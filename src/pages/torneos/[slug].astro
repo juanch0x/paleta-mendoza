@@ -1,0 +1,49 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import ActiveTournament from "@/components/tournament/ActiveTournament";
+import Layout from "@/layouts/Layout.astro";
+import registry from "@/data/torneos/registro.json";
+import type { ActiveTournament as TournamentData } from "@/data/active-tournament";
+
+type Archive = {
+  slug: string;
+  nombre: string;
+  fecha: string;
+  alcance: string;
+  parejas: TournamentData["parejas"];
+  partidos: TournamentData["partidos"];
+};
+
+export function getStaticPaths() {
+  const archives = import.meta.glob("../../data/torneos/archivos/*.json", { eager: true, import: "default" });
+
+  return registry.map((entry) => {
+    const tournament = archives[`../../data/torneos/archivos/${entry.slug}.json`] as Archive | undefined;
+    if (!tournament) throw new Error(`No se encontró el histórico ${entry.slug}.`);
+    return { params: { slug: entry.slug }, props: { tournament } };
+  });
+}
+
+const { tournament } = Astro.props as { tournament: Archive };
+const tournamentData = {
+  parejas: tournament.parejas,
+  partidos: tournament.partidos,
+} as unknown as TournamentData;
+---
+
+<Layout title={tournament.nombre} description={`Resultados y posiciones del ${tournament.nombre}.`}>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <a href="/torneos" class="text-sm font-semibold text-accent hover:underline">← Torneos anteriores</a>
+      <p class="mt-8 text-sm font-semibold tracking-[0.2em] text-accent uppercase">Torneo cerrado · {tournament.fecha}</p>
+      <h1 class="mt-3 max-w-3xl text-4xl leading-tight font-bold sm:text-6xl">{tournament.nombre}.</h1>
+      <p class="mt-5 max-w-2xl text-lg leading-8 text-foreground/80">
+        Archivo de {tournament.alcance.toLowerCase()}. Los datos quedaron congelados al cerrar el torneo.
+      </p>
+      <ActiveTournament client:load initialTournament={tournamentData} archived />
+    </section>
+  </main>
+  <Footer />
+</Layout>

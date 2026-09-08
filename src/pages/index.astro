@@ -1,0 +1,47 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import Hr from "@/components/Hr.astro";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+---
+
+<Layout>
+  <Header />
+  <main id="main-content">
+    <section class="pt-14 pb-12 sm:pt-20">
+      <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
+        Pelota paleta en Mendoza
+      </p>
+      <h1 class="mt-4 max-w-3xl text-4xl leading-tight font-bold sm:text-6xl">
+        Torneos, fixture y resultados en un solo lugar.
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg leading-8">
+        Consultá cuándo jugás, seguí las tablas de cada zona y enterate de las
+        novedades de la Federación de Paleta de Mendoza.
+      </p>
+      <div class="mt-8">
+        <LinkButton href="/torneo/" class="text-lg">
+          Ver torneo activo <IconArrowRight class="inline-block" />
+        </LinkButton>
+      </div>
+    </section>
+
+    <Hr />
+
+    <section class="py-12">
+      <h2 class="text-2xl font-semibold tracking-wide">Novedades</h2>
+      <p class="mt-4 max-w-2xl leading-7">
+        Próximamente vamos a publicar acá los anuncios de inscripciones,
+        campeones y noticias del circuito.
+      </p>
+      <div class="mt-6">
+        <LinkButton href="/posts/">
+          Ver noticias <IconArrowRight class="inline-block" />
+        </LinkButton>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
