@@ -7,6 +7,7 @@ import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { getCollection } from "astro:content";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPath } from "@/utils/getPath";
+import { activeTournamentConfig } from "@/data/active-tournament-config";
 
 const latestPosts = getSortedPosts(
   await getCollection("blog", ({ data }) => !data.draft),
@@ -30,10 +31,10 @@ const hasActiveTournament = Boolean(
                 Torneo activo
               </p>
               <h1 class="mt-2 max-w-2xl text-xl leading-tight font-bold sm:text-2xl">
-                Torneo Abierto Club Gimnasia y Esgrima
+                {activeTournamentConfig.name}
               </h1>
               <p class="mt-3 max-w-xl leading-7 text-skin-base/80">
-                Fixture, resultados y posiciones actualizadas.
+                {activeTournamentConfig.description}
               </p>
             </div>
             <LinkButton href="/torneo/" class="mt-5 shrink-0 sm:mt-0">
