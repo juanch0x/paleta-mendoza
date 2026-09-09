@@ -50,6 +50,7 @@ const hasActiveTournament = Boolean(
       {
         hasActiveTournament && (
           <a
+            id="active-tournament-shortcut"
             href="/torneo/"
             class="absolute top-4 right-14 flex size-10 items-center justify-center rounded-full focus-outline sm:hidden"
             aria-label="Ver torneo activo"
@@ -99,7 +100,7 @@ const hasActiveTournament = Boolean(
                 Torneos
                 {
                   hasActiveTournament && (
-                    <span class="relative hidden size-2 sm:flex" aria-hidden="true">
+                    <span class="relative flex size-2" aria-hidden="true">
                       <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
                       <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
                     </span>
@@ -137,6 +138,9 @@ const hasActiveTournament = Boolean(
     const menuItems = document.querySelector("#menu-items");
     const menuIcon = document.querySelector("#menu-icon");
     const closeIcon = document.querySelector("#close-icon");
+    const activeTournamentShortcut = document.querySelector(
+      "#active-tournament-shortcut"
+    );
 
     if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
 
@@ -149,6 +153,7 @@ const hasActiveTournament = Boolean(
       menuItems.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
+      activeTournamentShortcut?.classList.toggle("hidden", !openMenu);
     });
   }
 
