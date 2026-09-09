@@ -182,7 +182,7 @@ function Category({ categoria, parejas, partidos }: { categoria: string; parejas
         const scheduled = zoneMatches.filter(visible)
 
         return (
-          <div key={zone || "unique"} className="pt-2">
+          <div key={zone || "unique"} className="min-w-0 pt-2">
             <div className="flex items-center justify-between gap-4">
               <h3 className="text-lg font-bold">{zone ? `Zona ${zone}` : "Zona única"}</h3>
               <span className="text-xs text-foreground/65">Posiciones</span>
