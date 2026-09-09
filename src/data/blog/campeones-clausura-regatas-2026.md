@@ -2,6 +2,7 @@
 title: "Campeones del Clausura Regatas"
 description: "Los campeones de Primera, Segunda, Tercera y Cuarta del torneo Clausura Regatas 2026."
 pubDatetime: 2026-08-29
+ogImage: "/images/news/clausura-regatas-2026/tercera-campeones.jpeg"
 tags:
   - torneos
   - regatas

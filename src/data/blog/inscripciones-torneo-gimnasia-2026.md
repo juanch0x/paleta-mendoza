@@ -2,6 +2,7 @@
 title: "Inscripciones abiertas: Torneo Abierto Club Gimnasia y Esgrima"
 description: "Del 14 al 25 de septiembre se jugará el Torneo Abierto Club Gimnasia y Esgrima. Las inscripciones cierran el 9 de septiembre."
 pubDatetime: 2026-09-03
+ogImage: "/images/news/torneo-gimnasia-2026/inscripciones.jpeg"
 tags:
   - torneos
   - inscripciones

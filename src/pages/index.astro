@@ -5,6 +5,13 @@ import Footer from "@/components/Footer.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import Hr from "@/components/Hr.astro";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { getCollection } from "astro:content";
+import getSortedPosts from "@/utils/getSortedPosts";
+import { getPath } from "@/utils/getPath";
+
+const latestPosts = getSortedPosts(
+  await getCollection("blog", ({ data }) => !data.draft),
+).slice(0, 3);
 ---
 
 <Layout>
@@ -31,15 +38,57 @@ import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
     <Hr />
 
     <section class="py-12">
-      <h2 class="text-2xl font-semibold tracking-wide">Novedades</h2>
-      <p class="mt-4 max-w-2xl leading-7">
-        Próximamente vamos a publicar acá los anuncios de inscripciones,
-        campeones y noticias del circuito.
-      </p>
-      <div class="mt-6">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
+            Al día
+          </p>
+          <h2 class="mt-2 text-2xl font-semibold tracking-wide">Novedades</h2>
+        </div>
         <LinkButton href="/posts/">
           Ver noticias <IconArrowRight class="inline-block" />
         </LinkButton>
+      </div>
+
+      <div class="mt-8 grid gap-6 md:grid-cols-3">
+        {
+          latestPosts.map(post => {
+            const image = post.data.ogImage;
+            const imageSrc = typeof image === "string" ? image : image?.src;
+
+            return (
+              <article class="group overflow-hidden rounded-xl border border-skin-line bg-skin-fill shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <a href={getPath(post.id, post.filePath)} class="block">
+                  {imageSrc && (
+                    <img
+                      src={imageSrc}
+                      alt=""
+                      class="aspect-[4/3] w-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <div class="p-5">
+                    <time class="text-sm text-skin-base/70" datetime={post.data.pubDatetime.toISOString()}>
+                      {post.data.pubDatetime.toLocaleDateString("es-AR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                        timeZone: "UTC",
+                      })}
+                    </time>
+                    <h3 class="mt-2 text-xl font-semibold leading-snug group-hover:text-accent">
+                      {post.data.title}
+                    </h3>
+                    <p class="mt-3 leading-7 text-skin-base/80">{post.data.description}</p>
+                    <span class="mt-4 inline-block font-medium text-accent">
+                      Leer novedad <IconArrowRight class="inline-block" />
+                    </span>
+                  </div>
+                </a>
+              </article>
+            );
+          })
+        }
       </div>
     </section>
   </main>

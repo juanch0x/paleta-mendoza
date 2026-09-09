@@ -2,6 +2,7 @@
 title: "Bautista Latuf asciende a Segunda Categoría"
 description: "Luego de ganar tres torneos consecutivos, Bautista Latuf obtuvo el ascenso a Segunda Categoría."
 pubDatetime: 2026-08-31
+ogImage: "/images/news/ascenso-bautista-latuf-2026/bautista-latuf.jpeg"
 tags:
   - jugadores
   - ascensos
