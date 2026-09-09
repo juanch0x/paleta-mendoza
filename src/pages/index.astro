@@ -3,7 +3,6 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import LinkButton from "@/components/LinkButton.astro";
-import Hr from "@/components/Hr.astro";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
 import { getCollection } from "astro:content";
 import getSortedPosts from "@/utils/getSortedPosts";
@@ -12,32 +11,38 @@ import { getPath } from "@/utils/getPath";
 const latestPosts = getSortedPosts(
   await getCollection("blog", ({ data }) => !data.draft),
 ).slice(0, 3);
+
+const hasActiveTournament = Boolean(
+  import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL &&
+    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL,
+);
 ---
 
 <Layout>
   <Header />
   <main id="main-content">
-    <section class="pt-14 pb-12 sm:pt-20">
-      <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
-        Pelota paleta en Mendoza
-      </p>
-      <h1 class="mt-4 max-w-3xl text-4xl leading-tight font-bold sm:text-6xl">
-        Torneos, fixture y resultados en un solo lugar.
-      </h1>
-      <p class="mt-6 max-w-2xl text-lg leading-8">
-        Consultá cuándo jugás, seguí las tablas de cada zona y enterate de las
-        novedades de la Federación de Paleta de Mendoza.
-      </p>
-      <div class="mt-8">
-        <LinkButton href="/torneo/" class="text-lg">
-          Ver torneo activo <IconArrowRight class="inline-block" />
-        </LinkButton>
-      </div>
-    </section>
+    {
+      hasActiveTournament && (
+        <section class="pt-12 pb-10 sm:pt-16 sm:pb-12">
+          <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
+            Torneo activo
+          </p>
+          <h1 class="mt-3 max-w-2xl text-2xl leading-tight font-bold sm:text-3xl">
+            Torneo Abierto Club Gimnasia y Esgrima
+          </h1>
+          <p class="mt-4 max-w-xl leading-7 text-skin-base/80">
+            Fixture, resultados y posiciones actualizadas.
+          </p>
+          <div class="mt-6">
+            <LinkButton href="/torneo/">
+              Ver torneo <IconArrowRight class="inline-block" />
+            </LinkButton>
+          </div>
+        </section>
+      )
+    }
 
-    <Hr />
-
-    <section class="py-12">
+    <section class:list={{ "pt-12": !hasActiveTournament, "py-12": hasActiveTournament }}>
       <div class="flex items-end justify-between gap-4">
         <div>
           <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
