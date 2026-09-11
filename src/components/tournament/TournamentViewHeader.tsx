@@ -43,6 +43,10 @@ export default function TournamentViewHeader({ activeView }: Props) {
           </a>
         )}
       </nav>
+      <p className="text-foreground/60 mt-4 text-xs leading-5">
+        Información orientativa. Para horarios, cambios y resultados oficiales,
+        consultá los canales de la Federación de Paleta de Mendoza.
+      </p>
     </header>
   );
 }
