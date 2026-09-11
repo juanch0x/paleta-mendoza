@@ -4,6 +4,11 @@ import {
   loadActiveTournament,
   type ActiveTournament,
 } from "@/data/active-tournament";
+import {
+  cacheActiveTournament,
+  getCachedActiveTournament,
+  wasPageReloaded,
+} from "@/data/active-tournament-cache";
 import { mockActiveTournament } from "@/data/mock-active-tournament";
 import type { Participante, PartidoResuelto } from "@/domain/types";
 
@@ -132,7 +137,17 @@ export default function TournamentAgenda({
   const today = useMemo(() => localDate(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
   const [state, setState] = useState<TournamentState>(() => {
-    if (parejasUrl && partidosUrl) return { status: "loading" };
+    if (parejasUrl && partidosUrl) {
+      const cached = getCachedActiveTournament({ parejasUrl, partidosUrl });
+      if (cached)
+        return {
+          status: "ready",
+          tournament: cached.tournament,
+          updatedAt: cached.updatedAt,
+          source: "live",
+        };
+      return { status: "loading" };
+    }
     if (showMock)
       return {
         status: "ready",
@@ -145,19 +160,21 @@ export default function TournamentAgenda({
 
   useEffect(() => {
     if (!parejasUrl || !partidosUrl) return;
+    const source = { parejasUrl, partidosUrl };
+    const cached = getCachedActiveTournament(source);
+    if (cached?.isFresh && !wasPageReloaded()) return;
+
     let cancelled = false;
-    loadActiveTournament({ parejasUrl, partidosUrl })
+    loadActiveTournament(source)
       .then(tournament => {
-        if (!cancelled)
-          setState({
-            status: "ready",
-            tournament,
-            updatedAt: new Date(),
-            source: "live",
-          });
+        if (cancelled) return;
+
+        const updatedAt = new Date();
+        cacheActiveTournament(source, tournament, updatedAt);
+        setState({ status: "ready", tournament, updatedAt, source: "live" });
       })
       .catch(() => {
-        if (!cancelled) setState({ status: "error" });
+        if (!cancelled && !cached) setState({ status: "error" });
       });
     return () => {
       cancelled = true;

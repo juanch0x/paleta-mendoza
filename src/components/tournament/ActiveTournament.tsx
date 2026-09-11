@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 
 import { loadActiveTournament, type ActiveTournament } from "@/data/active-tournament"
+import { cacheActiveTournament, getCachedActiveTournament, wasPageReloaded } from "@/data/active-tournament-cache"
 import { mockActiveTournament } from "@/data/mock-active-tournament"
 import { buildStandings, type StandingRow } from "@/domain/standings"
 import type { Pareja, Participante, PartidoResuelto } from "@/domain/types"
@@ -65,12 +66,6 @@ const formatDateTime = (partido: PartidoResuelto) => {
 
   return partido.hora ? `${formattedDate} · ${partido.hora}` : formattedDate
 }
-
-const formatUpdatedAt = (date: Date) =>
-  new Intl.DateTimeFormat("es-AR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date)
 
 const scoreFor = (partido: PartidoResuelto, side: 0 | 1) => partido.sets.map(set => set[side]).join(" · ")
 
@@ -221,7 +216,11 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
   const [searchQuery, setSearchQuery] = useState("")
   const [state, setState] = useState<TournamentState>(() => {
     if (initialTournament) return { status: "ready", tournament: initialTournament, updatedAt: new Date(), source: "archive" }
-    if (parejasUrl && partidosUrl) return { status: "loading" }
+    if (parejasUrl && partidosUrl) {
+      const cached = getCachedActiveTournament({ parejasUrl, partidosUrl })
+      if (cached) return { status: "ready", tournament: cached.tournament, updatedAt: cached.updatedAt, source: "live" }
+      return { status: "loading" }
+    }
     if (showMock) return { status: "ready", tournament: mockActiveTournament, updatedAt: new Date(), source: "mock" }
     return { status: "missing-source" }
   })
@@ -229,13 +228,21 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
   useEffect(() => {
     if (initialTournament || !parejasUrl || !partidosUrl) return
 
+    const source = { parejasUrl, partidosUrl }
+    const cached = getCachedActiveTournament(source)
+    if (cached?.isFresh && !wasPageReloaded()) return
+
     let cancelled = false
-    loadActiveTournament({ parejasUrl, partidosUrl })
+    loadActiveTournament(source)
       .then(tournament => {
-        if (!cancelled) setState({ status: "ready", tournament, updatedAt: new Date(), source: "live" })
+        if (cancelled) return
+
+        const updatedAt = new Date()
+        cacheActiveTournament(source, tournament, updatedAt)
+        setState({ status: "ready", tournament, updatedAt, source: "live" })
       })
       .catch(() => {
-        if (!cancelled) setState({ status: "error" })
+        if (!cancelled && !cached) setState({ status: "error" })
       })
 
     return () => {
@@ -272,32 +279,26 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
 
   return (
     <>
-      <div className="mt-8 rounded-2xl border border-border bg-muted/40 p-5 sm:p-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">
-              {archived ? "Torneo cerrado" : "Seguimiento en vivo"}
-            </p>
-            <p className="mt-2 text-lg font-bold">
-              {archived ? "Resultados y posiciones definitivos." : "Consultá el fixture y las posiciones al instante."}
-            </p>
-          </div>
-          {!archived && <p className="text-sm text-foreground/70">Actualizado: {formatUpdatedAt(state.updatedAt)}</p>}
+      {archived ? (
+        <div className="mt-8 rounded-2xl border border-border bg-muted/40 p-5 sm:p-6">
+          <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Torneo cerrado</p>
+          <p className="mt-2 text-lg font-bold">Resultados y posiciones definitivos.</p>
         </div>
-        {state.source === "mock" && (
-          <p className="mt-5 rounded-xl border border-dashed border-accent bg-background p-4 text-sm">
-            Vista de demostración: estos resultados no corresponden a un torneo real.
-          </p>
-        )}
-        {!archived && (
-          <nav className="mt-5 flex items-center gap-5 border-t border-border pt-4 text-sm" aria-label="Vista del torneo">
+      ) : (
+        <>
+          <nav className="mt-8 flex items-center gap-5 border-b border-border pb-3 text-sm" aria-label="Vista del torneo">
             <span className="border-b-2 border-accent pb-1 font-semibold text-accent">Vista general</span>
             <a href="/torneo/agenda/" className="text-foreground/65 transition hover:text-foreground">
               Agenda por día
             </a>
           </nav>
-        )}
-      </div>
+          {state.source === "mock" && (
+            <p className="mt-5 rounded-xl border border-dashed border-accent bg-background p-4 text-sm">
+              Vista de demostración: estos resultados no corresponden a un torneo real.
+            </p>
+          )}
+        </>
+      )}
 
       <section className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-6" aria-labelledby="fixture-search-title">
         <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Tu fixture</p>
