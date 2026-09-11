@@ -29,7 +29,6 @@ const DATE_SHORTCUTS = [
   [-1, "Ayer"],
   [0, "Hoy"],
   [1, "Mañana"],
-  [2, "Pasado mañana"],
 ] as const;
 
 const PHASE_LABELS: Record<string, string> = {
@@ -253,7 +252,7 @@ export default function TournamentAgenda({
             real.
           </p>
         )}
-        <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
+        <div className="mt-6 grid grid-cols-3 gap-2">
           {DATE_SHORTCUTS.map(([offset, label]) => {
             const date = shiftDate(today, offset);
             const selected = date === selectedDate;
@@ -264,8 +263,8 @@ export default function TournamentAgenda({
                 onClick={() => setSelectedDate(date)}
                 className={
                   selected
-                    ? "bg-accent text-background shrink-0 rounded-full px-4 py-2 text-sm font-semibold"
-                    : "border-border bg-background hover:border-accent shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition"
+                    ? "bg-accent text-background w-full rounded-full px-4 py-2 text-sm font-semibold"
+                    : "border-border bg-background hover:border-accent w-full rounded-full border px-4 py-2 text-sm font-semibold transition"
                 }
               >
                 {label}
