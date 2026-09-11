@@ -11,6 +11,7 @@ import {
 } from "@/data/active-tournament-cache";
 import { mockActiveTournament } from "@/data/mock-active-tournament";
 import type { Participante, PartidoResuelto } from "@/domain/types";
+import TournamentViewHeader from "./TournamentViewHeader";
 
 type Props = { parejasUrl?: string; partidosUrl?: string; showMock?: boolean };
 
@@ -212,33 +213,14 @@ export default function TournamentAgenda({
 
   return (
     <>
-      <nav
-        className="border-border mt-8 flex items-center gap-5 border-b pb-3 text-sm"
-        aria-label="Vista del torneo"
-      >
-        <a
-          href="/torneo/"
-          className="text-foreground/65 hover:text-foreground transition"
-        >
-          Vista general
-        </a>
-        <span className="border-accent text-accent -mb-3 border-b-2 pb-3 font-semibold">
-          Agenda por día
-        </span>
-      </nav>
+      <TournamentViewHeader activeView="agenda" />
       <section
         className="border-border bg-muted/25 mt-8 rounded-2xl border p-5 sm:p-6"
         aria-labelledby="agenda-title"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-accent text-xs font-semibold tracking-[0.18em] uppercase">
-              Torneo activo
-            </p>
-            <h2
-              id="agenda-title"
-              className="mt-2 text-2xl font-bold sm:text-3xl"
-            >
+            <h2 id="agenda-title" className="text-2xl font-bold sm:text-3xl">
               Agenda por día
             </h2>
           </div>

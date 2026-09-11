@@ -5,6 +5,7 @@ import { cacheActiveTournament, getCachedActiveTournament, wasPageReloaded } fro
 import { mockActiveTournament } from "@/data/mock-active-tournament"
 import { buildStandings, type StandingRow } from "@/domain/standings"
 import type { Pareja, Participante, PartidoResuelto } from "@/domain/types"
+import TournamentViewHeader from "./TournamentViewHeader"
 
 type Props = {
   parejasUrl?: string
@@ -286,12 +287,7 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
         </div>
       ) : (
         <>
-          <nav className="mt-8 flex items-center gap-5 border-b border-border pb-3 text-sm" aria-label="Vista del torneo">
-            <span className="border-b-2 border-accent pb-1 font-semibold text-accent">Vista general</span>
-            <a href="/torneo/agenda/" className="text-foreground/65 transition hover:text-foreground">
-              Agenda por día
-            </a>
-          </nav>
+          <TournamentViewHeader activeView="general" />
           {state.source === "mock" && (
             <p className="mt-5 rounded-xl border border-dashed border-accent bg-background p-4 text-sm">
               Vista de demostración: estos resultados no corresponden a un torneo real.
