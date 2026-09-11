@@ -1,6 +1,9 @@
 {
   "slug": "clausura-regatas-2026",
   "nombre": "Clausura · Regatas",
+  "edition": "Clausura",
+  "hostClubName": "Regatas",
+  "clubId": "regatas",
   "fecha": "Agosto 2026",
   "estado": "cerrado",
   "alcance": "Fase de grupos y playoffs",

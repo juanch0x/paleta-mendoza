@@ -12,7 +12,8 @@ type Props = {
   partidosUrl?: string
   showMock?: boolean
   initialTournament?: ActiveTournament
-  archived?: boolean
+  showHeader?: boolean
+  showSearch?: boolean
 }
 
 type TournamentState =
@@ -157,7 +158,7 @@ function Category({ categoria, parejas, partidos }: { categoria: string; parejas
       </div>
 
       {playoffMatches.length > 0 && (
-        <div className="mt-8 border-t border-border pt-6">
+        <div className="mt-8">
           {groupByPhase(playoffMatches).map(([phase, matches], index) => (
             <div key={phase} className={index > 0 ? "mt-8" : ""}>
               <h3 className="text-lg font-bold tracking-wide uppercase">{phaseLabel(phase)}</h3>
@@ -171,7 +172,7 @@ function Category({ categoria, parejas, partidos }: { categoria: string; parejas
         </div>
       )}
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+      <div className={`mt-8 grid gap-8 lg:grid-cols-2 ${playoffMatches.length > 0 ? "border-t border-border pt-6" : ""}`}>
       {zones.map(zone => {
         const zonePairs = parejas.filter(pareja => (pareja.zona ?? "") === zone)
         const zoneMatches = groupMatches.filter(partido => (partido.zona ?? "") === zone)
@@ -213,7 +214,7 @@ function groupByPhase(partidos: PartidoResuelto[]) {
   return [...byPhase.entries()].sort(([a], [b]) => (PHASE_ORDER[a] ?? 99) - (PHASE_ORDER[b] ?? 99))
 }
 
-export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = false, initialTournament, archived = false }: Props) {
+export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = false, initialTournament, showHeader = true, showSearch = true }: Props) {
   const [searchQuery, setSearchQuery] = useState("")
   const [state, setState] = useState<TournamentState>(() => {
     if (initialTournament) return { status: "ready", tournament: initialTournament, updatedAt: new Date(), source: "archive" }
@@ -280,12 +281,7 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
 
   return (
     <>
-      {archived ? (
-        <div className="mt-8 rounded-2xl border border-border bg-muted/40 p-5 sm:p-6">
-          <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Torneo cerrado</p>
-          <p className="mt-2 text-lg font-bold">Resultados y posiciones definitivos.</p>
-        </div>
-      ) : (
+      {showHeader && (
         <>
           <TournamentViewHeader activeView="general" />
           {state.source === "mock" && (
@@ -296,7 +292,7 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
         </>
       )}
 
-      <section className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-6" aria-labelledby="fixture-search-title">
+      {showSearch && <section className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-6" aria-labelledby="fixture-search-title">
         <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Tu fixture</p>
         <h2 id="fixture-search-title" className="mt-2 text-2xl font-bold">¿Cuándo juego?</h2>
         <p className="mt-2 text-sm text-foreground/70">Buscá por tu nombre, apellido o pareja para ver todos tus partidos.</p>
@@ -330,7 +326,7 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
             )}
           </div>
         )}
-      </section>
+      </section>}
       {categories.map(categoria => (
         <Category
           key={categoria}
