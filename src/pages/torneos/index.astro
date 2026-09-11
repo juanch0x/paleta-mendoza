@@ -23,7 +23,7 @@ const hasActiveTournament = Boolean(
         hasActiveTournament && (
           <a
             href="/torneo/"
-            class="border-skin-line border-l-accent bg-skin-fill relative block overflow-hidden rounded-xl border border-l-4 p-5 transition hover:shadow-md sm:p-6"
+            class="border-skin-line border-l-accent bg-skin-fill relative block min-h-44 overflow-hidden rounded-xl border border-l-4 p-5 transition hover:shadow-md sm:p-6"
           >
             <img
               src={activeTournamentConfig.clubLogo}
@@ -31,7 +31,7 @@ const hasActiveTournament = Boolean(
               aria-hidden="true"
               class="pointer-events-none absolute -right-8 -bottom-10 size-48 object-contain opacity-10 sm:-right-4 sm:-bottom-14 sm:size-56"
             />
-            <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+            <div class="relative flex min-h-32 flex-col justify-between gap-6 sm:flex-row sm:items-center sm:gap-8">
               <div>
                 <div class="text-accent flex items-center gap-2 text-xs font-semibold tracking-[0.18em] uppercase">
                   <span class="relative flex size-2" aria-hidden="true">
@@ -43,9 +43,6 @@ const hasActiveTournament = Boolean(
                 <h2 class="mt-2 text-xl font-bold sm:text-2xl">
                   {activeTournamentConfig.name}
                 </h2>
-                <p class="text-foreground/70 mt-2">
-                  {activeTournamentConfig.description}
-                </p>
               </div>
               <span class="text-accent shrink-0 font-semibold">
                 Ver torneo →
@@ -60,7 +57,7 @@ const hasActiveTournament = Boolean(
           registry.map(torneo => (
             <a
               href={`/torneos/${torneo.slug}`}
-              class="border-border bg-muted/30 hover:border-accent relative block overflow-hidden rounded-2xl border p-6 transition hover:shadow-md"
+              class="border-border bg-muted/30 hover:border-accent relative block min-h-44 overflow-hidden rounded-2xl border p-6 transition hover:shadow-md"
             >
               <img
                 src={torneo.clubLogo}
@@ -71,12 +68,11 @@ const hasActiveTournament = Boolean(
               <p class="text-accent relative text-xs font-semibold tracking-[0.18em] uppercase">
                 {torneo.fecha}
               </p>
-              <div class="relative mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div class="relative mt-2 flex min-h-32 flex-col justify-between gap-6 sm:flex-row sm:items-center sm:gap-8">
                 <div>
                   <h2 class="text-2xl font-bold sm:text-3xl">
                     {torneo.nombre}
                   </h2>
-                  <p class="text-foreground/70 mt-2">{torneo.alcance}</p>
                 </div>
                 <span class="text-accent font-semibold">Ver resultados →</span>
               </div>
