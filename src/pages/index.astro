@@ -10,12 +10,12 @@ import { getPath } from "@/utils/getPath";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
 
 const latestPosts = getSortedPosts(
-  await getCollection("blog", ({ data }) => !data.draft),
+  await getCollection("blog", ({ data }) => !data.draft)
 ).slice(0, 3);
 
 const hasActiveTournament = Boolean(
   import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL &&
-    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL,
+    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL
 );
 ---
 
@@ -25,19 +25,25 @@ const hasActiveTournament = Boolean(
     {
       hasActiveTournament && (
         <section class="pt-8 pb-6 sm:pt-12 sm:pb-8">
-          <div class="rounded-xl border border-skin-line border-l-4 border-l-accent bg-skin-fill p-5 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-6">
-            <div>
-              <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
+          <div class="border-skin-line border-l-accent bg-skin-fill relative overflow-hidden rounded-xl border border-l-4 p-5 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-6">
+            <img
+              src={activeTournamentConfig.clubLogo}
+              alt=""
+              aria-hidden="true"
+              class="pointer-events-none absolute -right-8 -bottom-10 size-48 object-contain opacity-10 sm:-right-4 sm:-bottom-14 sm:size-56"
+            />
+            <div class="relative">
+              <p class="text-accent text-sm font-semibold tracking-[0.2em] uppercase">
                 Torneo activo
               </p>
               <h1 class="mt-2 max-w-2xl text-xl leading-tight font-bold sm:text-2xl">
                 {activeTournamentConfig.name}
               </h1>
-              <p class="mt-3 max-w-xl leading-7 text-skin-base/80">
+              <p class="text-skin-base/80 mt-3 max-w-xl leading-7">
                 {activeTournamentConfig.description}
               </p>
             </div>
-            <LinkButton href="/torneo/" class="mt-5 shrink-0 sm:mt-0">
+            <LinkButton href="/torneo/" class="relative mt-5 shrink-0 sm:mt-0">
               Ver torneo <IconArrowRight class="inline-block" />
             </LinkButton>
           </div>
@@ -45,10 +51,17 @@ const hasActiveTournament = Boolean(
       )
     }
 
-    <section class:list={{ "pt-10": !hasActiveTournament, "py-8": hasActiveTournament }}>
+    <section
+      class:list={{
+        "pt-10": !hasActiveTournament,
+        "py-8": hasActiveTournament,
+      }}
+    >
       <div class="flex items-end justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold tracking-[0.2em] text-accent uppercase">
+          <p
+            class="text-accent text-sm font-semibold tracking-[0.2em] uppercase"
+          >
             Al día
           </p>
           <h2 class="mt-2 text-2xl font-semibold tracking-wide">Novedades</h2>
@@ -65,7 +78,7 @@ const hasActiveTournament = Boolean(
             const imageSrc = typeof image === "string" ? image : image?.src;
 
             return (
-              <article class="group overflow-hidden rounded-xl border border-skin-line bg-skin-fill shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+              <article class="group border-skin-line bg-skin-fill overflow-hidden rounded-xl border shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                 <a href={getPath(post.id, post.filePath)} class="block">
                   {imageSrc && (
                     <img
@@ -76,7 +89,10 @@ const hasActiveTournament = Boolean(
                     />
                   )}
                   <div class="p-5">
-                    <time class="text-sm text-skin-base/70" datetime={post.data.pubDatetime.toISOString()}>
+                    <time
+                      class="text-skin-base/70 text-sm"
+                      datetime={post.data.pubDatetime.toISOString()}
+                    >
                       {post.data.pubDatetime.toLocaleDateString("es-AR", {
                         day: "numeric",
                         month: "long",
@@ -84,11 +100,13 @@ const hasActiveTournament = Boolean(
                         timeZone: "UTC",
                       })}
                     </time>
-                    <h3 class="mt-2 text-xl font-semibold leading-snug group-hover:text-accent">
+                    <h3 class="group-hover:text-accent mt-2 text-xl leading-snug font-semibold">
                       {post.data.title}
                     </h3>
-                    <p class="mt-3 leading-7 text-skin-base/80">{post.data.description}</p>
-                    <span class="mt-4 inline-block font-medium text-accent">
+                    <p class="text-skin-base/80 mt-3 leading-7">
+                      {post.data.description}
+                    </p>
+                    <span class="text-accent mt-4 inline-block font-medium">
                       Leer novedad <IconArrowRight class="inline-block" />
                     </span>
                   </div>

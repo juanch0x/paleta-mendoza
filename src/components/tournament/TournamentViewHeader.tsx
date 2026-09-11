@@ -7,14 +7,29 @@ type Props = {
 export default function TournamentViewHeader({ activeView }: Props) {
   return (
     <header className="mt-8">
-      <p className="text-accent text-xs font-semibold tracking-[0.18em] uppercase">
-        Torneo activo
-      </p>
-      <h2 className="mt-2 text-xl font-bold sm:text-2xl">
-        {activeTournamentConfig.name}
-      </h2>
+      <div>
+        <p className="text-accent text-xs font-semibold tracking-[0.18em] uppercase">
+          Torneo activo
+        </p>
+        <div className="mt-3 flex items-center gap-4">
+          <img
+            src={activeTournamentConfig.clubLogo}
+            alt=""
+            aria-hidden="true"
+            className="size-16 object-contain"
+          />
+          <div>
+            <h2 className="text-xl font-bold sm:text-2xl">
+              {activeTournamentConfig.edition}
+            </h2>
+            <p className="text-foreground/75 mt-0.5 text-base font-medium">
+              {activeTournamentConfig.hostClubName}
+            </p>
+          </div>
+        </div>
+      </div>
       <nav
-        className="border-border mt-5 flex items-center gap-5 border-b pb-3 text-sm"
+        className="border-border relative mt-5 flex items-center gap-5 border-b pb-3 text-sm"
         aria-label="Vista del torneo"
       >
         {activeView === "general" ? (
