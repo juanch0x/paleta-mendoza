@@ -1,0 +1,32 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import TournamentAgenda from "@/components/tournament/TournamentAgenda";
+import { activeTournamentConfig } from "@/data/active-tournament-config";
+import Layout from "@/layouts/Layout.astro";
+
+const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
+const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
+const showMock =
+  import.meta.env.DEV || import.meta.env.PUBLIC_TOURNAMENT_MOCK === "true";
+---
+
+<Layout
+  title={`Agenda · ${activeTournamentConfig.name}`}
+  description="Partidos del torneo activo organizados por día."
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-8 pb-12 sm:pt-12 sm:pb-16">
+      <h1 class="sr-only">
+        Agenda de {activeTournamentConfig.name}
+      </h1><TournamentAgenda
+        client:only="react"
+        parejasUrl={parejasUrl}
+        partidosUrl={partidosUrl}
+        showMock={showMock}
+      />
+    </section>
+  </main>
+  <Footer />
+</Layout>

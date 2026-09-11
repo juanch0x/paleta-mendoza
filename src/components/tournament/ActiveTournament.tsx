@@ -289,6 +289,14 @@ export default function ActiveTournament({ parejasUrl, partidosUrl, showMock = f
             Vista de demostración: estos resultados no corresponden a un torneo real.
           </p>
         )}
+        {!archived && (
+          <nav className="mt-5 flex items-center gap-5 border-t border-border pt-4 text-sm" aria-label="Vista del torneo">
+            <span className="border-b-2 border-accent pb-1 font-semibold text-accent">Vista general</span>
+            <a href="/torneo/agenda/" className="text-foreground/65 transition hover:text-foreground">
+              Agenda por día
+            </a>
+          </nav>
+        )}
       </div>
 
       <section className="mt-8 rounded-2xl border border-border bg-background p-5 sm:p-6" aria-labelledby="fixture-search-title">
