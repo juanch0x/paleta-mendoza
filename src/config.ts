@@ -4,7 +4,7 @@ export const SITE = {
   profile: "",
   desc: "Torneos y novedades de pelota paleta en Mendoza.",
   title: "Paleta Mendoza",
-  ogImage: "default-og.jpg",
+  ogImage: "images/social/default-og.png",
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 4,
