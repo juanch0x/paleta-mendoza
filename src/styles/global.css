@@ -38,11 +38,11 @@ html[data-theme="dark"] {
     @apply overflow-y-scroll scroll-smooth;
   }
   body {
-    @apply flex min-h-svh flex-col bg-background font-mono text-foreground selection:bg-accent/75 selection:text-background;
+    @apply bg-background text-foreground selection:bg-accent/75 selection:text-background flex min-h-svh flex-col font-mono;
   }
   a,
   button {
-    @apply outline-offset-1 outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+    @apply outline-accent outline-offset-1 focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -56,4 +56,216 @@ html[data-theme="dark"] {
 
 .active-nav {
   @apply underline decoration-wavy decoration-2 underline-offset-4;
+}
+
+.export-shell {
+  @apply py-8 sm:py-12;
+}
+
+.export-controls {
+  @apply border-border mb-8 border-b pb-6;
+}
+
+.export-controls-actions {
+  @apply mt-5 flex flex-col gap-3 sm:flex-row sm:items-end;
+}
+
+.export-controls label {
+  @apply flex flex-col gap-1 text-xs font-semibold tracking-wide uppercase;
+}
+
+.export-controls input {
+  @apply border-border bg-background rounded-lg border px-3 py-2 text-sm normal-case;
+}
+
+.export-controls button {
+  @apply bg-accent text-background rounded-lg px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.export-output-actions {
+  @apply mt-5;
+}
+
+.export-split-button {
+  @apply flex w-full sm:w-fit;
+}
+
+.export-split-button > button {
+  @apply flex-1 rounded-r-none sm:flex-none;
+}
+
+.export-split-button details {
+  @apply relative;
+}
+
+.export-split-button summary {
+  @apply bg-accent text-background border-background/30 flex h-full w-11 cursor-pointer list-none items-center justify-center rounded-r-lg border-l;
+}
+
+.export-split-button summary::-webkit-details-marker {
+  display: none;
+}
+
+.export-split-button summary svg {
+  @apply h-4 w-4;
+}
+
+.export-print-menu {
+  @apply border-border bg-background absolute right-0 z-10 mt-2 min-w-44 rounded-lg border p-1 shadow-lg;
+}
+
+.export-print-menu button {
+  @apply text-foreground hover:bg-muted w-full rounded-md bg-transparent px-3 py-2 text-left text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.export-range-help {
+  @apply text-foreground/65 mt-4 text-xs leading-5;
+}
+
+.export-message {
+  @apply border-border bg-background text-foreground/70 rounded-xl border border-dashed p-5 text-sm;
+}
+
+.export-report {
+  @apply border-border bg-background border p-4 sm:p-6;
+}
+
+.export-report-header {
+  @apply border-border flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-end sm:justify-between;
+}
+
+.export-report-header > div > p {
+  @apply text-accent text-xs font-semibold tracking-[0.16em] uppercase;
+}
+
+.export-report-header h2 {
+  @apply mt-1 text-xl font-bold sm:text-2xl;
+}
+
+.export-day {
+  @apply border-border bg-muted/25 mt-6 rounded-xl border p-4 sm:p-5;
+}
+
+.export-day-header {
+  @apply flex items-baseline justify-between gap-4;
+}
+
+.export-day-header h3 {
+  @apply text-lg font-bold;
+}
+
+.export-day-header p {
+  @apply text-foreground/65 text-xs;
+}
+
+.export-section {
+  @apply mt-5;
+}
+
+.export-section h4 {
+  @apply text-accent mb-2 text-xs font-semibold tracking-[0.16em] uppercase;
+}
+
+.export-match {
+  @apply border-border bg-background rounded-lg border p-4;
+}
+
+.export-match + .export-match {
+  @apply mt-3;
+}
+
+.export-match-meta {
+  @apply text-foreground/70 flex items-center gap-2 text-xs;
+}
+
+.export-match-meta span:nth-child(2) {
+  @apply min-w-0 flex-1 truncate;
+}
+
+.export-status {
+  @apply bg-muted rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase;
+}
+
+.export-status--complete {
+  @apply bg-accent/15 text-accent;
+}
+
+.export-match-body {
+  @apply mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center;
+}
+
+.export-match-body p {
+  @apply min-w-0 font-medium;
+}
+
+.export-match-body p:last-child {
+  @apply col-start-1 sm:col-start-auto sm:text-right;
+}
+
+.export-versus {
+  @apply text-accent row-span-2 self-center text-right tabular-nums sm:row-auto;
+}
+
+.export-result {
+  @apply bg-muted/50 mt-4 flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-semibold tabular-nums;
+}
+
+.export-result span {
+  @apply text-foreground/60 text-xs font-semibold tracking-wide uppercase;
+}
+
+.export-note {
+  @apply border-border text-foreground/70 mt-3 border-t pt-2 text-xs;
+}
+
+.export-report-footer {
+  @apply border-border text-foreground/60 mt-2 border-t pt-4 text-xs leading-5;
+}
+
+.export-report-footer p + p {
+  @apply mt-2;
+}
+
+.export-report-footer a {
+  @apply text-accent underline underline-offset-2;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .export-controls {
+    display: none;
+  }
+
+  .export-shell,
+  .export-report {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .export-match {
+    break-inside: avoid;
+  }
+
+  .export-day {
+    break-inside: auto;
+    margin-top: 5mm;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .export-day-header,
+  .export-section h4 {
+    break-after: avoid-page;
+  }
 }
