@@ -183,65 +183,18 @@ export default function TournamentExport({
   };
 
   const createPdfFile = async () => {
-    const { jsPDF } = await import("jspdf");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-    const margin = 14;
-    const width = 182;
-    let y = 16;
-    const nextPage = (space = 8) => {
-      if (y + space > 280) {
-        pdf.addPage();
-        y = 16;
-      }
-    };
-    const write = (text: string, size = 8, bold = false, color = "282728") => {
-      pdf.setFont("courier", bold ? "bold" : "normal");
-      pdf.setFontSize(size);
-      pdf.setTextColor(`#${color}`);
-      const lines = pdf.splitTextToSize(text, width);
-      nextPage(lines.length * (size * 0.45) + 3);
-      pdf.text(lines, margin, y);
-      y += lines.length * (size * 0.45) + 3;
-    };
-    write("PARTE DEL TORNEO", 8, true, "006cac");
-    write(activeTournamentConfig.name, 15, true);
-    y += 3;
-    for (const day of days) {
-      nextPage(22);
-      write(formatDate(day.date), 11, true);
-      for (const [label, matches] of [
-        ["RESULTADOS", day.results],
-        ["PARTIDOS PROGRAMADOS", day.scheduled],
-      ] as const) {
-        if (!matches.length) continue;
-        write(label, 8, true, "006cac");
-        for (const partido of matches) {
-          write(
-            `${partido.hora ?? "A confirmar"} · ${partido.categoria} · ${partido.fase === "grupo" ? `Zona ${partido.zona ?? "única"}` : partido.fase}`,
-            7,
-            false,
-            "666666"
-          );
-          write(
-            `${participantName(partido.a)}  vs.  ${participantName(partido.b)}`,
-            8,
-            true
-          );
-          if (partido.sets.length)
-            write(`RESULTADO  ${scoreBySet(partido)}`, 7, true, "006cac");
-          if (partido.nota) write(partido.nota, 7, false, "666666");
-          y += 2;
-        }
-      }
-      y += 3;
-    }
-    write(`Generado: ${formatUpdatedAt(generatedAt)}`, 7, false, "666666");
+    const [{ pdf }, { default: TournamentExportPdf }] = await Promise.all([
+      import("@react-pdf/renderer"),
+      import("./TournamentExportPdf"),
+    ]);
+    const blob = await pdf(
+      <TournamentExportPdf
+        days={days}
+        generatedAt={formatUpdatedAt(generatedAt)}
+      />
+    ).toBlob();
 
-    return new File([pdf.output("blob")], "parte-diario.pdf", {
+    return new File([blob], "parte-diario.pdf", {
       type: "application/pdf",
     });
   };
