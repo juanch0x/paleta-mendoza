@@ -164,6 +164,7 @@ export default function TournamentExport({
   }, [parejasUrl, partidosUrl]);
 
   const rangeIsValid = isExportRangeValid(from, to);
+  const generatedAt = state.status === "ready" ? state.updatedAt : new Date();
   const days = useMemo(
     () =>
       state.status === "ready"
@@ -182,53 +183,63 @@ export default function TournamentExport({
   };
 
   const createPdfFile = async () => {
-    const report = document.querySelector<HTMLElement>(".export-report");
-    if (!report) throw new Error("Export report is not available");
-
-    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-      import("html2canvas"),
-      import("jspdf"),
-    ]);
-    const canvas = await html2canvas(report, {
-      backgroundColor: "#ffffff",
-      scale: 2,
-      useCORS: true,
-      foreignObjectRendering: true,
-      onclone: clonedDocument => {
-        const styles = clonedDocument.createElement("style");
-        styles.textContent = `
-          .export-report, .export-report * {
-            color: #282728 !important;
-            outline-color: #006cac !important;
-            box-shadow: none !important;
-          }
-          .export-report { background: #ffffff !important; border-color: #ece9e9 !important; }
-          .export-report .export-day { background: rgba(230, 230, 230, .25) !important; border-color: #ece9e9 !important; }
-          .export-report .export-match { background: #ffffff !important; border-color: #ece9e9 !important; }
-          .export-report .export-result { background: rgba(230, 230, 230, .5) !important; }
-          .export-report .export-status { background: #e6e6e6 !important; }
-          .export-report .export-status--complete { background: rgba(0, 108, 172, .15) !important; color: #006cac !important; }
-          .export-report .export-report-header > div > p,
-          .export-report .export-section h4,
-          .export-report .export-versus,
-          .export-report .export-report-footer a { color: #006cac !important; }
-          .export-report .export-day-header p,
-          .export-report .export-match-meta,
-          .export-report .export-result span,
-          .export-report .export-note,
-          .export-report .export-report-footer { color: #666666 !important; }
-        `;
-        clonedDocument.head.append(styles);
-      },
-    });
-    const width = 210;
-    const height = (canvas.height * width) / canvas.width;
+    const { jsPDF } = await import("jspdf");
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
-      format: [width, height],
+      format: "a4",
     });
-    pdf.addImage(canvas, "JPEG", 0, 0, width, height, undefined, "FAST");
+    const margin = 14;
+    const width = 182;
+    let y = 16;
+    const nextPage = (space = 8) => {
+      if (y + space > 280) {
+        pdf.addPage();
+        y = 16;
+      }
+    };
+    const write = (text: string, size = 8, bold = false, color = "282728") => {
+      pdf.setFont("courier", bold ? "bold" : "normal");
+      pdf.setFontSize(size);
+      pdf.setTextColor(`#${color}`);
+      const lines = pdf.splitTextToSize(text, width);
+      nextPage(lines.length * (size * 0.45) + 3);
+      pdf.text(lines, margin, y);
+      y += lines.length * (size * 0.45) + 3;
+    };
+    write("PARTE DEL TORNEO", 8, true, "006cac");
+    write(activeTournamentConfig.name, 15, true);
+    y += 3;
+    for (const day of days) {
+      nextPage(22);
+      write(formatDate(day.date), 11, true);
+      for (const [label, matches] of [
+        ["RESULTADOS", day.results],
+        ["PARTIDOS PROGRAMADOS", day.scheduled],
+      ] as const) {
+        if (!matches.length) continue;
+        write(label, 8, true, "006cac");
+        for (const partido of matches) {
+          write(
+            `${partido.hora ?? "A confirmar"} · ${partido.categoria} · ${partido.fase === "grupo" ? `Zona ${partido.zona ?? "única"}` : partido.fase}`,
+            7,
+            false,
+            "666666"
+          );
+          write(
+            `${participantName(partido.a)}  vs.  ${participantName(partido.b)}`,
+            8,
+            true
+          );
+          if (partido.sets.length)
+            write(`RESULTADO  ${scoreBySet(partido)}`, 7, true, "006cac");
+          if (partido.nota) write(partido.nota, 7, false, "666666");
+          y += 2;
+        }
+      }
+      y += 3;
+    }
+    write(`Generado: ${formatUpdatedAt(generatedAt)}`, 7, false, "666666");
 
     return new File([pdf.output("blob")], "parte-diario.pdf", {
       type: "application/pdf",

@@ -26,9 +26,6 @@ importers:
       astro:
         specifier: ^5.18.2
         version: 5.18.2(jiti@2.7.0)(lightningcss@1.33.0)(rollup@4.63.1)(tsx@4.23.13)(typescript@5.8.2)(yaml@2.9.0)
-      html2canvas:
-        specifier: ^1.4.1
-        version: 1.4.1
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -5866,7 +5863,8 @@ snapshots:
 
   base-64@1.0.0: {}
 
-  base64-arraybuffer@1.0.2: {}
+  base64-arraybuffer@1.0.2:
+    optional: true
 
   base64-js@0.0.8: {}
 
@@ -6027,6 +6025,7 @@ snapshots:
   css-line-break@2.1.0:
     dependencies:
       utrie: 1.0.2
+    optional: true
 
   css-select@6.0.0:
     dependencies:
@@ -6589,6 +6588,7 @@ snapshots:
     dependencies:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
+    optional: true
 
   http-cache-semantics@4.2.0: {}
 
@@ -7805,6 +7805,7 @@ snapshots:
   text-segmentation@1.0.3:
     dependencies:
       utrie: 1.0.2
+    optional: true
 
   tiny-inflate@1.0.3: {}
 
@@ -7985,6 +7986,7 @@ snapshots:
   utrie@1.0.2:
     dependencies:
       base64-arraybuffer: 1.0.2
+    optional: true
 
   vfile-location@5.0.3:
     dependencies:
