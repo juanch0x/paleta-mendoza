@@ -117,6 +117,7 @@ export default function TournamentExport({
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
   const [isPreparingPdf, setIsPreparingPdf] = useState(false);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfError, setPdfError] = useState(false);
   const [state, setState] = useState<TournamentState>(() => {
     if (parejasUrl && partidosUrl) {
@@ -170,6 +171,11 @@ export default function TournamentExport({
         : [],
     [from, state, to]
   );
+
+  useEffect(() => {
+    setPdfFile(null);
+    setPdfError(false);
+  }, [from, to]);
 
   const printExport = () => {
     window.print();
@@ -237,24 +243,48 @@ export default function TournamentExport({
     URL.revokeObjectURL(url);
   };
 
-  const preparePdf = async (action: "share" | "download") => {
+  const preparePdf = async () => {
     setIsPreparingPdf(true);
     setPdfError(false);
     try {
       const file = await createPdfFile();
-      if (
-        action === "share" &&
-        navigator.share &&
-        navigator.canShare?.({ files: [file] })
-      ) {
-        await navigator.share({ files: [file] });
-      } else {
-        downloadPdf(file);
-      }
-    } catch (error) {
+      setPdfFile(file);
+    } catch {
+      setPdfError(true);
+    } finally {
+      setIsPreparingPdf(false);
+    }
+  };
+
+  const sharePdf = () => {
+    if (!pdfFile) {
+      void preparePdf();
+      return;
+    }
+    if (!navigator.share || !navigator.canShare?.({ files: [pdfFile] })) {
+      downloadPdf(pdfFile);
+      return;
+    }
+    navigator.share({ files: [pdfFile] }).catch(error => {
       if (!(error instanceof DOMException && error.name === "AbortError")) {
         setPdfError(true);
       }
+    });
+  };
+
+  const savePdf = async () => {
+    if (pdfFile) {
+      downloadPdf(pdfFile);
+      return;
+    }
+    setIsPreparingPdf(true);
+    setPdfError(false);
+    try {
+      const file = await createPdfFile();
+      setPdfFile(file);
+      downloadPdf(file);
+    } catch {
+      setPdfError(true);
     } finally {
       setIsPreparingPdf(false);
     }
@@ -308,11 +338,15 @@ export default function TournamentExport({
           <div className="export-split-button">
             <button
               type="button"
-              onClick={() => preparePdf("share")}
+              onClick={sharePdf}
               disabled={!rangeIsValid || days.length === 0 || isPreparingPdf}
               aria-busy={isPreparingPdf}
             >
-              {isPreparingPdf ? "Preparando PDF…" : "Compartir PDF"}
+              {isPreparingPdf
+                ? "Preparando PDF…"
+                : pdfFile
+                  ? "Compartir PDF"
+                  : "Preparar PDF"}
             </button>
             <details>
               <summary aria-label="Ver más opciones de exportación">
@@ -329,7 +363,7 @@ export default function TournamentExport({
               <div className="export-print-menu">
                 <button
                   type="button"
-                  onClick={() => preparePdf("download")}
+                  onClick={savePdf}
                   disabled={
                     !rangeIsValid || days.length === 0 || isPreparingPdf
                   }
@@ -354,6 +388,11 @@ export default function TournamentExport({
           Podés incluir hasta {MAX_EXPORT_DAYS} días. Los resultados y partidos
           programados se ordenan automáticamente.
         </p>
+        {pdfFile && (
+          <p className="export-range-help">
+            PDF listo. Tocá <strong>Compartir PDF</strong> para elegir WhatsApp.
+          </p>
+        )}
         {pdfError && (
           <p className="export-range-help" role="alert">
             No pudimos generar el PDF. Probá de nuevo.
