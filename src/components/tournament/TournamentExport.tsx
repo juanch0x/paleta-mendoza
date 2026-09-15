@@ -193,6 +193,7 @@ export default function TournamentExport({
       backgroundColor: "#ffffff",
       scale: 2,
       useCORS: true,
+      foreignObjectRendering: true,
       onclone: clonedDocument => {
         const styles = clonedDocument.createElement("style");
         styles.textContent = `
