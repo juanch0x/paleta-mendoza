@@ -116,6 +116,8 @@ export default function TournamentExport({
   const today = useMemo(() => localDate(new Date()), []);
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
+  const [isPreparingPdf, setIsPreparingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState(false);
   const [state, setState] = useState<TournamentState>(() => {
     if (parejasUrl && partidosUrl) {
       const cached = getCachedActiveTournament({ parejasUrl, partidosUrl });
@@ -169,28 +171,67 @@ export default function TournamentExport({
     [from, state, to]
   );
 
-  const printExport = (continuous: boolean) => {
-    document.getElementById("export-page-size")?.remove();
-
-    if (continuous) {
-      const report = document.querySelector<HTMLElement>(".export-report");
-      if (report) {
-        const millimeters = Math.ceil(
-          Math.max(297, (report.scrollHeight + 120) * (25.4 / 96) * 1.2)
-        );
-        const style = document.createElement("style");
-        style.id = "export-page-size";
-        style.textContent = `@media print { @page { size: 210mm ${millimeters}mm; margin: 12mm; } }`;
-        document.head.append(style);
-      }
-    }
-
-    window.addEventListener(
-      "afterprint",
-      () => document.getElementById("export-page-size")?.remove(),
-      { once: true }
-    );
+  const printExport = () => {
     window.print();
+  };
+
+  const createPdfFile = async () => {
+    const report = document.querySelector<HTMLElement>(".export-report");
+    if (!report) throw new Error("Export report is not available");
+
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
+    const canvas = await html2canvas(report, {
+      backgroundColor: "#ffffff",
+      scale: 2,
+      useCORS: true,
+    });
+    const width = 210;
+    const height = (canvas.height * width) / canvas.width;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [width, height],
+    });
+    pdf.addImage(canvas, "JPEG", 0, 0, width, height, undefined, "FAST");
+
+    return new File([pdf.output("blob")], "parte-diario.pdf", {
+      type: "application/pdf",
+    });
+  };
+
+  const downloadPdf = (file: File) => {
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const preparePdf = async (action: "share" | "download") => {
+    setIsPreparingPdf(true);
+    setPdfError(false);
+    try {
+      const file = await createPdfFile();
+      if (
+        action === "share" &&
+        navigator.share &&
+        navigator.canShare?.({ files: [file] })
+      ) {
+        await navigator.share({ files: [file] });
+      } else {
+        downloadPdf(file);
+      }
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        setPdfError(true);
+      }
+    } finally {
+      setIsPreparingPdf(false);
+    }
   };
 
   if (state.status === "missing-source")
@@ -241,10 +282,11 @@ export default function TournamentExport({
           <div className="export-split-button">
             <button
               type="button"
-              onClick={() => printExport(true)}
-              disabled={!rangeIsValid || days.length === 0}
+              onClick={() => preparePdf("share")}
+              disabled={!rangeIsValid || days.length === 0 || isPreparingPdf}
+              aria-busy={isPreparingPdf}
             >
-              Generar PDF para WhatsApp
+              {isPreparingPdf ? "Preparando PDF…" : "Compartir PDF"}
             </button>
             <details>
               <summary aria-label="Ver más opciones de exportación">
@@ -261,9 +303,20 @@ export default function TournamentExport({
               <div className="export-print-menu">
                 <button
                   type="button"
+                  onClick={() => preparePdf("download")}
+                  disabled={
+                    !rangeIsValid || days.length === 0 || isPreparingPdf
+                  }
+                >
+                  Guardar PDF
+                </button>
+                <button
+                  type="button"
                   aria-label="Imprimir en A4"
-                  onClick={() => printExport(false)}
-                  disabled={!rangeIsValid || days.length === 0}
+                  onClick={printExport}
+                  disabled={
+                    !rangeIsValid || days.length === 0 || isPreparingPdf
+                  }
                 >
                   Imprimir en A4
                 </button>
@@ -275,6 +328,11 @@ export default function TournamentExport({
           Podés incluir hasta {MAX_EXPORT_DAYS} días. Los resultados y partidos
           programados se ordenan automáticamente.
         </p>
+        {pdfError && (
+          <p className="export-range-help" role="alert">
+            No pudimos generar el PDF. Probá de nuevo.
+          </p>
+        )}
       </div>
 
       {!rangeIsValid ? (
