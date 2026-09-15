@@ -187,6 +187,32 @@ export default function TournamentExport({
       backgroundColor: "#ffffff",
       scale: 2,
       useCORS: true,
+      onclone: clonedDocument => {
+        const styles = clonedDocument.createElement("style");
+        styles.textContent = `
+          .export-report, .export-report * {
+            color: #282728 !important;
+            outline-color: #006cac !important;
+            box-shadow: none !important;
+          }
+          .export-report { background: #ffffff !important; border-color: #ece9e9 !important; }
+          .export-report .export-day { background: rgba(230, 230, 230, .25) !important; border-color: #ece9e9 !important; }
+          .export-report .export-match { background: #ffffff !important; border-color: #ece9e9 !important; }
+          .export-report .export-result { background: rgba(230, 230, 230, .5) !important; }
+          .export-report .export-status { background: #e6e6e6 !important; }
+          .export-report .export-status--complete { background: rgba(0, 108, 172, .15) !important; color: #006cac !important; }
+          .export-report .export-report-header > div > p,
+          .export-report .export-section h4,
+          .export-report .export-versus,
+          .export-report .export-report-footer a { color: #006cac !important; }
+          .export-report .export-day-header p,
+          .export-report .export-match-meta,
+          .export-report .export-result span,
+          .export-report .export-note,
+          .export-report .export-report-footer { color: #666666 !important; }
+        `;
+        clonedDocument.head.append(styles);
+      },
     });
     const width = 210;
     const height = (canvas.height * width) / canvas.width;
