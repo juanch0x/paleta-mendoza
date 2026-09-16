@@ -4,6 +4,12 @@ import { z } from "zod"
 import { parseSets } from "../domain/parse-sets.js"
 import type { Pareja, PartidoRaw } from "../domain/types.js"
 
+export type TournamentStatus = {
+  delayMinutes?: number
+  importantMessage?: string
+  updatedAt?: string
+}
+
 const requiredText = z.string().trim().min(1)
 const optionalText = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -59,6 +65,31 @@ export function parsePartidosCsv(csv: string): PartidoRaw[] {
 
   assertUniqueIds(partidos, "partidos")
   return partidos
+}
+
+export function parseTournamentStatusCsv(csv: string): TournamentStatus | undefined {
+  const rows = parseCsv(csv, "estado")
+  if (rows.length === 0) return undefined
+  if (rows.length > 1) throw new Error("estado: debe tener una sola fila")
+
+  const row = rows[0]
+  const delayValue = row.demora_minutos?.trim()
+  const delayMinutes = delayValue === undefined || delayValue === "" ? undefined : Number(delayValue)
+
+  if (delayMinutes !== undefined && (!Number.isInteger(delayMinutes) || delayMinutes < 0)) {
+    throw new Error("estado, fila 2: demora_minutos debe ser un entero mayor o igual a 0")
+  }
+
+  const importantMessage = row.mensaje_importante?.trim() || undefined
+  const updatedAt = row.actualizado_en?.trim() || undefined
+
+  if (!delayMinutes && !importantMessage) return undefined
+
+  return {
+    ...(delayMinutes ? { delayMinutes } : {}),
+    ...(importantMessage ? { importantMessage } : {}),
+    ...(updatedAt ? { updatedAt } : {}),
+  }
 }
 
 function parseCsv(csv: string, sheetName: string): Record<string, string>[] {

@@ -8,7 +8,11 @@ import { activeTournamentConfig } from "@/data/active-tournament-config";
 const title = "Torneo activo";
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
+const statusUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL;
 const showMock = import.meta.env.DEV || import.meta.env.PUBLIC_TOURNAMENT_MOCK === "true";
+const showMockStatus =
+  import.meta.env.DEV &&
+  import.meta.env.PUBLIC_TOURNAMENT_STATUS_MOCK === "true";
 ---
 
 <Layout title={title} description="Fixture, tablas y resultados del torneo activo.">
@@ -20,7 +24,9 @@ const showMock = import.meta.env.DEV || import.meta.env.PUBLIC_TOURNAMENT_MOCK =
         client:only="react"
         parejasUrl={parejasUrl}
         partidosUrl={partidosUrl}
+        statusUrl={statusUrl}
         showMock={showMock}
+        showMockStatus={showMockStatus}
       />
     </section>
   </main>

@@ -34,12 +34,13 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
 
 1. Create a new tournament spreadsheet by copying the base template.
 2. In Google Sheets, set sharing to **Anyone with the link — Viewer**.
-3. Copy the two CSV endpoints, one for the `parejas` sheet and one for `partidos`.
+3. Copy the two required CSV endpoints, one for the `parejas` sheet and one for `partidos`. Optionally, publish an `estado` sheet for live operational notices.
    The expected URL format is:
 
    ```text
    https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/gviz/tq?tqx=out:csv&sheet=parejas
    https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/gviz/tq?tqx=out:csv&sheet=partidos
+   https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/gviz/tq?tqx=out:csv&sheet=estado
    ```
 
 4. Put them in `.env`:
@@ -47,6 +48,7 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
    ```dotenv
    PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL="https://docs.google.com/...&sheet=parejas"
    PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL="https://docs.google.com/...&sheet=partidos"
+   PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL="https://docs.google.com/...&sheet=estado"
    PUBLIC_TOURNAMENT_MOCK=false
    ```
 
@@ -57,6 +59,19 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
 
 > The public Sheet is the operational panel. Do not put formulas or standings logic
 > in it: it contains raw data only, and TypeScript calculates the tournament.
+
+#### Optional `estado` sheet
+
+Use one row with these headers:
+
+| demora_minutos | mensaje_importante | actualizado_en |
+| ---: | --- | --- |
+| 30 | Presentarse con 15 minutos de anticipación. | 19:42 |
+
+- `demora_minutos` is a non-negative whole number. A value greater than zero adds an estimated time to pending matches with a published time.
+- `mensaje_importante` and `actualizado_en` are optional.
+- Leave the sheet empty, or set delay to `0` with no message, to hide the notice.
+- The status sheet is optional and isolated: if it is missing, invalid, or unreachable, the fixture, scores, and standings keep their current behavior.
 
 ### Daily Sheet workflow
 

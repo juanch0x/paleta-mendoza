@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import { buildStandings } from "../domain/standings.js"
 import { loadActiveTournament } from "./active-tournament.js"
 import { fetchCsv, type FetchLike } from "./fetch-csv.js"
+import { loadTournamentStatus } from "./tournament-status.js"
 
 const parejasCsv = `id,categoria,zona,jugador_1,jugador_2
 3A-1,Tercera,A,Fabián Tello,Diego Berna
@@ -51,5 +52,25 @@ describe("fetchCsv", () => {
     }
 
     await expect(fetchCsv("https://example.test/offline.csv", offlineFetch)).rejects.toThrow("No se pudo descargar")
+  })
+})
+
+describe("loadTournamentStatus", () => {
+  it("loads a valid optional status sheet", async () => {
+    const status = await loadTournamentStatus("https://example.test/estado.csv", async () => ({
+      ok: true,
+      status: 200,
+      text: async () => "demora_minutos,mensaje_importante,actualizado_en\n30,Llegar con anticipación,19:42",
+    }))
+
+    expect(status).toEqual({ delayMinutes: 30, importantMessage: "Llegar con anticipación", updatedAt: "19:42" })
+  })
+
+  it("falls back to no status when the optional sheet cannot be loaded", async () => {
+    await expect(loadTournamentStatus("https://example.test/estado.csv", async () => ({
+      ok: false,
+      status: 503,
+      text: async () => "",
+    }))).resolves.toBeUndefined()
   })
 })

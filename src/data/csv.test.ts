@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { parseParejasCsv, parsePartidosCsv } from "./csv.js"
+import { parseParejasCsv, parsePartidosCsv, parseTournamentStatusCsv } from "./csv.js"
 
 describe("parseParejasCsv", () => {
   it("normalizes names and ignores columns outside the domain contract", () => {
@@ -18,6 +18,27 @@ describe("parseParejasCsv", () => {
 3A-1,Tercera,A,Erik Castro,Osvaldo Calderón`
 
     expect(() => parseParejasCsv(csv)).toThrow("id duplicado 3A-1")
+  })
+})
+
+describe("parseTournamentStatusCsv", () => {
+  it("reads the singleton operational status", () => {
+    expect(parseTournamentStatusCsv(`demora_minutos,mensaje_importante,actualizado_en
+30,Presentarse con 15 minutos de anticipación,19:42`)).toEqual({
+      delayMinutes: 30,
+      importantMessage: "Presentarse con 15 minutos de anticipación",
+      updatedAt: "19:42",
+    })
+  })
+
+  it("treats an empty status sheet as no operational status", () => {
+    expect(parseTournamentStatusCsv("demora_minutos,mensaje_importante,actualizado_en\n")).toBeUndefined()
+    expect(parseTournamentStatusCsv("demora_minutos,mensaje_importante,actualizado_en\n0,,")).toBeUndefined()
+  })
+
+  it("rejects invalid delay values and multiple status rows", () => {
+    expect(() => parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30.5,")).toThrow("entero")
+    expect(() => parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30,\n15,")).toThrow("una sola fila")
   })
 })
 

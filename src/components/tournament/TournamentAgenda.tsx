@@ -9,11 +9,24 @@ import {
   getCachedActiveTournament,
   wasPageReloaded,
 } from "@/data/active-tournament-cache";
-import { mockActiveTournament } from "@/data/mock-active-tournament";
+import {
+  mockActiveTournament,
+  mockActiveTournamentStatus,
+} from "@/data/mock-active-tournament";
+import type { TournamentStatus } from "@/data/csv";
+import { loadTournamentStatus } from "@/data/tournament-status";
 import type { Participante, PartidoResuelto } from "@/domain/types";
+import { estimateTournamentTime } from "@/utils/tournament-time";
+import TournamentStatusNotice from "./TournamentStatusNotice";
 import TournamentViewHeader from "./TournamentViewHeader";
 
-type Props = { parejasUrl?: string; partidosUrl?: string; showMock?: boolean };
+type Props = {
+  parejasUrl?: string;
+  partidosUrl?: string;
+  statusUrl?: string;
+  showMock?: boolean;
+  showMockStatus?: boolean;
+};
 
 type TournamentState =
   | { status: "missing-source" }
@@ -49,7 +62,8 @@ const participantName = (participante: Participante) =>
     : participante.label;
 const scoreFor = (partido: PartidoResuelto, side: 0 | 1) =>
   partido.sets.map(set => set[side]).join(" · ");
-
+const dayOffsetLabel = (dayOffset: number) =>
+  dayOffset === 1 ? "(+1 día)" : `(+${dayOffset} días)`;
 const localDate = (date: Date) => {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Argentina/Mendoza",
@@ -80,8 +94,18 @@ const formatUpdatedAt = (date: Date) =>
     timeStyle: "short",
   }).format(date);
 
-function AgendaMatchCard({ partido }: { partido: PartidoResuelto }) {
+function AgendaMatchCard({
+  partido,
+  delayMinutes,
+}: {
+  partido: PartidoResuelto;
+  delayMinutes?: number;
+}) {
   const hasScore = partido.sets.length > 0;
+  const estimated =
+    !hasScore && partido.hora && delayMinutes
+      ? estimateTournamentTime(partido.hora, delayMinutes)
+      : undefined;
   const phase =
     partido.fase === "grupo"
       ? "Zona " + (partido.zona ?? "única")
@@ -102,8 +126,17 @@ function AgendaMatchCard({ partido }: { partido: PartidoResuelto }) {
               ? "bg-accent/15 text-accent rounded-full px-2.5 py-1 text-xs font-semibold"
               : "bg-muted rounded-full px-2.5 py-1 text-xs font-semibold"
           }
+          aria-label={
+            estimated
+              ? `Programado ${partido.hora}. Estimado ${estimated.time}${estimated.dayOffset ? `, ${dayOffsetLabel(estimated.dayOffset)}` : ""}.`
+              : undefined
+          }
         >
-          {hasScore ? "Finalizado" : (partido.hora ?? "A confirmar")}
+          {hasScore
+            ? "Finalizado"
+            : estimated
+              ? `${partido.hora} → ~${estimated.time}${estimated.dayOffset ? ` ${dayOffsetLabel(estimated.dayOffset)}` : ""}`
+              : (partido.hora ?? "A confirmar")}
         </span>
       </div>
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-3 text-sm sm:text-base">
@@ -132,10 +165,13 @@ function AgendaMatchCard({ partido }: { partido: PartidoResuelto }) {
 export default function TournamentAgenda({
   parejasUrl,
   partidosUrl,
+  statusUrl,
   showMock = false,
+  showMockStatus = false,
 }: Props) {
   const today = useMemo(() => localDate(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
+  const [tournamentStatus, setTournamentStatus] = useState<TournamentStatus>();
   const [state, setState] = useState<TournamentState>(() => {
     if (parejasUrl && partidosUrl) {
       const cached = getCachedActiveTournament({ parejasUrl, partidosUrl });
@@ -181,6 +217,23 @@ export default function TournamentAgenda({
     };
   }, [parejasUrl, partidosUrl]);
 
+  useEffect(() => {
+    if (!statusUrl) return;
+
+    let cancelled = false;
+    loadTournamentStatus(statusUrl)
+      .then(status => {
+        if (!cancelled) setTournamentStatus(status);
+      })
+      .catch(() => {
+        if (!cancelled) setTournamentStatus(undefined);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [statusUrl]);
+
   const matches = useMemo(
     () =>
       state.status !== "ready"
@@ -193,6 +246,8 @@ export default function TournamentAgenda({
             ),
     [selectedDate, state]
   );
+  const visibleTournamentStatus =
+    showMockStatus ? mockActiveTournamentStatus : tournamentStatus;
 
   if (state.status === "missing-source")
     return (
@@ -214,6 +269,7 @@ export default function TournamentAgenda({
   return (
     <>
       <TournamentViewHeader activeView="agenda" />
+      <TournamentStatusNotice status={visibleTournamentStatus} />
       <section
         className="border-border bg-muted/25 mt-8 rounded-2xl border p-5 sm:p-6"
         aria-labelledby="agenda-title"
@@ -285,7 +341,11 @@ export default function TournamentAgenda({
                   : "partidos publicados"}
               </p>
               {matches.map(partido => (
-                <AgendaMatchCard key={partido.id} partido={partido} />
+                <AgendaMatchCard
+                  key={partido.id}
+                  partido={partido}
+                  delayMinutes={visibleTournamentStatus?.delayMinutes}
+                />
               ))}
             </div>
           ) : (

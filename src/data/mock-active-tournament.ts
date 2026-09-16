@@ -1,5 +1,6 @@
-import { construirPartidos } from "@/domain/resolver"
-import type { Pareja, PartidoRaw } from "@/domain/types"
+import { construirPartidos } from "@/domain/resolver";
+import type { Pareja, PartidoRaw } from "@/domain/types";
+import type { TournamentStatus } from "./csv";
 
 const parejas: Pareja[] = [
   { id: "3A-1", categoria: "Tercera", zona: "A", nombre: "Castro / Calderón" },
@@ -11,7 +12,7 @@ const parejas: Pareja[] = [
   { id: "2-1", categoria: "Segunda", nombre: "Gómez / Sosa" },
   { id: "2-2", categoria: "Segunda", nombre: "López / Díaz" },
   { id: "2-3", categoria: "Segunda", nombre: "Martínez / Ríos" },
-]
+];
 
 const partidos: PartidoRaw[] = [
   {
@@ -83,7 +84,7 @@ const partidos: PartidoRaw[] = [
   },
   {
     id: "40",
-    fecha: "2026-09-12",
+    fecha: "2026-09-16",
     hora: "19:30",
     categoria: "Tercera",
     fase: "semi",
@@ -93,7 +94,7 @@ const partidos: PartidoRaw[] = [
   },
   {
     id: "41",
-    fecha: "2026-09-12",
+    fecha: "2026-09-16",
     hora: "21:00",
     categoria: "Tercera",
     fase: "semi",
@@ -103,7 +104,7 @@ const partidos: PartidoRaw[] = [
   },
   {
     id: "42",
-    fecha: "2026-09-13",
+    fecha: "2026-09-16",
     hora: "20:00",
     categoria: "Tercera",
     fase: "final",
@@ -131,9 +132,19 @@ const partidos: PartidoRaw[] = [
     pareja_b: "2-1",
     sets: "",
   },
-]
+];
 
 export const mockActiveTournament = {
   parejas,
-  partidos: construirPartidos(partidos, new Map(parejas.map(pareja => [pareja.id, pareja]))),
-}
+  partidos: construirPartidos(
+    partidos,
+    new Map(parejas.map(pareja => [pareja.id, pareja]))
+  ),
+};
+
+// Development-only preview data. Production only shows a status loaded from
+// the optional published `estado` sheet.
+export const mockActiveTournamentStatus: TournamentStatus = {
+  delayMinutes: 90,
+  updatedAt: "16 sep · 19:15",
+};
