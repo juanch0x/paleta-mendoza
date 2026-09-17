@@ -9,10 +9,6 @@ import {
   getCachedActiveTournament,
   wasPageReloaded,
 } from "@/data/active-tournament-cache";
-import {
-  mockActiveTournament,
-  mockActiveTournamentStatus,
-} from "@/data/mock-active-tournament";
 import type { TournamentStatus } from "@/data/csv";
 import { loadTournamentStatus } from "@/data/tournament-status";
 import type { Participante, PartidoResuelto } from "@/domain/types";
@@ -24,8 +20,6 @@ type Props = {
   parejasUrl?: string;
   partidosUrl?: string;
   statusUrl?: string;
-  showMock?: boolean;
-  showMockStatus?: boolean;
 };
 
 type TournamentState =
@@ -36,7 +30,6 @@ type TournamentState =
       status: "ready";
       tournament: ActiveTournament;
       updatedAt: Date;
-      source: "live" | "mock";
     };
 
 const DATE_SHORTCUTS = [
@@ -166,8 +159,6 @@ export default function TournamentAgenda({
   parejasUrl,
   partidosUrl,
   statusUrl,
-  showMock = false,
-  showMockStatus = false,
 }: Props) {
   const today = useMemo(() => localDate(new Date()), []);
   const [selectedDate, setSelectedDate] = useState(today);
@@ -180,17 +171,9 @@ export default function TournamentAgenda({
           status: "ready",
           tournament: cached.tournament,
           updatedAt: cached.updatedAt,
-          source: "live",
         };
       return { status: "loading" };
     }
-    if (showMock)
-      return {
-        status: "ready",
-        tournament: mockActiveTournament,
-        updatedAt: new Date(),
-        source: "mock",
-      };
     return { status: "missing-source" };
   });
 
@@ -207,7 +190,7 @@ export default function TournamentAgenda({
 
         const updatedAt = new Date();
         cacheActiveTournament(source, tournament, updatedAt);
-        setState({ status: "ready", tournament, updatedAt, source: "live" });
+        setState({ status: "ready", tournament, updatedAt });
       })
       .catch(() => {
         if (!cancelled && !cached) setState({ status: "error" });
@@ -246,8 +229,7 @@ export default function TournamentAgenda({
             ),
     [selectedDate, state]
   );
-  const visibleTournamentStatus =
-    showMockStatus ? mockActiveTournamentStatus : tournamentStatus;
+  const visibleTournamentStatus = tournamentStatus;
 
   if (state.status === "missing-source")
     return (
@@ -284,12 +266,6 @@ export default function TournamentAgenda({
             Actualizado: {formatUpdatedAt(state.updatedAt)}
           </p>
         </div>
-        {state.source === "mock" && (
-          <p className="border-accent bg-background mt-5 rounded-xl border border-dashed p-4 text-sm">
-            Vista de demostración: estos resultados no corresponden a un torneo
-            real.
-          </p>
-        )}
         <div className="mt-6 grid grid-cols-3 gap-2">
           {DATE_SHORTCUTS.map(([offset, label]) => {
             const date = shiftDate(today, offset);

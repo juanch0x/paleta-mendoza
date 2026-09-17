@@ -1,0 +1,145 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import {
+  diagnoseTournamentSheets,
+  fetchTournamentSheetGrids,
+  type TournamentDiagnostics,
+} from "@/data/tournament-diagnostics";
+import Layout from "@/layouts/Layout.astro";
+
+let localDiagnostics: TournamentDiagnostics | undefined;
+let localError: string | undefined;
+
+// Astro dev renders this page on the server, so the API key never reaches the browser.
+if (import.meta.env.DEV) {
+  try {
+    const spreadsheetId = import.meta.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+    const apiKey = import.meta.env.GOOGLE_SHEETS_API_KEY;
+
+    if (!spreadsheetId || !apiKey)
+      throw new Error("Google Sheets no está configurado");
+
+    localDiagnostics = diagnoseTournamentSheets(
+      await fetchTournamentSheetGrids(spreadsheetId, apiKey)
+    );
+  } catch {
+    localError =
+      "No se pudo ejecutar el diagnóstico local. Configurá GOOGLE_SHEETS_SPREADSHEET_ID y GOOGLE_SHEETS_API_KEY.";
+  }
+}
+---
+
+<Layout
+  title="Diagnóstico del torneo"
+  description="Verificación operativa de datos del torneo."
+>
+  <Header />
+  <main id="main-content" class="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+    <p class="text-accent text-xs font-semibold tracking-[0.18em] uppercase">
+      Operación
+    </p>
+    <h1 class="mt-2 text-3xl font-bold">Diagnóstico del torneo</h1>
+    <p class="text-foreground/70 mt-3 max-w-2xl">
+      Revisa la estructura del Sheet sin publicar su contenido. Cada problema se
+      informa con su coordenada real.
+    </p>
+    <section
+      id="diagnostic-result"
+      class="border-border bg-background mt-8 rounded-2xl border p-5 sm:p-6"
+      aria-live="polite"
+    >
+      {
+        localError ? (
+          <p class="text-red-700 dark:text-red-300">{localError}</p>
+        ) : null
+      }
+      {
+        localDiagnostics ? (
+          <div data-diagnostics={JSON.stringify(localDiagnostics)} />
+        ) : !localError ? (
+          <form id="diagnostic-auth" class="space-y-3">
+            <label class="block" for="diagnostic-token">
+              <span class="text-sm font-medium">Clave de diagnóstico</span>
+              <input
+                id="diagnostic-token"
+                class="border-border bg-muted/40 mt-2 w-full rounded-lg border px-3 py-2"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+            <button
+              class="bg-accent text-background rounded-lg px-4 py-2 font-semibold"
+              type="submit"
+            >
+              Ejecutar diagnóstico
+            </button>
+          </form>
+        ) : null
+      }
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  type Issue = { sheet: string; cell: string; rule: string; message: string };
+  type Diagnostics = { valid: boolean; checkedAt: string; issues: Issue[] };
+  const result = document.querySelector<HTMLElement>("#diagnostic-result");
+  const embedded =
+    result?.querySelector<HTMLElement>("[data-diagnostics]")?.dataset
+      .diagnostics;
+
+  const render = (diagnostics: Diagnostics) => {
+    if (!result) return;
+    const title = diagnostics.valid
+      ? "Datos válidos"
+      : `${diagnostics.issues.length} problema${diagnostics.issues.length === 1 ? "" : "s"} detectado${diagnostics.issues.length === 1 ? "" : "s"}`;
+    const tone = diagnostics.valid
+      ? "text-green-700 dark:text-green-300"
+      : "text-red-700 dark:text-red-300";
+    const issues = diagnostics.issues.length
+      ? `<ul class="border-border mt-5 divide-y rounded-xl border">${diagnostics.issues.map(issue => `<li class="p-4"><p class="font-semibold">${escapeHtml(issue.sheet)}!${escapeHtml(issue.cell)}</p><p class="text-foreground/70 mt-1 text-sm">${escapeHtml(issue.message)}</p></li>`).join("")}</ul>`
+      : '<p class="text-foreground/70 mt-2">No se encontraron valores huérfanos, campos obligatorios faltantes ni referencias inválidas.</p>';
+    result.innerHTML = `<p class="${tone} text-xl font-bold">${title}</p>${issues}`;
+  };
+
+  const escapeHtml = (value: string) =>
+    value.replace(
+      /[&<>'"]/g,
+      character =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          '"': "&quot;",
+        })[character] ?? character
+    );
+
+  if (embedded) {
+    render(JSON.parse(embedded));
+  } else {
+    const form = document.querySelector<HTMLFormElement>("#diagnostic-auth");
+    const input = document.querySelector<HTMLInputElement>("#diagnostic-token");
+
+    form?.addEventListener("submit", event => {
+      event.preventDefault();
+      const token = input?.value;
+      if (!token) return;
+
+      fetch("/api/torneo-diagnostico", {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(response => (response.ok ? response.json() : Promise.reject()))
+        .then(render)
+        .catch(() => {
+          if (result)
+            result.innerHTML =
+              '<p class="text-red-700 dark:text-red-300">No se pudo ejecutar el diagnóstico.</p>';
+        });
+    });
+  }
+</script>

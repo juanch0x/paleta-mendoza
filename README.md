@@ -22,10 +22,10 @@ pnpm build
 
 ## How tournament data works
 
-| Tournament state | Source | Purpose |
-| --- | --- | --- |
-| Active | Google Sheets CSV URLs | Editable from a phone during the tournament |
-| Archived | `src/data/torneos/archivos/*.json` | Immutable historical record |
+| Tournament state | Source                             | Purpose                                     |
+| ---------------- | ---------------------------------- | ------------------------------------------- |
+| Active           | Google Sheets CSV URLs             | Editable from a phone during the tournament |
+| Archived         | `src/data/torneos/archivos/*.json` | Immutable historical record                 |
 
 Only one tournament should be active at a time. The site never synchronizes the
 same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
@@ -49,13 +49,32 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
    PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL="https://docs.google.com/...&sheet=parejas"
    PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL="https://docs.google.com/...&sheet=partidos"
    PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL="https://docs.google.com/...&sheet=estado"
-   PUBLIC_TOURNAMENT_MOCK=false
    ```
 
 5. Keep `.env` for local development only. Configure the same variables in
    Cloudflare Pages under **Settings → Environment variables**, then trigger a new
    deployment. The CSV URLs are public read-only URLs, but the local `.env` file is
    still not committed.
+
+### Configure tournament diagnostics
+
+The `/torneo/diagnostico` route reads the same Sheet through the Google Sheets API
+to report physical coordinates such as `partidos!M354`. It requires these
+server-side variables locally and in Cloudflare Pages; never prefix them with
+`PUBLIC_`:
+
+```dotenv
+GOOGLE_SHEETS_API_KEY="..."
+GOOGLE_SHEETS_SPREADSHEET_ID="..."
+TOURNAMENT_DIAGNOSTICS_TOKEN="..."
+```
+
+- `GOOGLE_SHEETS_SPREADSHEET_ID` is the identifier between `/d/` and `/edit` in
+  the Google Sheets URL. It is required; the application does not embed a fallback
+  Sheet ID.
+- In Cloudflare, configure all three as encrypted secrets for Preview and
+  Production. The route returns a safe configuration error if the spreadsheet ID
+  or API key is missing, and remains hidden (`404`) without the diagnostics token.
 
 > The public Sheet is the operational panel. Do not put formulas or standings logic
 > in it: it contains raw data only, and TypeScript calculates the tournament.
@@ -64,9 +83,9 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
 
 Use one row with these headers:
 
-| demora_minutos | mensaje_importante | actualizado_en |
-| ---: | --- | --- |
-| 30 | Presentarse con 15 minutos de anticipación. | 19:42 |
+| demora_minutos | mensaje_importante                          | actualizado_en |
+| -------------: | ------------------------------------------- | -------------- |
+|             30 | Presentarse con 15 minutos de anticipación. | 19:42          |
 
 - `demora_minutos` is a non-negative whole number. A value greater than zero adds an estimated time to pending matches with a published time.
 - `mensaje_importante` and `actualizado_en` are optional.
@@ -131,38 +150,38 @@ deploys the site automatically.
 
 Cloudflare Pages configuration:
 
-| Setting | Value |
-| --- | --- |
-| Production branch | `main` |
-| Build command | `pnpm build` |
-| Build output directory | `dist` |
+| Setting                | Value        |
+| ---------------------- | ------------ |
+| Production branch      | `main`       |
+| Build command          | `pnpm build` |
+| Build output directory | `dist`       |
 
 This is a static **Pages** project, not a Cloudflare Worker. Do not configure a
 `wrangler deploy` command.
 
 ## Useful commands
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the local development server |
-| `pnpm test` | Run tournament logic tests |
-| `pnpm build` | Type-check and build the production site |
-| `pnpm preview` | Preview the latest local production build |
-| `pnpm freeze -- --help` | Show archive command arguments |
-| `pnpm format:check` | Check formatting |
-| `pnpm lint` | Run linting |
+| Command                 | Purpose                                   |
+| ----------------------- | ----------------------------------------- |
+| `pnpm dev`              | Start the local development server        |
+| `pnpm test`             | Run tournament logic tests                |
+| `pnpm build`            | Type-check and build the production site  |
+| `pnpm preview`          | Preview the latest local production build |
+| `pnpm freeze -- --help` | Show archive command arguments            |
+| `pnpm format:check`     | Check formatting                          |
+| `pnpm lint`             | Run linting                               |
 
 ## Main project locations
 
-| Path | Responsibility |
-| --- | --- |
-| `src/components/tournament/ActiveTournament.tsx` | Tournament UI, fixture search, zones, and playoffs |
-| `src/data/` | CSV parsing, match resolution, standings, and archive validation |
-| `src/data/torneos/registro.json` | Index of historical tournaments |
-| `src/data/torneos/archivos/` | Frozen tournament snapshots |
-| `src/data/blog/` | News and champion posts in Markdown |
-| `scripts/freeze.ts` | Command-line archive workflow |
-| `.env.example` | Required active-tournament environment variables |
+| Path                                             | Responsibility                                                   |
+| ------------------------------------------------ | ---------------------------------------------------------------- |
+| `src/components/tournament/ActiveTournament.tsx` | Tournament UI, fixture search, zones, and playoffs               |
+| `src/data/`                                      | CSV parsing, match resolution, standings, and archive validation |
+| `src/data/torneos/registro.json`                 | Index of historical tournaments                                  |
+| `src/data/torneos/archivos/`                     | Frozen tournament snapshots                                      |
+| `src/data/blog/`                                 | News and champion posts in Markdown                              |
+| `scripts/freeze.ts`                              | Command-line archive workflow                                    |
+| `.env.example`                                   | Required active-tournament environment variables                 |
 
 ## Before a tournament starts
 

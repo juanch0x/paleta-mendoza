@@ -9,13 +9,12 @@ const title = "Torneo activo";
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
 const statusUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL;
-const showMock = import.meta.env.DEV || import.meta.env.PUBLIC_TOURNAMENT_MOCK === "true";
-const showMockStatus =
-  import.meta.env.DEV &&
-  import.meta.env.PUBLIC_TOURNAMENT_STATUS_MOCK === "true";
 ---
 
-<Layout title={title} description="Fixture, tablas y resultados del torneo activo.">
+<Layout
+  title={title}
+  description="Fixture, tablas y resultados del torneo activo."
+>
   <Header />
   <main id="main-content">
     <section class="pt-8 pb-12 sm:pt-12 sm:pb-16">
@@ -25,8 +24,6 @@ const showMockStatus =
         parejasUrl={parejasUrl}
         partidosUrl={partidosUrl}
         statusUrl={statusUrl}
-        showMock={showMock}
-        showMockStatus={showMockStatus}
       />
     </section>
   </main>

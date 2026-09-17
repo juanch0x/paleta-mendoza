@@ -4,8 +4,6 @@ import TournamentExport from "@/components/tournament/TournamentExport";
 
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
-const showMock =
-  import.meta.env.DEV || import.meta.env.PUBLIC_TOURNAMENT_MOCK === "true";
 ---
 
 <Layout
@@ -17,7 +15,6 @@ const showMock =
       client:only="react"
       parejasUrl={parejasUrl}
       partidosUrl={partidosUrl}
-      showMock={showMock}
     />
   </main>
 </Layout>

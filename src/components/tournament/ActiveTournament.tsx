@@ -10,10 +10,6 @@ import {
   wasPageReloaded,
 } from "@/data/active-tournament-cache";
 import type { TournamentStatus } from "@/data/csv";
-import {
-  mockActiveTournament,
-  mockActiveTournamentStatus,
-} from "@/data/mock-active-tournament";
 import { loadTournamentStatus } from "@/data/tournament-status";
 import { buildStandings, type StandingRow } from "@/domain/standings";
 import type { Pareja, Participante, PartidoResuelto } from "@/domain/types";
@@ -25,8 +21,6 @@ type Props = {
   parejasUrl?: string;
   partidosUrl?: string;
   statusUrl?: string;
-  showMock?: boolean;
-  showMockStatus?: boolean;
   initialTournament?: ActiveTournament;
   showHeader?: boolean;
   showSearch?: boolean;
@@ -40,7 +34,7 @@ type TournamentState =
       status: "ready";
       tournament: ActiveTournament;
       updatedAt: Date;
-      source: "live" | "mock" | "archive";
+      source: "live" | "archive";
     };
 
 const PHASE_ORDER: Record<string, number> = {
@@ -357,8 +351,6 @@ export default function ActiveTournament({
   parejasUrl,
   partidosUrl,
   statusUrl,
-  showMock = false,
-  showMockStatus = false,
   initialTournament,
   showHeader = true,
   showSearch = true,
@@ -384,13 +376,6 @@ export default function ActiveTournament({
         };
       return { status: "loading" };
     }
-    if (showMock)
-      return {
-        status: "ready",
-        tournament: mockActiveTournament,
-        updatedAt: new Date(),
-        source: "mock",
-      };
     return { status: "missing-source" };
   });
 
@@ -437,8 +422,7 @@ export default function ActiveTournament({
   }, [statusUrl]);
 
   const tournament = state.status === "ready" ? state.tournament : undefined;
-  const visibleTournamentStatus =
-    showMockStatus ? mockActiveTournamentStatus : tournamentStatus;
+  const visibleTournamentStatus = tournamentStatus;
   const matchesForSearch = useMemo(() => {
     const query = normalizeSearch(searchQuery.trim());
     if (!tournament || !query) return [];
@@ -493,12 +477,6 @@ export default function ActiveTournament({
       {showHeader && (
         <>
           <TournamentViewHeader activeView="general" />
-          {state.source === "mock" && (
-            <p className="border-accent bg-background mt-5 rounded-xl border border-dashed p-4 text-sm">
-              Vista de demostración: estos resultados no corresponden a un
-              torneo real.
-            </p>
-          )}
         </>
       )}
 

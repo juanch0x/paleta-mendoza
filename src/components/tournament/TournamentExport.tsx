@@ -14,12 +14,11 @@ import {
   groupMatchesForExport,
   isExportRangeValid,
 } from "@/data/tournament-export";
-import { mockActiveTournament } from "@/data/mock-active-tournament";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
 import type { Participante, PartidoResuelto } from "@/domain/types";
 import { SITE } from "@/config";
 
-type Props = { parejasUrl?: string; partidosUrl?: string; showMock?: boolean };
+type Props = { parejasUrl?: string; partidosUrl?: string };
 
 type TournamentState =
   | { status: "missing-source" }
@@ -29,7 +28,6 @@ type TournamentState =
       status: "ready";
       tournament: ActiveTournament;
       updatedAt: Date;
-      source: "live" | "mock";
     };
 
 const localDate = (date: Date) => {
@@ -108,11 +106,7 @@ function Match({
   );
 }
 
-export default function TournamentExport({
-  parejasUrl,
-  partidosUrl,
-  showMock = false,
-}: Props) {
+export default function TournamentExport({ parejasUrl, partidosUrl }: Props) {
   const today = useMemo(() => localDate(new Date()), []);
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
@@ -127,17 +121,9 @@ export default function TournamentExport({
           status: "ready",
           tournament: cached.tournament,
           updatedAt: cached.updatedAt,
-          source: "live",
         };
       return { status: "loading" };
     }
-    if (showMock)
-      return {
-        status: "ready",
-        tournament: mockActiveTournament,
-        updatedAt: new Date(),
-        source: "mock",
-      };
     return { status: "missing-source" };
   });
 
@@ -153,7 +139,7 @@ export default function TournamentExport({
         if (cancelled) return;
         const updatedAt = new Date();
         cacheActiveTournament(source, tournament, updatedAt);
-        setState({ status: "ready", tournament, updatedAt, source: "live" });
+        setState({ status: "ready", tournament, updatedAt });
       })
       .catch(() => {
         if (!cancelled && !cached) setState({ status: "error" });
@@ -377,13 +363,6 @@ export default function TournamentExport({
               <h2>{activeTournamentConfig.name}</h2>
             </div>
           </header>
-
-          {state.source === "mock" && (
-            <p className="export-message">
-              Vista de demostración: estos datos no corresponden a un torneo
-              real.
-            </p>
-          )}
           {days.length === 0 ? (
             <p className="export-message">
               No hay partidos publicados en este rango.
