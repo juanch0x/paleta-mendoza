@@ -5,6 +5,7 @@ import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
 import { SITE } from "@/config";
+import { hasActiveTournament } from "@/data/tournament-availability";
 
 const { pathname } = Astro.url;
 
@@ -19,17 +20,14 @@ const isActive = (path: string) => {
   return currentPath === path || currentPathArray[0] === pathArray[0];
 };
 
-const hasActiveTournament = Boolean(
-  import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL &&
-    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL
-);
+const tournamentIsActive = hasActiveTournament();
 ---
 
 <header>
   <a
     id="skip-to-content"
     href="#main-content"
-    class="absolute -top-full left-16 z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+    class="bg-background text-accent absolute -top-full left-16 z-50 px-3 py-2 backdrop-blur-lg transition-all focus:top-4"
   >
     Ir al contenido
   </a>
@@ -39,7 +37,7 @@ const hasActiveTournament = Boolean(
   >
     <div
       id="top-nav-wrap"
-      class="relative flex w-full items-baseline justify-between bg-background p-4 sm:py-6"
+      class="bg-background relative flex w-full items-baseline justify-between p-4 sm:py-6"
     >
       <a
         href="/"
@@ -48,17 +46,17 @@ const hasActiveTournament = Boolean(
         {SITE.title}
       </a>
       {
-        hasActiveTournament && (
+        tournamentIsActive && (
           <a
             id="active-tournament-shortcut"
             href="/torneo/"
-            class="absolute top-4 right-14 flex size-10 items-center justify-center rounded-full focus-outline sm:hidden"
+            class="focus-outline absolute top-4 right-14 flex size-10 items-center justify-center rounded-full sm:hidden"
             aria-label="Ver torneo activo"
             title="Ver torneo activo"
           >
             <span class="relative flex size-3" aria-hidden="true">
-              <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
-              <span class="relative inline-flex size-3 rounded-full bg-accent"></span>
+              <span class="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-60" />
+              <span class="bg-accent relative inline-flex size-3 rounded-full" />
             </span>
           </a>
         )
@@ -81,7 +79,7 @@ const hasActiveTournament = Boolean(
           id="menu-items"
           class:list={[
             "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-            "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
+            "[&>li>a]:hover:text-accent [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
             "hidden",
             "sm:mt-0 sm:ml-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
           ]}
@@ -99,10 +97,10 @@ const hasActiveTournament = Boolean(
               <span class="inline-flex items-center gap-2">
                 Torneos
                 {
-                  hasActiveTournament && (
+                  tournamentIsActive && (
                     <span class="relative flex size-2" aria-hidden="true">
-                      <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
-                      <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
+                      <span class="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-60" />
+                      <span class="bg-accent relative inline-flex size-2 rounded-full" />
                     </span>
                   )
                 }
@@ -114,7 +112,7 @@ const hasActiveTournament = Boolean(
               <li class="col-span-2 flex items-center justify-center">
                 <button
                   id="theme-btn"
-                  class="focus-outline relative size-12 p-4 sm:size-8 hover:[&>svg]:stroke-accent"
+                  class="focus-outline hover:[&>svg]:stroke-accent relative size-12 p-4 sm:size-8"
                   title="Cambiar tema"
                   aria-label="auto"
                   aria-live="polite"
@@ -148,7 +146,10 @@ const hasActiveTournament = Boolean(
       const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
 
       menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
-      menuBtn.setAttribute("aria-label", openMenu ? "Abrir menú" : "Cerrar menú");
+      menuBtn.setAttribute(
+        "aria-label",
+        openMenu ? "Abrir menú" : "Cerrar menú"
+      );
 
       menuItems.classList.toggle("hidden");
       menuIcon.classList.toggle("hidden");

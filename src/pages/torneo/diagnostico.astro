@@ -7,6 +7,9 @@ import {
   type TournamentDiagnostics,
 } from "@/data/tournament-diagnostics";
 import Layout from "@/layouts/Layout.astro";
+import { hasActiveTournament } from "@/data/tournament-availability";
+
+if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 
 let localDiagnostics: TournamentDiagnostics | undefined;
 let localError: string | undefined;

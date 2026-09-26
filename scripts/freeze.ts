@@ -4,7 +4,7 @@ import path from "node:path"
 import { fetchCsv } from "../src/data/fetch-csv.js"
 import { freezeTournament, type TournamentMetadata } from "../src/data/freeze.js"
 
-type RegistryEntry = TournamentMetadata & { alcance: string }
+type RegistryEntry = Pick<TournamentMetadata, "slug" | "nombre" | "fecha" | "clubLogo"> & { alcance: string }
 
 const option = (name: string) => {
   const index = process.argv.indexOf(name)
@@ -18,7 +18,7 @@ const requiredOption = (name: string) => {
 }
 
 if (process.argv.includes("--help")) {
-  console.log("Uso: pnpm freeze -- --slug <slug> --nombre <nombre> --fecha <mes y año> --parejas-url <csv> --partidos-url <csv> [--overwrite]")
+  console.log("Uso: pnpm freeze -- --slug <slug> --nombre <nombre> --fecha <mes y año> --edition <edición> --host-club-name <club> --club-id <id> --club-logo <ruta> --parejas-url <csv> --partidos-url <csv> [--overwrite]")
   process.exit(0)
 }
 
@@ -26,6 +26,10 @@ const metadata: TournamentMetadata = {
   slug: requiredOption("--slug"),
   nombre: requiredOption("--nombre"),
   fecha: requiredOption("--fecha"),
+  edition: requiredOption("--edition"),
+  hostClubName: requiredOption("--host-club-name"),
+  clubId: requiredOption("--club-id") as TournamentMetadata["clubId"],
+  clubLogo: requiredOption("--club-logo"),
 }
 const parejasUrl = requiredOption("--parejas-url")
 const partidosUrl = requiredOption("--partidos-url")
@@ -36,10 +40,11 @@ const tournament = freezeTournament(metadata, parejasCsv, partidosCsv)
 
 const dataDirectory = path.resolve("src/data/torneos")
 const archiveDirectory = path.join(dataDirectory, "archivos")
-const archivePath = path.join(archiveDirectory, `${metadata.slug}.json`)
+const tournamentDirectory = path.join(archiveDirectory, metadata.slug)
+const archivePath = path.join(tournamentDirectory, "torneo.json")
 const registryPath = path.join(dataDirectory, "registro.json")
 
-await fs.mkdir(archiveDirectory, { recursive: true })
+await fs.mkdir(tournamentDirectory, { recursive: true })
 
 try {
   await fs.access(archivePath)
@@ -49,10 +54,18 @@ try {
 }
 
 const registry = JSON.parse(await fs.readFile(registryPath, "utf8")) as RegistryEntry[]
-const entry: RegistryEntry = { slug: tournament.slug, nombre: tournament.nombre, fecha: tournament.fecha, alcance: tournament.alcance }
-const nextRegistry = [...registry.filter((item) => item.slug !== metadata.slug), entry]
+const entry: RegistryEntry = {
+  slug: tournament.slug,
+  nombre: tournament.nombre,
+  fecha: tournament.fecha,
+  clubLogo: tournament.clubLogo,
+  alcance: tournament.alcance,
+}
+const nextRegistry = [entry, ...registry.filter((item) => item.slug !== metadata.slug)]
 
 await fs.writeFile(archivePath, `${JSON.stringify(tournament, null, 2)}\n`)
+await fs.writeFile(path.join(tournamentDirectory, "parejas.csv"), parejasCsv)
+await fs.writeFile(path.join(tournamentDirectory, "partidos.csv"), partidosCsv)
 await fs.writeFile(registryPath, `${JSON.stringify(nextRegistry, null, 2)}\n`)
 
 console.log(`Congelado ${tournament.nombre}: ${tournament.parejas.length} parejas y ${tournament.partidos.length} partidos.`)

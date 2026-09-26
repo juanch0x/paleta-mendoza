@@ -4,27 +4,54 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import ActiveTournament from "@/components/tournament/ActiveTournament";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
+import { hasActiveTournament } from "@/data/tournament-availability";
 
 const title = "Torneo activo";
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
 const statusUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL;
+const tournamentIsActive = hasActiveTournament();
 ---
 
 <Layout
   title={title}
-  description="Fixture, tablas y resultados del torneo activo."
+  description={tournamentIsActive
+    ? "Fixture, tablas y resultados del torneo activo."
+    : "Resultados y posiciones de torneos anteriores."}
 >
   <Header />
   <main id="main-content">
     <section class="pt-8 pb-12 sm:pt-12 sm:pb-16">
-      <h1 class="sr-only">{activeTournamentConfig.name}</h1>
-      <ActiveTournament
-        client:only="react"
-        parejasUrl={parejasUrl}
-        partidosUrl={partidosUrl}
-        statusUrl={statusUrl}
-      />
+      {
+        tournamentIsActive ? (
+          <>
+            <h1 class="sr-only">{activeTournamentConfig.name}</h1>
+            <ActiveTournament
+              client:only="react"
+              parejasUrl={parejasUrl}
+              partidosUrl={partidosUrl}
+              statusUrl={statusUrl}
+            />
+          </>
+        ) : (
+          <div class="mx-auto max-w-xl text-center">
+            <p class="text-accent text-xs font-semibold tracking-[0.18em] uppercase">
+              Entre torneos
+            </p>
+            <h1 class="mt-3 text-3xl font-bold">No hay un torneo en curso</h1>
+            <p class="text-foreground/70 mt-3">
+              Mientras preparamos la próxima edición, podés consultar los
+              resultados de los torneos anteriores.
+            </p>
+            <a
+              class="text-accent mt-6 inline-block font-semibold hover:underline"
+              href="/torneos/"
+            >
+              Ver torneos anteriores →
+            </a>
+          </div>
+        )
+      }
     </section>
   </main>
   <Footer />

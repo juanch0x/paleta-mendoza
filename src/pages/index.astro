@@ -8,22 +8,20 @@ import { getCollection } from "astro:content";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { getPath } from "@/utils/getPath";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
+import { hasActiveTournament } from "@/data/tournament-availability";
 
 const latestPosts = getSortedPosts(
   await getCollection("blog", ({ data }) => !data.draft)
 ).slice(0, 3);
 
-const hasActiveTournament = Boolean(
-  import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL &&
-    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL
-);
+const tournamentIsActive = hasActiveTournament();
 ---
 
 <Layout>
   <Header />
   <main id="main-content">
     {
-      hasActiveTournament && (
+      tournamentIsActive && (
         <section class="pt-8 pb-6 sm:pt-12 sm:pb-8">
           <div class="border-skin-line border-l-accent bg-skin-fill relative overflow-hidden rounded-xl border border-l-4 p-5 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-6">
             <img
@@ -53,8 +51,8 @@ const hasActiveTournament = Boolean(
 
     <section
       class:list={{
-        "pt-10": !hasActiveTournament,
-        "py-8": hasActiveTournament,
+        "pt-10": !tournamentIsActive,
+        "py-8": tournamentIsActive,
       }}
     >
       <div class="flex items-end justify-between gap-4">

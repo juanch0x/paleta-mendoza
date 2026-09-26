@@ -4,11 +4,9 @@ import Header from "@/components/Header.astro";
 import Layout from "@/layouts/Layout.astro";
 import registry from "@/data/torneos/registro.json";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
+import { hasActiveTournament } from "@/data/tournament-availability";
 
-const hasActiveTournament = Boolean(
-  import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL &&
-    import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL
-);
+const tournamentIsActive = hasActiveTournament();
 ---
 
 <Layout
@@ -20,7 +18,7 @@ const hasActiveTournament = Boolean(
     <section class="pt-8 pb-16 sm:pt-12">
       <h1 class="sr-only">Torneos</h1>
       {
-        hasActiveTournament && (
+        tournamentIsActive && (
           <a
             href="/torneo/"
             class="border-skin-line border-l-accent bg-skin-fill relative block min-h-44 overflow-hidden rounded-xl border border-l-4 p-5 transition hover:shadow-md sm:p-6"
@@ -52,7 +50,7 @@ const hasActiveTournament = Boolean(
         )
       }
 
-      <div class:list={["space-y-4", { "mt-4": hasActiveTournament }]}>
+      <div class:list={["space-y-4", { "mt-4": tournamentIsActive }]}>
         {
           registry.map(torneo => (
             <a
@@ -74,7 +72,9 @@ const hasActiveTournament = Boolean(
                     {torneo.nombre}
                   </h2>
                 </div>
-                <span class="text-accent font-semibold">Ver resultados →</span>
+                <span class="text-accent shrink-0 font-semibold whitespace-nowrap">
+                  Ver resultados →
+                </span>
               </div>
             </a>
           ))

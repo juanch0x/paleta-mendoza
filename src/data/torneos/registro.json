@@ -1,5 +1,12 @@
 [
   {
+    "slug": "clausura-gimnasia-y-esgrima-2026",
+    "nombre": "Clausura · Gimnasia y Esgrima",
+    "fecha": "Septiembre 2026",
+    "clubLogo": "/images/clubs/gimnasia-y-esgrima.png",
+    "alcance": "Fase de grupos y playoffs"
+  },
+  {
     "slug": "clausura-regatas-2026",
     "nombre": "Clausura · Regatas",
     "fecha": "Agosto 2026",

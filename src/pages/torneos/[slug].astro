@@ -13,6 +13,7 @@ type Archive = {
   edition: string;
   hostClubName: string;
   clubId: "gimnasia-y-esgrima" | "regatas";
+  clubLogo: string;
   fecha: string;
   alcance: string;
   parejas: TournamentData["parejas"];
@@ -20,15 +21,23 @@ type Archive = {
 };
 
 export function getStaticPaths() {
-  const archives = import.meta.glob("../../data/torneos/archivos/*.json", {
-    eager: true,
-    import: "default",
-  });
+  const archives = import.meta.glob(
+    [
+      "../../data/torneos/archivos/*.json",
+      "../../data/torneos/archivos/*/torneo.json",
+    ],
+    {
+      eager: true,
+      import: "default",
+    }
+  );
 
   return registry.map(entry => {
-    const tournament = archives[
-      `../../data/torneos/archivos/${entry.slug}.json`
-    ] as Archive | undefined;
+    const tournament = (archives[
+      `../../data/torneos/archivos/${entry.slug}/torneo.json`
+    ] ?? archives[`../../data/torneos/archivos/${entry.slug}.json`]) as
+      | Archive
+      | undefined;
     if (!tournament)
       throw new Error(`No se encontró el histórico ${entry.slug}.`);
     return { params: { slug: entry.slug }, props: { tournament } };

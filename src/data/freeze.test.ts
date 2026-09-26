@@ -1,26 +1,58 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest";
 
-import { freezeTournament } from "./freeze.js"
+import { freezeTournament } from "./freeze.js";
 
 const parejasCsv = `id,categoria,zona,jugador_1,jugador_2
 1A-1,Primera,A,Ana,Uno
-1A-2,Primera,A,Beto,Dos`
+1A-2,Primera,A,Beto,Dos`;
 
 describe("freezeTournament", () => {
   it("creates a validated historical snapshot from completed CSV data", () => {
     const partidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
-1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,12-8 12-9,`
+1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,12-8 12-9,`;
 
-    const tournament = freezeTournament({ slug: "prueba-2026", nombre: "Prueba", fecha: "Septiembre 2026" }, parejasCsv, partidosCsv)
+    const tournament = freezeTournament(
+      {
+        slug: "prueba-2026",
+        nombre: "Prueba",
+        fecha: "Septiembre 2026",
+        edition: "Prueba",
+        hostClubName: "Regatas",
+        clubId: "regatas",
+        clubLogo: "/images/clubs/regatas.png",
+      },
+      parejasCsv,
+      partidosCsv
+    );
 
-    expect(tournament.alcance).toBe("Fase de grupos")
-    expect(tournament.partidos).toHaveLength(1)
-  })
+    expect(tournament.alcance).toBe("Fase de grupos");
+    expect(tournament.partidos).toHaveLength(1);
+    expect(tournament).toMatchObject({
+      edition: "Prueba",
+      hostClubName: "Regatas",
+      clubId: "regatas",
+      clubLogo: "/images/clubs/regatas.png",
+    });
+  });
 
   it("refuses to freeze a tournament with pending matches", () => {
     const partidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
-1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,,`
+1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,,`;
 
-    expect(() => freezeTournament({ slug: "prueba-2026", nombre: "Prueba", fecha: "Septiembre 2026" }, parejasCsv, partidosCsv)).toThrow("sin resultado")
-  })
-})
+    expect(() =>
+      freezeTournament(
+        {
+          slug: "prueba-2026",
+          nombre: "Prueba",
+          fecha: "Septiembre 2026",
+          edition: "Prueba",
+          hostClubName: "Regatas",
+          clubId: "regatas",
+          clubLogo: "/images/clubs/regatas.png",
+        },
+        parejasCsv,
+        partidosCsv
+      )
+    ).toThrow("sin resultado");
+  });
+});

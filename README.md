@@ -43,18 +43,23 @@ same tournament between a Sheet and JSON: when it ends, it is frozen into JSON.
    https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/gviz/tq?tqx=out:csv&sheet=estado
    ```
 
-4. Put them in `.env`:
+4. Put them in `.env`. The tournament remains hidden until `PUBLIC_TOURNAMENT_ACTIVE` is explicitly `true`:
 
    ```dotenv
    PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL="https://docs.google.com/...&sheet=parejas"
    PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL="https://docs.google.com/...&sheet=partidos"
    PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL="https://docs.google.com/...&sheet=estado"
+   PUBLIC_TOURNAMENT_ACTIVE="true"
    ```
 
 5. Keep `.env` for local development only. Configure the same variables in
    Cloudflare Pages under **Settings → Environment variables**, then trigger a new
    deployment. The CSV URLs are public read-only URLs, but the local `.env` file is
    still not committed.
+
+Set `PUBLIC_TOURNAMENT_ACTIVE="false"` between editions. The site then keeps
+the historical tournaments available, hides active-tournament navigation, and
+redirects active-only agenda, export, and diagnostics routes to `/torneos/`.
 
 ### Configure tournament diagnostics
 
@@ -129,13 +134,18 @@ pnpm freeze -- \
   --slug 2026-09 \
   --nombre "Apertura" \
   --fecha "September 2026" \
+  --edition "Apertura" \
+  --host-club-name "Club anfitrión" \
+  --club-id "regatas" \
+  --club-logo "/images/clubs/regatas.png" \
   --parejas-url "https://docs.google.com/...&sheet=parejas" \
   --partidos-url "https://docs.google.com/...&sheet=partidos"
 ```
 
 The command downloads both CSV files, validates the full tournament, and writes:
 
-- `src/data/torneos/archivos/<slug>.json`
+- `src/data/torneos/archivos/<slug>/torneo.json`
+- `src/data/torneos/archivos/<slug>/parejas.csv` and `partidos.csv` (immutable source snapshots)
 - an entry in `src/data/torneos/registro.json`
 
 It intentionally fails if a match has no score or a playoff reference cannot be
