@@ -4,6 +4,7 @@ description: "Jugadores de las categorías Infantiles y Juveniles participarán 
 pubDatetime: 2026-09-30
 tags:
   - argentino
+  - infantiles
   - juveniles
 ---
 
@@ -13,7 +14,7 @@ Del **1 al 4 de octubre** se disputará el **Campeonato Argentino de Trinquete**
 
 ## Infantiles
 
-- **Pareja A:** Felipe Córdoba y Juan Pablo Baidal.
+- **Pareja A:** Felipe Córdoba y Juan Pablo Gorri.
 
 ## Juveniles
 
