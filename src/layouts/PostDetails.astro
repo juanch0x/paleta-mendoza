@@ -92,7 +92,7 @@ const nextPost =
   >
     <h1
       transition:name={slugifyStr(title)}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+      class="text-accent inline-block text-2xl font-bold sm:text-3xl"
     >
       {title}
     </h1>
@@ -105,7 +105,7 @@ const nextPost =
       />
       <EditPost class="max-sm:hidden" {hideEditPost} {post} />
     </div>
-    <article id="article" class="mx-auto prose mt-8 max-w-3xl">
+    <article id="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
 
@@ -144,7 +144,7 @@ const nextPost =
             <IconChevronLeft class="inline-block flex-none" />
             <div>
               <span>Noticia anterior</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
+              <div class="text-accent/85 text-sm">{prevPost.title}</div>
             </div>
           </a>
         )
@@ -157,7 +157,7 @@ const nextPost =
           >
             <div>
               <span>Siguiente noticia</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
+              <div class="text-accent/85 text-sm">{nextPost.title}</div>
             </div>
             <IconChevronRight class="inline-block flex-none" />
           </a>
@@ -235,7 +235,7 @@ const nextPost =
   /** Attaches copy buttons to code blocks in the document,
    * allowing users to copy code easily. */
   function attachCopyButtons() {
-    const copyButtonLabel = "Copy";
+    const copyButtonLabel = "Copiar";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     for (const codeBlock of codeBlocks) {
@@ -265,7 +265,7 @@ const nextPost =
       await navigator.clipboard.writeText(text ?? "");
 
       // visual feedback that task is completed
-      button.innerText = "Copied";
+      button.innerText = "Copiado";
 
       setTimeout(() => {
         button.innerText = copyButtonLabel;

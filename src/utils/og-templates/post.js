@@ -72,7 +72,7 @@ import loadGoogleFonts from "../loadGoogleFont";
 //             }}
 //           >
 //             <span>
-//               by{" "}
+//               por{" "}
 //               <span
 //                 style={{
 //                   color: "transparent",
@@ -178,7 +178,7 @@ export default async post => {
                             type: "span",
                             props: {
                               children: [
-                                "by ",
+                                "por ",
                                 {
                                   type: "span",
                                   props: {
@@ -222,7 +222,7 @@ export default async post => {
       height: 630,
       embedFont: true,
       fonts: await loadGoogleFonts(
-        post.data.title + post.data.author + SITE.title + "by"
+        post.data.title + post.data.author + SITE.title + "por"
       ),
     }
   );
