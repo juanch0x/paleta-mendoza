@@ -1,10 +1,10 @@
 import { clubs } from "./clubs";
 
 export const activeTournamentConfig = {
-  name: "Clausura · Gimnasia y Esgrima",
+  name: "Clausura · Club Social Maipú",
   edition: "Clausura",
-  hostClubName: "Gimnasia y Esgrima",
+  hostClubName: "Club Social Maipú",
   description: "Fixture, resultados y posiciones actualizadas.",
-  clubId: "gimnasia-y-esgrima",
-  clubLogo: clubs["gimnasia-y-esgrima"].logo,
+  clubId: "club-social-maipu",
+  clubLogo: clubs["club-social-maipu"].logo,
 } as const;

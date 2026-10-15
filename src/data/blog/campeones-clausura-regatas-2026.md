@@ -23,7 +23,7 @@ El torneo **Clausura Regatas** llegó a su fin. Felicitamos a todas las parejas 
 
 **Gonzalo Martínez / Matías Lombardi** fueron los campeones de Segunda. La final ante Sebastián Fleury / Danilo Morea terminó **6-12, 12-5 y 7-4**.
 
-*En la foto: las dos parejas finalistas de Segunda.*
+_En la foto: las dos parejas finalistas de Segunda._
 
 ## Tercera
 

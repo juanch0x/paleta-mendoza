@@ -9,6 +9,11 @@ export const clubs = {
     logo: "/images/clubs/regatas.png",
     markClassName: "border-accent/70 bg-white p-1.5",
   },
+  "club-social-maipu": {
+    name: "Club Social Maipú",
+    logo: "/images/clubs/club-social-maipu.png",
+    markClassName: "border-accent/70 bg-white p-1.5",
+  },
 } as const;
 
 export type ClubId = keyof typeof clubs;
