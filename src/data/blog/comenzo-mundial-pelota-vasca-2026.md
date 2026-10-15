@@ -19,4 +19,4 @@ La delegación argentina comparte el campeonato con equipos de América y Europa
 
 Consultá la [agenda del Mundial en Paleta Mendoza](/mundial/2026/) para ver horarios y partidos. También podés seguir las novedades en el [sitio oficial](https://mundialbsas2026.com.ar/) y las transmisiones en el [canal oficial de YouTube de la Confederación Argentina de Pelota](https://www.youtube.com/@pelotatvcapoficial). La organización también publica información en su sección de [Televisación](https://mundialbsas2026.com.ar/televisacion/).
 
-*Foto: Buenos Aires Ciudad.*
+_Foto: Buenos Aires Ciudad._

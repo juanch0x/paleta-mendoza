@@ -1,53 +1,78 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest";
 
-import { parseParejasCsv, parsePartidosCsv, parseTournamentStatusCsv } from "./csv.js"
+import {
+  parseParejasCsv,
+  parsePartidosCsv,
+  parseTournamentStatusCsv,
+} from "./csv.js";
 
 describe("parseParejasCsv", () => {
   it("normalizes names and ignores columns outside the domain contract", () => {
-    const parejas = parseParejasCsv(`id,categoria,zona,jugador_1,jugador_2,estado
-3A-1,Tercera,A,Fabián Tello,Diego Berna,activa`)
+    const parejas =
+      parseParejasCsv(`id,categoria,zona,jugador_1,jugador_2,estado
+3A-1,Tercera,A,Fabián Tello,Diego Berna,activa`);
 
     expect(parejas).toEqual([
-      { id: "3A-1", categoria: "Tercera", zona: "A", nombre: "Fabián Tello / Diego Berna" },
-    ])
-  })
+      {
+        id: "3A-1",
+        categoria: "Tercera",
+        zona: "A",
+        nombre: "Fabián Tello / Diego Berna",
+      },
+    ]);
+  });
 
   it("rejects duplicate ids", () => {
     const csv = `id,categoria,zona,jugador_1,jugador_2
 3A-1,Tercera,A,Fabián Tello,Diego Berna
-3A-1,Tercera,A,Erik Castro,Osvaldo Calderón`
+3A-1,Tercera,A,Erik Castro,Osvaldo Calderón`;
 
-    expect(() => parseParejasCsv(csv)).toThrow("id duplicado 3A-1")
-  })
-})
+    expect(() => parseParejasCsv(csv)).toThrow("id duplicado 3A-1");
+  });
+});
 
 describe("parseTournamentStatusCsv", () => {
   it("reads the singleton operational status", () => {
-    expect(parseTournamentStatusCsv(`demora_minutos,mensaje_importante,actualizado_en
-30,Presentarse con 15 minutos de anticipación,19:42`)).toEqual({
+    expect(
+      parseTournamentStatusCsv(`demora_minutos,mensaje_importante,actualizado_en
+30,Presentarse con 15 minutos de anticipación,19:42`)
+    ).toEqual({
       delayMinutes: 30,
       importantMessage: "Presentarse con 15 minutos de anticipación",
       updatedAt: "19:42",
-    })
-  })
+    });
+  });
 
   it("treats an empty status sheet as no operational status", () => {
-    expect(parseTournamentStatusCsv("demora_minutos,mensaje_importante,actualizado_en\n")).toBeUndefined()
-    expect(parseTournamentStatusCsv("demora_minutos,mensaje_importante,actualizado_en\n0,,")).toBeUndefined()
-  })
+    expect(
+      parseTournamentStatusCsv(
+        "demora_minutos,mensaje_importante,actualizado_en\n"
+      )
+    ).toBeUndefined();
+    expect(
+      parseTournamentStatusCsv(
+        "demora_minutos,mensaje_importante,actualizado_en\n0,,"
+      )
+    ).toBeUndefined();
+  });
 
   it("rejects invalid delay values and multiple status rows", () => {
-    expect(() => parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30.5,")).toThrow("entero")
-    expect(() => parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30,\n15,")).toThrow("una sola fila")
-  })
-})
+    expect(() =>
+      parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30.5,")
+    ).toThrow("entero");
+    expect(() =>
+      parseTournamentStatusCsv("demora_minutos,mensaje_importante\n30,\n15,")
+    ).toThrow("una sola fila");
+  });
+});
 
 describe("parsePartidosCsv", () => {
-  const headers = "id,dia,fecha,hora,categoria,fase,zona,pareja_a,equipo_a,pareja_b,equipo_b,sets,nota"
+  const headers =
+    "id,dia,fecha,hora,categoria,fase,zona,pareja_a,equipo_a,pareja_b,equipo_b,sets,nota";
 
   it("ignores editorial columns and preserves only the raw match contract", () => {
     const partidos = parsePartidosCsv(`${headers}
-40,Wed 27/8,2026-08-27,20:30,Tercera,semi,,3A-1,Fabián Tello / Diego Berna,3B-1,Bautista Latuf / Ignacio Corso,12-9 8-12 6-7,cruce declarado`)
+40,Wed 27/8,2026-08-27,20:30,Tercera,semi,,3A-1,Fabián Tello / Diego Berna,3B-1,Bautista Latuf / Ignacio Corso,12-9 8-12 6-7,cruce declarado`);
 
     expect(partidos).toEqual([
       {
@@ -61,24 +86,35 @@ describe("parsePartidosCsv", () => {
         sets: "12-9 8-12 6-7",
         nota: "cruce declarado",
       },
-    ])
-  })
+    ]);
+  });
 
   it("accepts a pending match with blank schedule and score", () => {
     const partidos = parsePartidosCsv(`${headers}
-42,,,,Tercera,final,,G:40,G:40,G:41,G:41,,`)
+42,,,,Tercera,final,,G:40,G:40,G:41,G:41,,`);
 
-    expect(partidos[0]).toMatchObject({ id: "42", pareja_a: "G:40", pareja_b: "G:41", sets: "" })
-    expect(partidos[0].fecha).toBeUndefined()
-  })
+    expect(partidos[0]).toMatchObject({
+      id: "42",
+      pareja_a: "G:40",
+      pareja_b: "G:41",
+      sets: "",
+    });
+    expect(partidos[0].fecha).toBeUndefined();
+  });
 
   it("rejects malformed dates, scores and duplicate ids", () => {
-    expect(() => parsePartidosCsv(`${headers}
-40,,27-08-2026,20:30,Tercera,semi,,3A-1,,3B-1,,12-9 12-8,`)).toThrow("Fecha inválida")
-    expect(() => parsePartidosCsv(`${headers}
-40,,2026-08-27,20:30,Tercera,semi,,3A-1,,3B-1,,12-9,`)).toThrow("dos o tres sets")
-    expect(() => parsePartidosCsv(`${headers}
+    expect(() =>
+      parsePartidosCsv(`${headers}
+40,,27-08-2026,20:30,Tercera,semi,,3A-1,,3B-1,,12-9 12-8,`)
+    ).toThrow("Fecha inválida");
+    expect(() =>
+      parsePartidosCsv(`${headers}
+40,,2026-08-27,20:30,Tercera,semi,,3A-1,,3B-1,,12-9,`)
+    ).toThrow("dos o tres sets");
+    expect(() =>
+      parsePartidosCsv(`${headers}
 40,,2026-08-27,20:30,Tercera,semi,,3A-1,,3B-1,,12-9 12-8,
-40,,2026-08-28,20:30,Tercera,final,,G:40,G:40,G:41,G:41,12-7 12-4,`)).toThrow("id duplicado 40")
-  })
-})
+40,,2026-08-28,20:30,Tercera,final,,G:40,G:40,G:41,G:41,12-7 12-4,`)
+    ).toThrow("id duplicado 40");
+  });
+});
