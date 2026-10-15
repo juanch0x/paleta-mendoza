@@ -226,4 +226,4 @@ for (const sheetName of ["parejas", "partidos", "_referencia"]) {
 const output = await SpreadsheetFile.exportXlsx(workbook);
 await output.save(outputPath);
 
-console.log(JSON.stringify({ outputPath, pairs: roster.length, groupMatches: matches.length }, null, 2));
+process.stdout.write(`${JSON.stringify({ outputPath, pairs: roster.length, groupMatches: matches.length }, null, 2)}\n`);

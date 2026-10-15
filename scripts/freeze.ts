@@ -18,7 +18,7 @@ const requiredOption = (name: string) => {
 }
 
 if (process.argv.includes("--help")) {
-  console.log("Uso: pnpm freeze -- --slug <slug> --nombre <nombre> --fecha <mes y año> --edition <edición> --host-club-name <club> --club-id <id> --club-logo <ruta> --parejas-url <csv> --partidos-url <csv> [--overwrite]")
+  process.stdout.write("Uso: pnpm freeze -- --slug <slug> --nombre <nombre> --fecha <mes y año> --edition <edición> --host-club-name <club> --club-id <id> --club-logo <ruta> --parejas-url <csv> --partidos-url <csv> [--overwrite]\n")
   process.exit(0)
 }
 
@@ -68,4 +68,4 @@ await fs.writeFile(path.join(tournamentDirectory, "parejas.csv"), parejasCsv)
 await fs.writeFile(path.join(tournamentDirectory, "partidos.csv"), partidosCsv)
 await fs.writeFile(registryPath, `${JSON.stringify(nextRegistry, null, 2)}\n`)
 
-console.log(`Congelado ${tournament.nombre}: ${tournament.parejas.length} parejas y ${tournament.partidos.length} partidos.`)
+process.stdout.write(`Congelado ${tournament.nombre}: ${tournament.parejas.length} parejas y ${tournament.partidos.length} partidos.\n`)
