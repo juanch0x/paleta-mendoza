@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  argentinaCount,
   courtLabels,
   dailyEvents,
-  dates,
+  dayNavigation,
   formatDate,
+  isArgentinaEvent,
   localDate,
   modalities,
   mundial,
@@ -16,6 +18,7 @@ import {
 
 export function EventCard({ event }: { event: MundialEvent }) {
   const ceremony = precedingCeremony(event);
+  const argentinaEvent = isArgentinaEvent(event);
   const kind =
     event.kind === "ceremony"
       ? "Ceremonia"
@@ -23,7 +26,19 @@ export function EventCard({ event }: { event: MundialEvent }) {
         ? "Sesión"
         : "Partido";
   return (
-    <article className="border-border bg-background rounded-xl border p-4">
+    <article
+      className={`border-border relative overflow-hidden rounded-xl border p-4 ${argentinaEvent ? "bg-[#74ACDF]/[0.08]" : "bg-background"}`}
+    >
+      {argentinaEvent && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-[5px]"
+          style={{
+            background:
+              "linear-gradient(to bottom, #74ACDF 0 33.333%, #fff 33.333% 66.666%, #74ACDF 66.666% 100%)",
+          }}
+        />
+      )}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-accent text-xs font-semibold tracking-wide uppercase">
@@ -52,11 +67,29 @@ export function EventCard({ event }: { event: MundialEvent }) {
         <h3 className="mt-4 font-medium">Inauguración</h3>
       ) : (
         <h3 className="mt-4 text-sm font-medium sm:text-base">
-          {event.participantA || event.participantB
-            ? `${event.participantA ?? "Por definir"} vs. ${event.participantB ?? "Por definir"}`
-            : event.kind === "session"
-              ? "Sesión programada · participantes por definir"
-              : "Participantes por definir"}
+          {event.participantA || event.participantB ? (
+            <>
+              {event.participantA === "Argentina" ? (
+                <>
+                  <span aria-hidden="true">🇦🇷</span> <strong>Argentina</strong>
+                </>
+              ) : (
+                (event.participantA ?? "Por definir")
+              )}
+              {" vs. "}
+              {event.participantB === "Argentina" ? (
+                <>
+                  <span aria-hidden="true">🇦🇷</span> <strong>Argentina</strong>
+                </>
+              ) : (
+                (event.participantB ?? "Por definir")
+              )}
+            </>
+          ) : event.kind === "session" ? (
+            "Sesión programada · participantes por definir"
+          ) : (
+            "Participantes por definir"
+          )}
         </h3>
       )}
       {event.kind !== "ceremony" && event.phaseLabel && (
@@ -77,9 +110,8 @@ export function EventCard({ event }: { event: MundialEvent }) {
 }
 
 export default function MundialAgenda() {
-  const [selection, setSelection] = useState<AgendaSelection>();
+  const [rawSelection, setSelection] = useState<AgendaSelection>();
   const [today, setToday] = useState("");
-  const dayList = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const sync = () => {
       const now = new Date();
@@ -97,20 +129,18 @@ export default function MundialAgenda() {
       window.clearInterval(timer);
     };
   }, []);
-  useEffect(() => {
-    const button = dayList.current?.querySelector<HTMLButtonElement>(
-      '[aria-pressed="true"]'
-    );
-    if (button && dayList.current)
-      dayList.current.scrollLeft =
-        button.offsetLeft - dayList.current.offsetLeft;
-  }, [selection?.date]);
-  if (!selection)
+  if (!rawSelection)
     return (
       <p role="status" className="mt-8 text-sm">
         Cargando agenda…
       </p>
     );
+  const argentinaTotal = argentinaCount(rawSelection);
+  // A stale argentina=1 on a day without Argentina matches must not empty the list.
+  const selection: AgendaSelection = {
+    ...rawSelection,
+    argentinaOnly: rawSelection.argentinaOnly && argentinaTotal > 0,
+  };
   const change = (next: AgendaSelection) => {
     window.history.pushState(
       {},
@@ -119,51 +149,66 @@ export default function MundialAgenda() {
     );
     setSelection(next);
   };
+  const goTo = (date: string) =>
+    change({ ...selection, date, argentinaOnly: false });
+  const navigation = dayNavigation(selection.date, today);
   const clear = () =>
     change({ ...selection, modality: "", argentinaOnly: false });
   const events = dailyEvents(selection);
   const filtered = Boolean(selection.modality || selection.argentinaOnly);
   return (
     <div className="mt-8">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-lg font-bold">Agenda por día</h2>
-        {dates.includes(today) && (
-          <button
-            type="button"
-            className="border-border hover:bg-muted rounded-lg border px-3 py-2 text-sm"
-            onClick={() => change({ ...selection, date: today })}
-          >
-            Hoy
-          </button>
-        )}
+      <h2 className="text-lg font-bold">Agenda por día</h2>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        {navigation.shortcuts.map(({ label, date }) => {
+          const selected = date === selection.date;
+          return (
+            <button
+              key={label}
+              type="button"
+              onClick={() => date && goTo(date)}
+              aria-pressed={selected}
+              className={`${date === null ? "invisible" : ""} ${
+                selected
+                  ? "bg-accent text-background min-h-11 w-full rounded-full px-4 py-2 text-sm font-semibold"
+                  : "border-border bg-background hover:border-accent min-h-11 w-full rounded-full border px-4 py-2 text-sm font-semibold transition"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
-      <div
-        ref={dayList}
-        role="group"
-        aria-label="Día de la agenda"
-        className="relative mt-4 flex gap-2 overflow-x-auto p-1 pb-3"
-      >
-        {dates.map(date => (
-          <button
-            key={date}
-            type="button"
-            aria-pressed={selection.date === date}
-            onClick={() => change({ ...selection, date })}
-            className={`shrink-0 rounded-lg border px-3 py-3 text-sm ${selection.date === date ? "border-accent bg-accent/10 text-accent font-semibold" : "border-border hover:bg-muted"}`}
-          >
-            {formatDate(date, true)}
-          </button>
-        ))}
+      <div className="border-border mt-4 flex items-center justify-between gap-4 border-y py-4">
+        <button
+          type="button"
+          onClick={() => navigation.previous && goTo(navigation.previous)}
+          className={`${navigation.previous === null ? "invisible" : ""} border-border bg-background hover:border-accent min-h-11 min-w-11 shrink-0 rounded-lg border px-3 py-2 text-sm font-semibold transition`}
+          aria-label="Ver día anterior"
+        >
+          ←
+        </button>
+        <p className="text-center text-base font-bold capitalize sm:text-lg">
+          {formatDate(selection.date)}
+        </p>
+        <button
+          type="button"
+          onClick={() => navigation.next && goTo(navigation.next)}
+          className={`${navigation.next === null ? "invisible" : ""} border-border bg-background hover:border-accent min-h-11 min-w-11 shrink-0 rounded-lg border px-3 py-2 text-sm font-semibold transition`}
+          aria-label="Ver día siguiente"
+        >
+          →
+        </button>
       </div>
-      <div className="border-border mt-4 flex flex-wrap items-end gap-4 border-b pb-5">
+      <div className="border-border mt-4 border-b pb-5">
         <label
-          className="flex min-w-0 flex-col gap-2 text-xs font-semibold"
+          className="flex flex-col gap-2 text-sm font-semibold"
           htmlFor="mundial-modality"
         >
           Modalidad
           <select
             id="mundial-modality"
-            className="border-border bg-background max-w-full rounded-lg border px-3 py-2.5 text-sm font-normal"
+            className="border-border bg-background min-h-11 w-full rounded-lg border px-3 py-2.5 text-base font-normal"
             value={selection.modality}
             onChange={event =>
               change({ ...selection, modality: event.target.value })
@@ -175,40 +220,32 @@ export default function MundialAgenda() {
             ))}
           </select>
         </label>
-        <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            role="switch"
-            className="accent-accent size-4"
-            checked={selection.argentinaOnly}
-            aria-describedby={
-              selection.argentinaOnly ? "argentina-help" : undefined
-            }
-            onChange={event =>
-              change({ ...selection, argentinaOnly: event.target.checked })
-            }
-          />
-          Solo Argentina
-        </label>
-        {filtered && (
-          <button
-            type="button"
-            className="text-accent min-h-11 text-sm underline underline-offset-4"
-            onClick={clear}
-          >
-            Limpiar filtros
-          </button>
+        {argentinaTotal > 0 && (
+          <div className="border-border bg-muted mt-4 rounded-xl border p-4">
+            <p className="text-base font-semibold">
+              <span aria-hidden="true">🇦🇷</span> Argentina juega{" "}
+              {argentinaTotal} {argentinaTotal === 1 ? "partido" : "partidos"}
+            </p>
+            <button
+              type="button"
+              aria-pressed={selection.argentinaOnly}
+              onClick={() =>
+                change({
+                  ...selection,
+                  argentinaOnly: !selection.argentinaOnly,
+                })
+              }
+              className={`mt-3 min-h-11 w-full rounded-full px-4 py-2 text-sm font-semibold transition ${
+                selection.argentinaOnly
+                  ? "bg-accent text-background"
+                  : "border-border bg-background hover:border-accent border"
+              }`}
+            >
+              {selection.argentinaOnly ? "Ver todos" : "Ver solo esos"}
+            </button>
+          </div>
         )}
       </div>
-      {selection.argentinaOnly && (
-        <p
-          id="argentina-help"
-          className="text-foreground/75 mt-3 text-xs leading-5"
-        >
-          Solo participaciones confirmadas de Argentina. Los cruces con
-          participantes por definir no se incluyen.
-        </p>
-      )}
       <div className="mt-6" aria-live="polite" aria-atomic="true">
         <h3 className="font-semibold capitalize">
           {formatDate(selection.date)}

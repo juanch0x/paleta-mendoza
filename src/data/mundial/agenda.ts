@@ -81,6 +81,50 @@ export function precedingCeremony(
     .sort((a, b) => b.sourceOrder - a.sourceOrder)[0];
 }
 
+export function isArgentinaEvent(event: MundialEvent): boolean {
+  return (
+    event.participantA === "Argentina" || event.participantB === "Argentina"
+  );
+}
+
+export function argentinaCount(selection: AgendaSelection): number {
+  return dailyEvents({ ...selection, argentinaOnly: false }).filter(
+    isArgentinaEvent
+  ).length;
+}
+
+export type DayShortcut = {
+  label: "Ayer" | "Hoy" | "Mañana";
+  date: string | null;
+};
+
+export function dayNavigation(selected: string, today: string) {
+  const inRange = (date: string) => (dates.includes(date) ? date : null);
+  const clampedToday =
+    today < calendar.startDate
+      ? calendar.startDate
+      : today > calendar.endDate
+        ? calendar.endDate
+        : today;
+  const shortcuts: DayShortcut[] = [
+    { label: "Ayer", date: inRange(addDays(today, -1)) },
+    { label: "Hoy", date: clampedToday },
+    { label: "Mañana", date: inRange(addDays(today, 1)) },
+  ];
+  return {
+    previous: dates.filter(date => date < selected).pop() ?? null,
+    next: dates.find(date => date > selected) ?? null,
+    shortcuts,
+  };
+}
+
+function addDays(date: string, days: number): string {
+  const ONE_DAY_MS = 86_400_000;
+  return new Date(Date.parse(`${date}T00:00:00Z`) + days * ONE_DAY_MS)
+    .toISOString()
+    .slice(0, 10);
+}
+
 export function dailyEvents(selection: AgendaSelection): MundialEvent[] {
   const anchorTime = (event: MundialEvent) =>
     event.startTime ?? precedingCeremony(event)?.startTime ?? "99:99";
@@ -89,9 +133,7 @@ export function dailyEvents(selection: AgendaSelection): MundialEvent[] {
       event =>
         event.date === selection.date &&
         (!selection.modality || event.modality === selection.modality) &&
-        (!selection.argentinaOnly ||
-          event.participantA === "Argentina" ||
-          event.participantB === "Argentina")
+        (!selection.argentinaOnly || isArgentinaEvent(event))
     )
     .sort(
       (a, b) =>
