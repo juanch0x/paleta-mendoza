@@ -13,16 +13,16 @@ Argentina terminó el XX Campeonato Mundial Absoluto de Pelota Vasca en el segun
 
 ## Medallero final
 
-| Delegación | Oro | Plata | Bronce | Total |
-| --- | ---: | ---: | ---: | ---: |
-| España | 7 | 9 | 2 | 18 |
-| **🇦🇷 Argentina** | **5** | **0** | **3** | **8** |
-| Euskadi | 4 | 7 | 1 | 12 |
-| México | 4 | 0 | 7 | 11 |
-| Francia | 2 | 5 | 6 | 13 |
-| Estados Unidos | 0 | 1 | 1 | 2 |
-| Cuba | 0 | 0 | 1 | 1 |
-| Uruguay | 0 | 0 | 1 | 1 |
+| Delegación       |   Oro | Plata | Bronce | Total |
+| ---------------- | ----: | ----: | -----: | ----: |
+| España           |     7 |     9 |      2 |    18 |
+| **🇦🇷 Argentina** | **5** | **0** |  **3** | **8** |
+| Euskadi          |     4 |     7 |      1 |    12 |
+| México           |     4 |     0 |      7 |    11 |
+| Francia          |     2 |     5 |      6 |    13 |
+| Estados Unidos   |     0 |     1 |      1 |     2 |
+| Cuba             |     0 |     0 |      1 |     1 |
+| Uruguay          |     0 |     0 |      1 |     1 |
 
 El orden sigue el medallero final del campeonato. Para México, la cifra de siete bronces coincide con su [balance de cierre](https://ntcd.mx/noticias-mexico-cierra-mundial-pelota-vasca-2026-cuatro-oros-siete-bronces).
 
