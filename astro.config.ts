@@ -9,6 +9,9 @@ import { SITE } from "./src/config";
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  redirects: {
+    "/mundial/2026": "/posts/comenzo-mundial-pelota-vasca-2026/",
+  },
   integrations: [
     react(),
     sitemap({

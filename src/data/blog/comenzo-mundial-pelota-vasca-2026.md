@@ -17,6 +17,6 @@ Las pruebas se disputan en el CeNARD, el Club Ciudad de Buenos Aires y el Club B
 
 La delegación argentina comparte el campeonato con equipos de América y Europa, incluida Euskadi, que participa con selección propia. Hay actividad femenina y masculina en distintas modalidades.
 
-Consultá la [agenda del Mundial en Paleta Mendoza](/mundial/2026/) para ver horarios y partidos. También podés seguir las novedades en el [sitio oficial](https://mundialbsas2026.com.ar/) y las transmisiones en el [canal oficial de YouTube de la Confederación Argentina de Pelota](https://www.youtube.com/@pelotatvcapoficial). La organización también publica información en su sección de [Televisación](https://mundialbsas2026.com.ar/televisacion/).
+La organización publicó información en el [sitio oficial](https://mundialbsas2026.com.ar/), las transmisiones en el [canal oficial de YouTube de la Confederación Argentina de Pelota](https://www.youtube.com/@pelotatvcapoficial) y los detalles en su sección de [Televisación](https://mundialbsas2026.com.ar/televisacion/).
 
 _Foto: Buenos Aires Ciudad._
