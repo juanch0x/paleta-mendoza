@@ -7,8 +7,7 @@ import { hasActiveTournament } from "@/data/tournament-availability";
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
 
-if (!hasActiveTournament(undefined, activeTournamentConfig.isActive))
-  return Astro.redirect("/torneos/");
+if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 ---
 
 <Layout

@@ -9,10 +9,7 @@ import Layout from "@/layouts/Layout.astro";
 const parejasUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL;
 const partidosUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_PARTIDOS_CSV_URL;
 const statusUrl = import.meta.env.PUBLIC_ACTIVE_TOURNAMENT_STATUS_CSV_URL;
-const tournamentIsActive = hasActiveTournament(
-  undefined,
-  activeTournamentConfig.isActive
-);
+const tournamentIsActive = hasActiveTournament();
 
 if (!tournamentIsActive) return Astro.redirect("/torneos/");
 ---

@@ -10,8 +10,7 @@ import Layout from "@/layouts/Layout.astro";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
 import { hasActiveTournament } from "@/data/tournament-availability";
 
-if (!hasActiveTournament(undefined, activeTournamentConfig.isActive))
-  return Astro.redirect("/torneos/");
+if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 
 let localDiagnostics: TournamentDiagnostics | undefined;
 let localError: string | undefined;

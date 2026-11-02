@@ -1,7 +1,6 @@
 import { clubs } from "./clubs";
 
 export const activeTournamentConfig = {
-  isActive: false,
   name: "Clausura · Club Social Maipú",
   edition: "Clausura",
   hostClubName: "Club Social Maipú",

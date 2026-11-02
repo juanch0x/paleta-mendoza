@@ -21,10 +21,7 @@ const isActive = (path: string) => {
   return currentPath === path || currentPathArray[0] === pathArray[0];
 };
 
-const tournamentIsActive = hasActiveTournament(
-  undefined,
-  activeTournamentConfig.isActive
-);
+const tournamentIsActive = hasActiveTournament();
 ---
 
 <header>
