@@ -1,0 +1,1611 @@
+{
+  "slug": "clausura-club-social-maipu-2026",
+  "nombre": "Clausura · Club Social Maipú",
+  "fecha": "Octubre 2026",
+  "edition": "Clausura",
+  "hostClubName": "Club Social Maipú",
+  "clubId": "club-social-maipu",
+  "clubLogo": "/images/clubs/club-social-maipu.png",
+  "alcance": "Fase de grupos y playoffs",
+  "parejas": [
+    {
+      "id": "1A-1",
+      "categoria": "Primera",
+      "zona": "A",
+      "nombre": "Bautista Latuf / Alexis Corso"
+    },
+    {
+      "id": "1A-2",
+      "categoria": "Primera",
+      "zona": "A",
+      "nombre": "Ignacio Corso / Tomás Molteno"
+    },
+    {
+      "id": "1A-3",
+      "categoria": "Primera",
+      "zona": "A",
+      "nombre": "Juan Cuevas / Matías Poblete"
+    },
+    {
+      "id": "1A-4",
+      "categoria": "Primera",
+      "zona": "A",
+      "nombre": "Hernan Fontana / Fernando Laguillo"
+    },
+    {
+      "id": "2A-1",
+      "categoria": "Segunda",
+      "zona": "A",
+      "nombre": "Gonzalo Martinez / Martin Armenault"
+    },
+    {
+      "id": "2A-2",
+      "categoria": "Segunda",
+      "zona": "A",
+      "nombre": "Francisco Martín / Gonzalo Zulueta"
+    },
+    {
+      "id": "2A-3",
+      "categoria": "Segunda",
+      "zona": "A",
+      "nombre": "Arturo Molteno / Fernando Losilla"
+    },
+    {
+      "id": "2A-4",
+      "categoria": "Segunda",
+      "zona": "A",
+      "nombre": "Victor Vazquez / Marcos Bustamante"
+    },
+    {
+      "id": "2A-5",
+      "categoria": "Segunda",
+      "zona": "A",
+      "nombre": "Ignacio Corso / Sebastian Masetto"
+    },
+    {
+      "id": "2B-1",
+      "categoria": "Segunda",
+      "zona": "B",
+      "nombre": "Bautista Latuf / Luca Vives"
+    },
+    {
+      "id": "2B-2",
+      "categoria": "Segunda",
+      "zona": "B",
+      "nombre": "Cristian Aranzabal / Cesar Mendoza"
+    },
+    {
+      "id": "2B-3",
+      "categoria": "Segunda",
+      "zona": "B",
+      "nombre": "Ruben Poblete / Ariel Astesiano"
+    },
+    {
+      "id": "2B-4",
+      "categoria": "Segunda",
+      "zona": "B",
+      "nombre": "Ernesto Retamales / Manolo Masetoo"
+    },
+    {
+      "id": "3A-1",
+      "categoria": "Tercera",
+      "zona": "A",
+      "nombre": "Ignacio Corso / Sebastian Masetto"
+    },
+    {
+      "id": "3A-2",
+      "categoria": "Tercera",
+      "zona": "A",
+      "nombre": "Álvaro Zulueta / Martin Guerra"
+    },
+    {
+      "id": "3A-3",
+      "categoria": "Tercera",
+      "zona": "A",
+      "nombre": "Juan Portugal / Juan José Alvarez"
+    },
+    {
+      "id": "3A-4",
+      "categoria": "Tercera",
+      "zona": "A",
+      "nombre": "Mariano López / Nicolás Quesada"
+    },
+    {
+      "id": "3A-5",
+      "categoria": "Tercera",
+      "zona": "A",
+      "nombre": "Benicio Zulueta / Santiago Tello"
+    },
+    {
+      "id": "4A-1",
+      "categoria": "Cuarta",
+      "zona": "A",
+      "nombre": "Isaias Fernandez / Gabriel Fernandez"
+    },
+    {
+      "id": "4A-2",
+      "categoria": "Cuarta",
+      "zona": "A",
+      "nombre": "Carlos Salis / Carlos Castrillejo"
+    },
+    {
+      "id": "4A-3",
+      "categoria": "Cuarta",
+      "zona": "A",
+      "nombre": "Benjamin Zamorano / Valentín Olguin"
+    },
+    {
+      "id": "4B-1",
+      "categoria": "Cuarta",
+      "zona": "B",
+      "nombre": "Juan Chondro / Gonzalo Marzal"
+    },
+    {
+      "id": "4B-2",
+      "categoria": "Cuarta",
+      "zona": "B",
+      "nombre": "Lautaro Quiroga / Mariano Briffi"
+    },
+    {
+      "id": "4B-3",
+      "categoria": "Cuarta",
+      "zona": "B",
+      "nombre": "Pedro Agüero / Diego Aguinaga"
+    }
+  ],
+  "partidos": [
+    {
+      "id": "1",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-19",
+      "hora": "17:30",
+      "sets": [
+        [9, 12],
+        [12, 5],
+        [7, 5]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-2",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Tomás Molteno"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-3",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Juan Cuevas / Matías Poblete"
+        }
+      }
+    },
+    {
+      "id": "2",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-21",
+      "hora": "19:30",
+      "sets": [
+        [12, 3],
+        [12, 4]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-4",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Victor Vazquez / Marcos Bustamante"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-19",
+      "hora": "20:00",
+      "sets": [
+        [12, 11],
+        [10, 12],
+        [5, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-4",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ernesto Retamales / Manolo Masetoo"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-3",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ruben Poblete / Ariel Astesiano"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-19",
+      "hora": "20:30",
+      "sets": [
+        [9, 12],
+        [5, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-3",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Pedro Agüero / Diego Aguinaga"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-1",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Juan Chondro / Gonzalo Marzal"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-19",
+      "hora": "21:00",
+      "sets": [
+        [12, 9],
+        [12, 2]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-1",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Bautista Latuf / Luca Vives"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-2",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Cristian Aranzabal / Cesar Mendoza"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-20",
+      "hora": "18:30",
+      "sets": [
+        [12, 7],
+        [12, 3]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-5",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-20",
+      "hora": "19:00",
+      "sets": [
+        [12, 8],
+        [9, 12],
+        [7, 4]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-3",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Juan Portugal / Juan José Alvarez"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-5",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Benicio Zulueta / Santiago Tello"
+        }
+      }
+    },
+    {
+      "id": "8",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-20",
+      "hora": "19:30",
+      "sets": [
+        [12, 0],
+        [12, 0]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-1",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Bautista Latuf / Luca Vives"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-3",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ruben Poblete / Ariel Astesiano"
+        }
+      }
+    },
+    {
+      "id": "9",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-20",
+      "hora": "20:00",
+      "sets": [
+        [10, 12],
+        [7, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-1",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-4",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Mariano López / Nicolás Quesada"
+        }
+      }
+    },
+    {
+      "id": "10",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-20",
+      "hora": "20:30",
+      "sets": [
+        [2, 12],
+        [9, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-3",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Benjamin Zamorano / Valentín Olguin"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-1",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Isaias Fernandez / Gabriel Fernandez"
+        }
+      }
+    },
+    {
+      "id": "11",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-20",
+      "hora": "21:00",
+      "sets": [
+        [11, 12],
+        [12, 5],
+        [3, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-1",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Bautista Latuf / Alexis Corso"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-4",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Hernan Fontana / Fernando Laguillo"
+        }
+      }
+    },
+    {
+      "id": "12",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-21",
+      "hora": "18:30",
+      "sets": [
+        [3, 12],
+        [5, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-2",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Cristian Aranzabal / Cesar Mendoza"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-4",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ernesto Retamales / Manolo Masetoo"
+        }
+      }
+    },
+    {
+      "id": "13",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-21",
+      "hora": "19:00",
+      "sets": [
+        [12, 7],
+        [12, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-3",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Pedro Agüero / Diego Aguinaga"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-2",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Lautaro Quiroga / Mariano Briffi"
+        }
+      }
+    },
+    {
+      "id": "14",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-21",
+      "hora": "20:30",
+      "sets": [
+        [9, 12],
+        [7, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-2",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Álvaro Zulueta / Martin Guerra"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-3",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Juan Portugal / Juan José Alvarez"
+        }
+      }
+    },
+    {
+      "id": "15",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-19",
+      "hora": "19:30",
+      "sets": [
+        [12, 10],
+        [12, 9]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-3",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Arturo Molteno / Fernando Losilla"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-4",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Victor Vazquez / Marcos Bustamante"
+        }
+      }
+    },
+    {
+      "id": "16",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-21",
+      "hora": "20:00",
+      "sets": [
+        [12, 8],
+        [12, 10]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-1",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Bautista Latuf / Alexis Corso"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-2",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Tomás Molteno"
+        }
+      }
+    },
+    {
+      "id": "17",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-23",
+      "hora": "19:30",
+      "sets": [
+        [12, 4],
+        [12, 9]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-1",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Gonzalo Martinez / Martin Armenault"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-5",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      }
+    },
+    {
+      "id": "18",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-22",
+      "hora": "19:00",
+      "sets": [
+        [12, 11],
+        [12, 11]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-4",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Mariano López / Nicolás Quesada"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-3",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Juan Portugal / Juan José Alvarez"
+        }
+      }
+    },
+    {
+      "id": "19",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-22",
+      "hora": "19:30",
+      "sets": [
+        [12, 11],
+        [10, 12],
+        [7, 6]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-3",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Benjamin Zamorano / Valentín Olguin"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-2",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Carlos Salis / Carlos Castrillejo"
+        }
+      }
+    },
+    {
+      "id": "20",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-22",
+      "hora": "20:00",
+      "sets": [
+        [9, 12],
+        [7, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-5",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-3",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Arturo Molteno / Fernando Losilla"
+        }
+      }
+    },
+    {
+      "id": "21",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-28",
+      "hora": "21:30",
+      "sets": [
+        [12, 7],
+        [12, 10]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-1",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Gonzalo Martinez / Martin Armenault"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-4",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Victor Vazquez / Marcos Bustamante"
+        }
+      }
+    },
+    {
+      "id": "22",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-23",
+      "hora": "20:00",
+      "sets": [
+        [12, 9],
+        [12, 4]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-4",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Mariano López / Nicolás Quesada"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-5",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Benicio Zulueta / Santiago Tello"
+        }
+      }
+    },
+    {
+      "id": "23",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-23",
+      "hora": "20:30",
+      "sets": [
+        [12, 10],
+        [12, 11]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-3",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Juan Cuevas / Matías Poblete"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-4",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Hernan Fontana / Fernando Laguillo"
+        }
+      }
+    },
+    {
+      "id": "24",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-23",
+      "hora": "21:00",
+      "sets": [
+        [12, 4],
+        [11, 12],
+        [7, 2]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-1",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Juan Chondro / Gonzalo Marzal"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-2",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Lautaro Quiroga / Mariano Briffi"
+        }
+      }
+    },
+    {
+      "id": "25",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-26",
+      "hora": "21:30",
+      "sets": [
+        [12, 4],
+        [12, 11]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-3",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ruben Poblete / Ariel Astesiano"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-2",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Cristian Aranzabal / Cesar Mendoza"
+        }
+      }
+    },
+    {
+      "id": "26",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-26",
+      "hora": "17:30",
+      "sets": [
+        [9, 12],
+        [10, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-1",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Bautista Latuf / Alexis Corso"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-3",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Juan Cuevas / Matías Poblete"
+        }
+      }
+    },
+    {
+      "id": "27",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-26",
+      "hora": "18:00",
+      "sets": [
+        [3, 12],
+        [3, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-2",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Álvaro Zulueta / Martin Guerra"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-1",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      }
+    },
+    {
+      "id": "28",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-26",
+      "hora": "20:00",
+      "sets": [
+        [12, 7],
+        [12, 9]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-1",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Gonzalo Martinez / Martin Armenault"
+        }
+      }
+    },
+    {
+      "id": "29",
+      "categoria": "Cuarta",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-26",
+      "hora": "20:30",
+      "sets": [
+        [12, 6],
+        [12, 11]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-1",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Isaias Fernandez / Gabriel Fernandez"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-2",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Carlos Salis / Carlos Castrillejo"
+        }
+      }
+    },
+    {
+      "id": "30",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-26",
+      "hora": "21:00",
+      "sets": [
+        [12, 7],
+        [12, 6]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-1",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-3",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Juan Portugal / Juan José Alvarez"
+        }
+      }
+    },
+    {
+      "id": "31",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "B",
+      "fecha": "2026-10-27",
+      "hora": "18:30",
+      "sets": [
+        [9, 12],
+        [5, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-1",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Bautista Latuf / Luca Vives"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-4",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ernesto Retamales / Manolo Masetoo"
+        }
+      }
+    },
+    {
+      "id": "32",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-27",
+      "hora": "19:00",
+      "sets": [
+        [9, 12],
+        [12, 6],
+        [7, 3]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-2",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Álvaro Zulueta / Martin Guerra"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-5",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Benicio Zulueta / Santiago Tello"
+        }
+      }
+    },
+    {
+      "id": "33",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-27",
+      "hora": "19:30",
+      "sets": [
+        [12, 8],
+        [12, 10]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-4",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Mariano López / Nicolás Quesada"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-2",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Álvaro Zulueta / Martin Guerra"
+        }
+      }
+    },
+    {
+      "id": "34",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-27",
+      "hora": "20:00",
+      "sets": [
+        [12, 11],
+        [12, 10]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-3",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Arturo Molteno / Fernando Losilla"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-1",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Gonzalo Martinez / Martin Armenault"
+        }
+      }
+    },
+    {
+      "id": "35",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-27",
+      "hora": "20:30",
+      "sets": [
+        [12, 7],
+        [9, 12],
+        [7, 1]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-4",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Victor Vazquez / Marcos Bustamante"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-5",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      }
+    },
+    {
+      "id": "36",
+      "categoria": "Segunda",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-28",
+      "hora": "19:00",
+      "sets": [
+        [7, 12],
+        [12, 5],
+        [1, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-3",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Arturo Molteno / Fernando Losilla"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      }
+    },
+    {
+      "id": "37",
+      "categoria": "Primera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-28",
+      "hora": "20:00",
+      "sets": [
+        [12, 9],
+        [12, 3]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-2",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Tomás Molteno"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-4",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Hernan Fontana / Fernando Laguillo"
+        }
+      }
+    },
+    {
+      "id": "38",
+      "categoria": "Tercera",
+      "fase": "grupo",
+      "zona": "A",
+      "fecha": "2026-10-27",
+      "hora": "21:00",
+      "sets": [
+        [12, 11],
+        [12, 9]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-1",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-5",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Benicio Zulueta / Santiago Tello"
+        }
+      }
+    },
+    {
+      "id": "39",
+      "categoria": "Cuarta",
+      "fase": "repechaje",
+      "zona": "A",
+      "fecha": "2026-10-28",
+      "hora": "19:30",
+      "sets": [
+        [6, 12],
+        [12, 9],
+        [7, 6]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-3",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Benjamin Zamorano / Valentín Olguin"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-2",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Lautaro Quiroga / Mariano Briffi"
+        }
+      }
+    },
+    {
+      "id": "40",
+      "categoria": "Cuarta",
+      "fase": "repechaje",
+      "zona": "A",
+      "fecha": "2026-10-28",
+      "hora": "20:30",
+      "sets": [
+        [12, 0],
+        [12, 0]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-3",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Pedro Agüero / Diego Aguinaga"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-2",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Carlos Salis / Carlos Castrillejo"
+        }
+      }
+    },
+    {
+      "id": "41",
+      "categoria": "Segunda",
+      "fase": "semi",
+      "zona": "A",
+      "fecha": "2026-10-29",
+      "hora": "19:00",
+      "sets": [
+        [11, 12],
+        [8, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-1",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Bautista Latuf / Luca Vives"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      }
+    },
+    {
+      "id": "42",
+      "categoria": "Segunda",
+      "fase": "semi",
+      "zona": "A",
+      "fecha": "2026-10-29",
+      "hora": "19:30",
+      "sets": [
+        [10, 12],
+        [12, 6],
+        [7, 6]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-4",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ernesto Retamales / Manolo Masetoo"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-3",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Arturo Molteno / Fernando Losilla"
+        }
+      }
+    },
+    {
+      "id": "43",
+      "categoria": "Cuarta",
+      "fase": "semi",
+      "zona": "A",
+      "fecha": "2026-10-29",
+      "hora": "20:00",
+      "sets": [
+        [12, 9],
+        [12, 8]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-1",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Isaias Fernandez / Gabriel Fernandez"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-3",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Pedro Agüero / Diego Aguinaga"
+        }
+      }
+    },
+    {
+      "id": "44",
+      "categoria": "Cuarta",
+      "fase": "semi",
+      "zona": "A",
+      "fecha": "2026-10-29",
+      "hora": "20:30",
+      "sets": [
+        [12, 7],
+        [12, 6]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-1",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Juan Chondro / Gonzalo Marzal"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-3",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Benjamin Zamorano / Valentín Olguin"
+        }
+      }
+    },
+    {
+      "id": "45",
+      "categoria": "Cuarta",
+      "fase": "final",
+      "zona": "A",
+      "fecha": "2026-10-30",
+      "hora": "19:30",
+      "sets": [
+        [5, 12],
+        [12, 6],
+        [5, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4B-1",
+          "categoria": "Cuarta",
+          "zona": "B",
+          "nombre": "Juan Chondro / Gonzalo Marzal"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "4A-1",
+          "categoria": "Cuarta",
+          "zona": "A",
+          "nombre": "Isaias Fernandez / Gabriel Fernandez"
+        }
+      }
+    },
+    {
+      "id": "46",
+      "categoria": "Segunda",
+      "fase": "final",
+      "zona": "A",
+      "fecha": "2026-10-30",
+      "hora": "20:00",
+      "sets": [
+        [12, 6],
+        [10, 12],
+        [4, 7]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2A-2",
+          "categoria": "Segunda",
+          "zona": "A",
+          "nombre": "Francisco Martín / Gonzalo Zulueta"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "2B-4",
+          "categoria": "Segunda",
+          "zona": "B",
+          "nombre": "Ernesto Retamales / Manolo Masetoo"
+        }
+      }
+    },
+    {
+      "id": "47",
+      "categoria": "Tercera",
+      "fase": "final",
+      "zona": "A",
+      "fecha": "2026-10-30",
+      "hora": "20:30",
+      "sets": [
+        [12, 8],
+        [12, 11]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-4",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Mariano López / Nicolás Quesada"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "3A-1",
+          "categoria": "Tercera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Sebastian Masetto"
+        }
+      }
+    },
+    {
+      "id": "48",
+      "categoria": "Primera",
+      "fase": "final",
+      "zona": "A",
+      "fecha": "2026-10-30",
+      "hora": "21:00",
+      "sets": [
+        [8, 12],
+        [10, 12]
+      ],
+      "a": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-3",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Juan Cuevas / Matías Poblete"
+        }
+      },
+      "b": {
+        "tipo": "pareja",
+        "pareja": {
+          "id": "1A-2",
+          "categoria": "Primera",
+          "zona": "A",
+          "nombre": "Ignacio Corso / Tomás Molteno"
+        }
+      }
+    }
+  ]
+}
