@@ -27,7 +27,7 @@ const frozenTournamentSchema = z.object({
   fecha: z.string().trim().min(1),
   edition: z.string().trim().min(1),
   hostClubName: z.string().trim().min(1),
-  clubId: z.enum(["gimnasia-y-esgrima", "regatas"]),
+  clubId: z.enum(["gimnasia-y-esgrima", "regatas", "club-social-maipu"]),
   clubLogo: z.string().trim().min(1),
   alcance: z.string().trim().min(1),
   parejas: z.array(

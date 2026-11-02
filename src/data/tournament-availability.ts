@@ -13,9 +13,12 @@ const configuredEnvironment = (): TournamentEnvironment => ({
 });
 
 export function hasActiveTournament(
-  environment: TournamentEnvironment = configuredEnvironment()
+  environment: TournamentEnvironment = configuredEnvironment(),
+  isConfiguredActive = true
 ): boolean {
-  if (environment.PUBLIC_TOURNAMENT_ACTIVE !== "true") return false;
+  if (!isConfiguredActive || environment.PUBLIC_TOURNAMENT_ACTIVE !== "true") {
+    return false;
+  }
 
   if (
     !environment.PUBLIC_ACTIVE_TOURNAMENT_PAREJAS_CSV_URL ||

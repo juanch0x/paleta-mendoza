@@ -35,6 +35,31 @@ describe("freezeTournament", () => {
     });
   });
 
+  it("accepts Club Social Maipú metadata", () => {
+    const partidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
+1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,12-8 12-9,`;
+
+    const tournament = freezeTournament(
+      {
+        slug: "maipu-2026",
+        nombre: "Torneo Club Social Maipú",
+        fecha: "Septiembre 2026",
+        edition: "Maipú 2026",
+        hostClubName: "Club Social Maipú",
+        clubId: "club-social-maipu",
+        clubLogo: "/images/clubs/club-social-maipu.png",
+      },
+      parejasCsv,
+      partidosCsv
+    );
+
+    expect(tournament).toMatchObject({
+      hostClubName: "Club Social Maipú",
+      clubId: "club-social-maipu",
+      clubLogo: "/images/clubs/club-social-maipu.png",
+    });
+  });
+
   it("refuses to freeze a tournament with pending matches", () => {
     const partidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
 1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,,`;

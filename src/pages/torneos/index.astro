@@ -6,7 +6,10 @@ import registry from "@/data/torneos/registro.json";
 import { activeTournamentConfig } from "@/data/active-tournament-config";
 import { hasActiveTournament } from "@/data/tournament-availability";
 
-const tournamentIsActive = hasActiveTournament();
+const tournamentIsActive = hasActiveTournament(
+  undefined,
+  activeTournamentConfig.isActive
+);
 ---
 
 <Layout

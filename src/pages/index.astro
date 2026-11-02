@@ -14,7 +14,10 @@ const latestPosts = getSortedPosts(
   await getCollection("blog", ({ data }) => !data.draft)
 ).slice(0, 3);
 
-const tournamentIsActive = hasActiveTournament();
+const tournamentIsActive = hasActiveTournament(
+  undefined,
+  activeTournamentConfig.isActive
+);
 ---
 
 <Layout>
