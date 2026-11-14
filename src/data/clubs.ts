@@ -14,6 +14,11 @@ export const clubs = {
     logo: "/images/clubs/club-social-maipu.png",
     markClassName: "border-accent/70 bg-white p-1.5",
   },
+  "villa-emilia": {
+    name: "Villa Emilia",
+    logo: "/images/clubs/villa-emilia.png",
+    markClassName: "border-accent/70 bg-white p-1.5",
+  },
 } as const;
 
 export type ClubId = keyof typeof clubs;
