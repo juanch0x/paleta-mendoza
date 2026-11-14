@@ -47,12 +47,15 @@ export async function runToolConversation(
   }
 
   // Reserve a final response so results from the last tool round are not lost.
-  messages.push({
-    role: "system",
-    content:
-      "The tool round limit has been reached. Give your final answer using only the results already available. Explain any missing information. Do not request more tools.",
-  });
-  const final = await getModelResponse(messages, []);
+  const finalMessages: Message[] = [
+    ...messages,
+    {
+      role: "system",
+      content:
+        "The tool round limit has been reached. Give your final answer using only the results already available. Explain any missing information. Do not request more tools.",
+    },
+  ];
+  const final = await getModelResponse(finalMessages, []);
   messages.push(final);
   trace("Assistant response", final);
   if (final.tool_calls?.length)
