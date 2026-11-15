@@ -271,7 +271,9 @@ describe("pair references in group matches", () => {
 
   it("reports a pair from another category", () => {
     expect(
-      rulesOf(withMatch(groupMatch("11", "3A-1", "3A-2", { categoria: "Cuarta" })))
+      rulesOf(
+        withMatch(groupMatch("11", "3A-1", "3A-2", { categoria: "Cuarta" }))
+      )
     ).toEqual(["pair-category-mismatch", "pair-category-mismatch"]);
   });
 
