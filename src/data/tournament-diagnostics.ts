@@ -124,6 +124,16 @@ export function diagnoseTournamentSheets(
     issues
   );
 
+  const partidosGrid = gridByName.get("partidos");
+  if (partidosGrid) {
+    validatePairReferences(
+      partidosGrid,
+      headersBySheet.get("partidos")!,
+      readRoster(gridByName.get("parejas"), headersBySheet.get("parejas")!),
+      issues
+    );
+  }
+
   return {
     valid: issues.length === 0,
     checkedAt,
@@ -235,6 +245,105 @@ function validateDuplicateIds(
       return;
     }
     ids.set(id, row);
+  });
+}
+
+type RosterEntry = { categoria: string; zona: string };
+
+function readRoster(
+  grid: SheetGrid | undefined,
+  headers: Headers
+): Map<string, RosterEntry> {
+  const roster = new Map<string, RosterEntry>();
+  if (!grid) return roster;
+
+  forEachPhysicalDataRow(grid, (_row, values) => {
+    const id = valueAt(values, headers, "id");
+    if (!id || roster.has(id)) return;
+    roster.set(id, {
+      categoria: valueAt(values, headers, "categoria"),
+      zona: valueAt(values, headers, "zona"),
+    });
+  });
+
+  return roster;
+}
+
+/**
+ * Group matches must reference real pairs from the parejas sheet. Playoff rows
+ * (semi, final, repechaje) may still use labels or G:/P: references, because the
+ * runtime resolves those; see the label test in tournament-diagnostics.test.ts.
+ */
+function validatePairReferences(
+  grid: SheetGrid,
+  headers: Headers,
+  roster: Map<string, RosterEntry>,
+  issues: TournamentDiagnosticIssue[]
+) {
+  const meetings = new Map<string, number>();
+
+  forEachPhysicalDataRow(grid, (row, values) => {
+    if (valueAt(values, headers, "fase") !== "grupo") return;
+
+    const categoria = valueAt(values, headers, "categoria");
+    const zona = valueAt(values, headers, "zona");
+    const resolved: string[] = [];
+
+    for (const field of ["pareja_a", "pareja_b"] as const) {
+      const id = valueAt(values, headers, field);
+      if (!id) continue;
+
+      const pareja = roster.get(id);
+      const column = columnFor("partidos", field, headers);
+      if (!pareja) {
+        addIssue(
+          issues,
+          "partidos",
+          row,
+          column,
+          "unknown-pair",
+          `La pareja "${id}" no existe en la hoja parejas.`
+        );
+        continue;
+      }
+      if (pareja.categoria !== categoria) {
+        addIssue(
+          issues,
+          "partidos",
+          row,
+          column,
+          "pair-category-mismatch",
+          `La pareja "${id}" es de ${pareja.categoria}, no de ${categoria}.`
+        );
+      }
+      if (zona && pareja.zona && pareja.zona !== zona) {
+        addIssue(
+          issues,
+          "partidos",
+          row,
+          column,
+          "pair-zone-mismatch",
+          `La pareja "${id}" es de la zona ${pareja.zona}, no de la zona ${zona}.`
+        );
+      }
+      resolved.push(id);
+    }
+
+    if (resolved.length !== 2) return;
+    const meeting = [...resolved].sort().join("|") + `|${categoria}|${zona}`;
+    const firstRow = meetings.get(meeting);
+    if (firstRow !== undefined) {
+      addIssue(
+        issues,
+        "partidos",
+        row,
+        columnFor("partidos", "pareja_a", headers),
+        "duplicate-meeting",
+        `Este cruce ya aparece en la fila ${firstRow}.`
+      );
+      return;
+    }
+    meetings.set(meeting, row);
   });
 }
 
