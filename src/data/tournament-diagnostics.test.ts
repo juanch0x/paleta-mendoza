@@ -223,6 +223,83 @@ describe("diagnoseTournamentSheets", () => {
   });
 });
 
+describe("pair references in group matches", () => {
+  const groupMatch = (
+    id: string,
+    pareja_a: string,
+    pareja_b: string,
+    overrides: { categoria?: string; zona?: string; fase?: string } = {}
+  ) => [
+    id,
+    "2026-09-18",
+    "19:00",
+    overrides.categoria ?? "Tercera",
+    overrides.fase ?? "grupo",
+    overrides.zona ?? "A",
+    pareja_a,
+    pareja_b,
+    "",
+    "",
+  ];
+  const withMatch = (row: string[]) => {
+    const grids = structuredClone(validGrids);
+    grids[1].values.push(row);
+    return grids;
+  };
+  const rulesOf = (grids: SheetGrid[]) =>
+    diagnoseTournamentSheets(grids).issues.map(issue => issue.rule);
+
+  it("reports a group match whose pair id does not exist in parejas", () => {
+    const issues = diagnoseTournamentSheets(
+      withMatch(groupMatch("11", "3A-1", "3A-9"))
+    ).issues;
+
+    expect(issues).toEqual([
+      expect.objectContaining({
+        sheet: "partidos",
+        cell: "H3",
+        rule: "unknown-pair",
+      }),
+    ]);
+  });
+
+  it("reports a group match that uses a label instead of a pair", () => {
+    expect(
+      rulesOf(withMatch(groupMatch("11", "3A-1", "Ganador de la zona A")))
+    ).toEqual(["unknown-pair"]);
+  });
+
+  it("reports a pair from another category", () => {
+    expect(
+      rulesOf(withMatch(groupMatch("11", "3A-1", "3A-2", { categoria: "Cuarta" })))
+    ).toEqual(["pair-category-mismatch", "pair-category-mismatch"]);
+  });
+
+  it("reports a pair from another zone", () => {
+    const grids = structuredClone(validGrids);
+    grids[0].values.push(["3B-1", "Tercera", "B", "Eva", "Fran"]);
+    grids[1].values.push(groupMatch("11", "3A-1", "3B-1"));
+
+    expect(rulesOf(grids)).toEqual(["pair-zone-mismatch"]);
+  });
+
+  it("reports the same meeting scheduled twice in the same zone", () => {
+    const grids = withMatch(groupMatch("11", "3A-2", "3A-1"));
+
+    expect(rulesOf(grids)).toEqual(["duplicate-meeting"]);
+  });
+
+  it("does not check pair references in playoff rows", () => {
+    expect(
+      rulesOf(
+        withMatch(
+          groupMatch("11", "Ganador de la zona A", "G:10", { fase: "semi" })
+        )
+      )
+    ).toEqual([]);
+  });
+});
+
 describe("CSV runtime contract alignment", () => {
   const cases = [
     {
