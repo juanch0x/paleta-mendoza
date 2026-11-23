@@ -10,6 +10,7 @@ import {
 } from "@/data/repositories/json";
 import type { ArchiveRecord } from "@/data/repositories/types";
 import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
+import { isoYear } from "@/domain/archived-tournament";
 import type { Player } from "@/domain/player";
 import { buildOfficialProfile } from "@/domain/player-official";
 import { buildPlayerStats } from "@/domain/player-record";
@@ -47,7 +48,7 @@ const figures = [
 const hoy = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Mendoza",
 }).format(new Date());
-const anioActual = Number(hoy.slice(0, 4));
+const anioActual = isoYear(hoy);
 const official = buildOfficialProfile(player, view.torneos, hoy);
 const POSICION_LABEL = { delantero: "Delantero", zaguero: "Zaguero" } as const;
 const ORIGEN_LABEL = { federacion: "federación", ascenso: "ascenso" } as const;

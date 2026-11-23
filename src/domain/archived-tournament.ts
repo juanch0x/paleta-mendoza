@@ -8,7 +8,7 @@ export type ArchivedPareja = Pareja & {
 export type ArchivedTournament = {
   slug: string;
   nombre: string;
-  /** Display date such as "Octubre 2026"; the year is read from it. */
+  /** Display date such as "Octubre 2026"; never read for years (see `tournamentYear`). */
   fecha: string;
   parejas: readonly ArchivedPareja[];
   partidos: readonly PartidoResuelto[];
@@ -27,4 +27,20 @@ export function tournamentDate(tournament: {
       earliest = partido.fecha;
   }
   return earliest;
+}
+
+/** Year of an ISO date (YYYY-MM-DD). */
+export function isoYear(fecha: string): number {
+  return Number(fecha.slice(0, 4));
+}
+
+/**
+ * The year a tournament counts for: the year of `tournamentDate`. Undefined
+ * when no match has a date.
+ */
+export function tournamentYear(tournament: {
+  partidos: readonly { fecha?: string }[];
+}): number | undefined {
+  const fecha = tournamentDate(tournament);
+  return fecha ? isoYear(fecha) : undefined;
 }

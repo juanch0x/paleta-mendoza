@@ -1,4 +1,7 @@
-import type { ArchivedTournament } from "./archived-tournament.js";
+import {
+  tournamentYear,
+  type ArchivedTournament,
+} from "./archived-tournament.js";
 import { compareCategories } from "./categories.js";
 import { matchResult, setsWon } from "./match-result.js";
 import type { Player } from "./player.js";
@@ -79,6 +82,7 @@ export type YearRecord = {
 /** A player's full record: overall, by year (newest first) and by category. */
 export type PlayerHistorial = {
   total: RecordFigures;
+  /** Tournaments without match dates count in the totals but in no year. */
   porAnio: YearRecord[];
   /** All years combined, highest category first. */
   porCategoria: CategoryRecord[];
@@ -86,13 +90,6 @@ export type PlayerHistorial = {
 
 const byCategory = (a: CategoryRecord, b: CategoryRecord) =>
   compareCategories(a.categoria, b.categoria);
-
-/** Reads the year from an archive display date such as "Octubre 2026". */
-export function yearOf(fecha: string): number {
-  const match = /\b(\d{4})\b/.exec(fecha);
-  if (!match) throw new Error(`No se pudo leer el año de la fecha "${fecha}".`);
-  return Number(match[1]);
-}
 
 type Tally = Omit<RecordFigures, "companerosCampeones"> & {
   companeros: Set<string>;
@@ -125,7 +122,8 @@ const mergeTallies = (tallies: readonly Tally[]): Tally => {
   return merged;
 };
 
-type Slice = { anio: number; categoria: string; tally: Tally };
+/** A year and category of the record; `anio` is undefined for undated tournaments. */
+type Slice = { anio: number | undefined; categoria: string; tally: Tally };
 
 const categoryRecords = (slices: readonly Slice[]): CategoryRecord[] =>
   [...new Set(slices.map(s => s.categoria))]
@@ -144,7 +142,7 @@ function buildHistorial(
   tournaments: readonly ArchivedTournament[]
 ): PlayerHistorial {
   const slices: Slice[] = [];
-  const sliceFor = (anio: number, categoria: string) => {
+  const sliceFor = (anio: number | undefined, categoria: string) => {
     let slice = slices.find(s => s.anio === anio && s.categoria === categoria);
     if (!slice) {
       slice = { anio, categoria, tally: emptyTally() };
@@ -154,7 +152,7 @@ function buildHistorial(
   };
 
   for (const tournament of tournaments) {
-    const anio = yearOf(tournament.fecha);
+    const anio = tournamentYear(tournament);
     const own = new Map(
       tournament.parejas
         .filter(p => p.jugadores.includes(playerId))
@@ -197,7 +195,9 @@ function buildHistorial(
     }
   }
 
-  const years = [...new Set(slices.map(s => s.anio))].sort((a, b) => b - a);
+  const years = [
+    ...new Set(slices.flatMap(s => (s.anio === undefined ? [] : [s.anio]))),
+  ].sort((a, b) => b - a);
   return {
     total: toFigures(mergeTallies(slices.map(s => s.tally))),
     porAnio: years.map(anio => {

@@ -1,4 +1,5 @@
 import {
+  isoYear,
   tournamentDate,
   type ArchivedPareja,
   type ArchivedTournament,
@@ -185,9 +186,4 @@ function pairFigures(
     if (won && partido.fase === "final") figures.titulos += 1;
   }
   return figures;
-}
-
-/** Year of an ISO date (YYYY-MM-DD). */
-function isoYear(fecha: string): number {
-  return Number(fecha.slice(0, 4));
 }

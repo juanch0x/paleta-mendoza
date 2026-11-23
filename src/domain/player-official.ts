@@ -1,5 +1,6 @@
 import {
-  tournamentDate,
+  isoYear,
+  tournamentYear,
   type ArchivedTournament,
 } from "./archived-tournament.js";
 import { matchResult } from "./match-result.js";
@@ -83,11 +84,10 @@ function titlesByPosition(
 ): TitulosPorPosicion[] {
   const titlesByYear = new Map<number, number>();
   for (const tournament of tournaments) {
-    const fecha = tournamentDate(tournament);
-    if (!fecha) continue;
+    const anio = tournamentYear(tournament);
+    if (anio === undefined) continue;
     const titles = titlesWonIn(tournament, player.id);
     if (titles === 0) continue;
-    const anio = isoYear(fecha);
     titlesByYear.set(anio, (titlesByYear.get(anio) ?? 0) + titles);
   }
   return [...titlesByYear]
@@ -129,9 +129,4 @@ function categoryChangesIn(
       ? [{ ...entry, anterior: history[index - 1].categoria }]
       : []
   );
-}
-
-/** Year of an ISO date (YYYY-MM-DD). */
-function isoYear(fecha: string): number {
-  return Number(fecha.slice(0, 4));
 }

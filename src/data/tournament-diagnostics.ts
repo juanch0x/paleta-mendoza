@@ -9,6 +9,7 @@ import { matchResult } from "../domain/match-result.js";
 import { parseSets } from "../domain/parse-sets.js";
 import { createPlayerMatcher } from "../domain/player-names.js";
 import {
+  isoYear,
   tournamentDate,
   type ArchivedTournament,
 } from "../domain/archived-tournament.js";
@@ -483,7 +484,7 @@ export function diagnosePlayerRegistry(
   players: readonly Player[],
   fecha: string
 ): PlayerMissingOfficialData[] {
-  const anio = Number(fecha.slice(0, 4));
+  const anio = isoYear(fecha);
   return players.flatMap(player => {
     const faltaCategoria = !categoryOn(player, fecha);
     const faltaPosicion = !positionIn(player, anio);

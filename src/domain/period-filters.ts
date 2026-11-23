@@ -1,4 +1,4 @@
-import { tournamentDate } from "./archived-tournament.js";
+import { isoYear, tournamentDate } from "./archived-tournament.js";
 import { normalizePlayerName } from "./player-names.js";
 
 /** What period filtering needs from an archived tournament. */
@@ -222,7 +222,7 @@ function datedTournaments<T extends PeriodSource>(
   return tournaments
     .flatMap(torneo => {
       const fecha = tournamentDate(torneo);
-      return fecha ? [{ torneo, fecha, anio: Number(fecha.slice(0, 4)) }] : [];
+      return fecha ? [{ torneo, fecha, anio: isoYear(fecha) }] : [];
     })
     .sort((a, b) => b.fecha.localeCompare(a.fecha));
 }

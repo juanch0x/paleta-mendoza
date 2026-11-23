@@ -14,6 +14,7 @@ import {
   jsonPlayerRepository,
 } from "@/data/repositories/json";
 import { hasActiveTournament } from "@/data/tournament-availability";
+import { isoYear } from "@/domain/archived-tournament";
 
 if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 
@@ -55,7 +56,7 @@ const likelyPromotions = diagnoseLikelyPromotions(
 const pendingLabel = (player: (typeof pendingPlayers)[number]) =>
   [
     player.faltaCategoria && "categoría oficial",
-    player.faltaPosicion && `posición ${registryDate.slice(0, 4)}`,
+    player.faltaPosicion && `posición ${isoYear(registryDate)}`,
   ]
     .filter(Boolean)
     .join(" y ");
