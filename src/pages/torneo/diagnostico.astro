@@ -7,6 +7,7 @@ import {
   type TournamentDiagnostics,
 } from "@/data/tournament-diagnostics";
 import Layout from "@/layouts/Layout.astro";
+import { jsonPlayerRepository } from "@/data/repositories/json";
 import { hasActiveTournament } from "@/data/tournament-availability";
 
 if (!hasActiveTournament()) return Astro.redirect("/torneos/");
@@ -24,7 +25,9 @@ if (import.meta.env.DEV) {
       throw new Error("Google Sheets no está configurado");
 
     localDiagnostics = diagnoseTournamentSheets(
-      await fetchTournamentSheetGrids(spreadsheetId, apiKey)
+      await fetchTournamentSheetGrids(spreadsheetId, apiKey),
+      undefined,
+      { players: await jsonPlayerRepository.list() }
     );
   } catch {
     localError =
@@ -88,7 +91,12 @@ if (import.meta.env.DEV) {
 
 <script>
   type Issue = { sheet: string; cell: string; rule: string; message: string };
-  type Diagnostics = { valid: boolean; checkedAt: string; issues: Issue[] };
+  type Diagnostics = {
+    valid: boolean;
+    checkedAt: string;
+    issues: Issue[];
+    warnings?: Issue[];
+  };
   const result = document.querySelector<HTMLElement>("#diagnostic-result");
   const embedded =
     result?.querySelector<HTMLElement>("[data-diagnostics]")?.dataset
@@ -103,10 +111,17 @@ if (import.meta.env.DEV) {
       ? "text-green-700 dark:text-green-300"
       : "text-red-700 dark:text-red-300";
     const issues = diagnostics.issues.length
-      ? `<ul class="border-border mt-5 divide-y rounded-xl border">${diagnostics.issues.map(issue => `<li class="p-4"><p class="font-semibold">${escapeHtml(issue.sheet)}!${escapeHtml(issue.cell)}</p><p class="text-foreground/70 mt-1 text-sm">${escapeHtml(issue.message)}</p></li>`).join("")}</ul>`
+      ? issueList(diagnostics.issues)
       : '<p class="text-foreground/70 mt-2">No se encontraron valores huérfanos, campos obligatorios faltantes ni referencias inválidas.</p>';
-    result.innerHTML = `<p class="${tone} text-xl font-bold">${title}</p>${issues}`;
+    const warnings = diagnostics.warnings ?? [];
+    const warningSection = warnings.length
+      ? `<h2 class="mt-8 text-lg font-bold text-amber-700 dark:text-amber-300">${warnings.length} advertencia${warnings.length === 1 ? "" : "s"}</h2><p class="text-foreground/70 mt-1 text-sm">No afectan al torneo en curso, pero hay que corregirlas antes de archivarlo.</p>${issueList(warnings)}`
+      : "";
+    result.innerHTML = `<p class="${tone} text-xl font-bold">${title}</p>${issues}${warningSection}`;
   };
+
+  const issueList = (items: Issue[]) =>
+    `<ul class="border-border mt-5 divide-y rounded-xl border">${items.map(issue => `<li class="p-4"><p class="font-semibold">${escapeHtml(issue.sheet)}!${escapeHtml(issue.cell)}</p><p class="text-foreground/70 mt-1 text-sm">${escapeHtml(issue.message)}</p></li>`).join("")}</ul>`;
 
   const escapeHtml = (value: string) =>
     value.replace(
