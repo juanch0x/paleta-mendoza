@@ -141,6 +141,26 @@ export function parseParejasCsv(csv: string): Pareja[] {
   return parejas;
 }
 
+export type ParejaMembers = {
+  parejaId: string;
+  /** Sheet row, counting the header as row 1. */
+  fila: number;
+  nombres: readonly [string, string];
+};
+
+/** The two player names of every pair, with the sheet row they came from. */
+export function parseParejaMembersCsv(csv: string): ParejaMembers[] {
+  return parseCsv(csv, "parejas").map((row, index) => {
+    const fila = index + 2;
+    const pareja = parseRow(parejaRow, row, "parejas", fila);
+    return {
+      parejaId: pareja.id,
+      fila,
+      nombres: [pareja.jugador_1, pareja.jugador_2] as const,
+    };
+  });
+}
+
 export function parsePartidosCsv(csv: string): PartidoRaw[] {
   const rows = parseCsv(csv, "partidos");
   const partidos = rows.map((row, index) =>

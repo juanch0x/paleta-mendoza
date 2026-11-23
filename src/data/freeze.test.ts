@@ -1,11 +1,21 @@
 import { describe, expect, it } from "vitest";
 
+import { validateArchive } from "./archive-validation.js";
 import { loadRegisteredArchives } from "./archives.js";
 import { freezeTournament } from "./freeze.js";
 
 const parejasCsv = `id,categoria,zona,jugador_1,jugador_2
-1A-1,Primera,A,Ana,Uno
-1A-2,Primera,A,Beto,Dos`;
+1A-1,Primera,A,Ana Prueba,Uno Ficticio
+1A-2,Primera,A,Beto Prueba,Dos Ficticio`;
+
+const players = [
+  { id: "ana-prueba", nombreOficial: "Ana Prueba" },
+  { id: "uno-ficticio", nombreOficial: "Uno Ficticio" },
+  { id: "beto-prueba", nombreOficial: "Beto Prueba" },
+  { id: "dos-ficticio", nombreOficial: "Dos Ficticio" },
+  { id: "jose-maria-inventado", nombreOficial: "José María Inventado" },
+  { id: "lucia-inventada", nombreOficial: "Lucía Inventada" },
+];
 
 const completedPartidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
 1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,12-8 12-9,
@@ -34,7 +44,8 @@ describe("freezeTournament", () => {
         clubLogo: "/images/clubs/regatas.png",
       },
       parejasCsv,
-      completedPartidosCsv
+      completedPartidosCsv,
+      players
     );
 
     expect(tournament.alcance).toBe("Fase de grupos y playoffs");
@@ -59,7 +70,8 @@ describe("freezeTournament", () => {
         clubLogo: "/images/clubs/club-social-maipu.png",
       },
       parejasCsv,
-      completedPartidosCsv
+      completedPartidosCsv,
+      players
     );
 
     expect(tournament).toMatchObject({
@@ -86,7 +98,8 @@ describe("freezeTournament", () => {
           clubLogo: "/images/clubs/regatas.png",
         },
         parejasCsv,
-        partidosCsv
+        partidosCsv,
+        players
       )
     ).toThrow(/prueba-2026.*partido 2.*sin resultado/);
   });
@@ -95,9 +108,59 @@ describe("freezeTournament", () => {
     const partidosCsv = `id,fecha,hora,categoria,fase,zona,pareja_a,pareja_b,sets,nota
 1,2026-09-01,20:00,Primera,grupo,A,1A-1,1A-2,12-8 12-9,`;
 
-    expect(() => freezeTournament(metadata, parejasCsv, partidosCsv)).toThrow(
-      /prueba-2026.*categoría Primera.*final/
+    expect(() =>
+      freezeTournament(metadata, parejasCsv, partidosCsv, players)
+    ).toThrow(/prueba-2026.*categoría Primera.*final/);
+  });
+
+  it("stores the registry ids of both members, matching names regardless of accents, case and spacing", () => {
+    const csv = `id,categoria,zona,jugador_1,jugador_2
+1A-1,Primera,A,  jose   maria INVENTADO ,Lucia Inventada
+1A-2,Primera,A,Beto Prueba,Dos Ficticio`;
+
+    const tournament = freezeTournament(
+      metadata,
+      csv,
+      completedPartidosCsv,
+      players
     );
+
+    expect(tournament.parejas.map(pareja => pareja.jugadores)).toEqual([
+      ["jose-maria-inventado", "lucia-inventada"],
+      ["beto-prueba", "dos-ficticio"],
+    ]);
+  });
+
+  it("refuses to freeze an unmatched name, naming the name, pair and sheet row", () => {
+    const csv = `id,categoria,zona,jugador_1,jugador_2
+1A-1,Primera,A,Ana Prueba,Uno Ficticio
+1A-2,Primera,A,Carla Prueba,Dos Ficticio`;
+
+    expect(() =>
+      freezeTournament(metadata, csv, completedPartidosCsv, players)
+    ).toThrow(/"Carla Prueba" \(pareja 1A-2, parejas fila 3\)/);
+  });
+
+  it("rejects an archive whose pairs reference unknown or missing player ids", () => {
+    const tournament = freezeTournament(
+      metadata,
+      parejasCsv,
+      completedPartidosCsv,
+      players
+    );
+    const [first, second] = tournament.parejas;
+    const tampered = {
+      ...tournament,
+      parejas: [
+        { ...first, jugadores: ["ana-prueba", "nadie-inventado"] as const },
+        { ...second, jugadores: undefined },
+      ],
+    };
+
+    expect(() => validateArchive(tampered, { players })).toThrow(
+      /prueba-2026.*pareja 1A-1.*nadie-inventado.*pareja 1A-2.*sin jugadores/
+    );
+    expect(() => validateArchive(tournament, { players })).not.toThrow();
   });
 
   it("loads every registered archive, all of which pass the shared validation", () => {

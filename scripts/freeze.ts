@@ -3,6 +3,7 @@ import path from "node:path"
 
 import { fetchCsv } from "../src/data/fetch-csv.js"
 import { freezeTournament, type TournamentMetadata } from "../src/data/freeze.js"
+import type { Player } from "../src/domain/player-stats.js"
 
 type RegistryEntry = Pick<TournamentMetadata, "slug" | "nombre" | "fecha" | "clubLogo"> & { alcance: string }
 
@@ -35,8 +36,15 @@ const parejasUrl = requiredOption("--parejas-url")
 const partidosUrl = requiredOption("--partidos-url")
 const overwrite = process.argv.includes("--overwrite")
 
+const playersDirectory = path.resolve("src/data/jugadores")
+const players = await Promise.all(
+  (await fs.readdir(playersDirectory))
+    .filter((file) => file.endsWith(".json"))
+    .map(async (file) => JSON.parse(await fs.readFile(path.join(playersDirectory, file), "utf8")) as Player),
+)
+
 const [parejasCsv, partidosCsv] = await Promise.all([fetchCsv(parejasUrl), fetchCsv(partidosUrl)])
-const tournament = freezeTournament(metadata, parejasCsv, partidosCsv)
+const tournament = freezeTournament(metadata, parejasCsv, partidosCsv, players)
 
 const dataDirectory = path.resolve("src/data/torneos")
 const archiveDirectory = path.join(dataDirectory, "archivos")
