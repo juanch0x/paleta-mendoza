@@ -4,11 +4,15 @@
 
 **Blocked by:** 03 (Player registry and minimal player profile)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Profile shows finals, semifinals, matches W/L, sets W/L and distinct title partners
-- [ ] All figures are broken down by year and by category
-- [ ] Categories without semis (single zone) do not create phantom semifinals
-- [ ] Possible walkovers (12-0 12-0) count as regular wins
-- [ ] Covered by the player statistics function tests with synthetic fixtures
-- [ ] Readable on mobile with text labels (older audience)
+- [x] Profile shows finals, semifinals, matches W/L, sets W/L and distinct title partners
+- [x] All figures are broken down by year and by category
+- [x] Categories without semis (single zone) do not create phantom semifinals
+- [x] Possible walkovers (12-0 12-0) count as regular wins
+- [x] Covered by the player statistics function tests with synthetic fixtures
+- [x] Readable on mobile with text labels (older audience)
+
+## Comments
+
+Resolved in fb11b8a, e819d27. `PlayerStats.historial` (`buildHistorial`, `yearOf`) in `src/domain/player-stats.ts`; profile section "Historial completo" via `src/components/players/RecordFiguresList.astro`. Note: tournament `fecha` is a month label ("Octubre 2026"); category-on-date logic must use real ISO match dates (`partidos[].fecha`).
