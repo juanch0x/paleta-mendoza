@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  diagnoseLikelyPromotions,
   diagnosePlayerRegistry,
   diagnoseTournamentSheets,
   diagnosticRanges,
@@ -12,6 +13,12 @@ import {
   parsePartidosCsv,
   parseTournamentStatusCsv,
 } from "./csv.js";
+import type {
+  ArchivedPareja,
+  ArchivedTournament,
+  CategoriaOficial,
+  Player,
+} from "../domain/player-stats.js";
 
 const validGrids: SheetGrid[] = [
   {
@@ -454,5 +461,181 @@ describe("diagnosePlayerRegistry", () => {
         faltaPosicion: true,
       },
     ]);
+  });
+});
+
+describe("diagnoseLikelyPromotions", () => {
+  const ana: Player = { id: "ana-alfa", nombreOficial: "Ana Alfa" };
+  const beto: Player = { id: "beto-beta", nombreOficial: "Beto Beta" };
+  const caro: Player = { id: "caro-gama", nombreOficial: "Caro Gama" };
+  const dani: Player = { id: "dani-delta", nombreOficial: "Dani Delta" };
+
+  const pareja = (
+    id: string,
+    jugadores: readonly [string, string],
+    categoria = "Tercera"
+  ): ArchivedPareja => ({
+    id,
+    categoria,
+    nombre: jugadores.join(" / "),
+    jugadores,
+  });
+
+  /** A tournament whose only match is the `categoria` final, won by `winner`. */
+  const torneo = (
+    slug: string,
+    fecha: string,
+    winner: readonly [string, string],
+    loser: readonly [string, string],
+    categoria = "Tercera"
+  ): ArchivedTournament => {
+    const a = pareja(`${slug}-a`, winner, categoria);
+    const b = pareja(`${slug}-b`, loser, categoria);
+    return {
+      slug,
+      nombre: `Torneo ${slug}`,
+      fecha: "Mes 2026",
+      parejas: [a, b],
+      partidos: [
+        {
+          id: `${slug}-final`,
+          categoria,
+          fase: "final",
+          fecha,
+          a: { tipo: "pareja", pareja: a },
+          b: { tipo: "pareja", pareja: b },
+          sets: [
+            [12, 8],
+            [12, 9],
+          ],
+        },
+      ],
+    };
+  };
+
+  const ab = ["ana-alfa", "beto-beta"] as const;
+  const cd = ["caro-gama", "dani-delta"] as const;
+
+  it("warns on three consecutive titles in a category, naming the player, category and tournaments", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana, beto, caro, dani], tournaments)
+    ).toEqual([
+      {
+        id: "ana-alfa",
+        nombreOficial: "Ana Alfa",
+        categoria: "Tercera",
+        torneos: [
+          { slug: "uno", nombre: "Torneo uno" },
+          { slug: "dos", nombre: "Torneo dos" },
+          { slug: "tres", nombre: "Torneo tres" },
+        ],
+      },
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        categoria: "Tercera",
+        torneos: [
+          { slug: "uno", nombre: "Torneo uno" },
+          { slug: "dos", nombre: "Torneo dos" },
+          { slug: "tres", nombre: "Torneo tres" },
+        ],
+      },
+    ]);
+  });
+
+  const promotedOn = (desde: string): CategoriaOficial[] => [
+    { desde: "2026-01-01", categoria: "Tercera", origen: "federacion" },
+    { desde, categoria: "Segunda", origen: "ascenso" },
+  ];
+
+  it("does not warn when a promotion entry exists after the third title", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+    const promoted = [ana, beto].map(player => ({
+      ...player,
+      categorias: promotedOn("2026-07-20"),
+    }));
+
+    expect(diagnoseLikelyPromotions(promoted, tournaments)).toEqual([]);
+  });
+
+  it("still warns when the only promotion entry predates the third title", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+    const promotedEarly = { ...ana, categorias: promotedOn("2026-04-01") };
+
+    expect(
+      diagnoseLikelyPromotions([promotedEarly], tournaments).map(w => w.id)
+    ).toEqual(["ana-alfa"]);
+  });
+
+  it("does not warn when another pair wins a tournament in between", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", cd, ab),
+      torneo("tres", "2026-07-10", ab, cd),
+      torneo("cuatro", "2026-09-10", ab, cd),
+    ];
+
+    expect(diagnoseLikelyPromotions([ana, caro], tournaments)).toEqual([]);
+  });
+
+  it("orders tournaments by match date, not by archive order or month label", () => {
+    // In archive order the "cuatro" loss would break the run; by match date
+    // it is played after the three titles.
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("cuatro", "2026-09-10", cd, ab),
+      torneo("tres", "2026-07-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w =>
+        w.torneos.map(t => t.slug)
+      )
+    ).toEqual([["uno", "dos", "tres"]]);
+  });
+
+  it("breaks ties between tournaments on the same date by slug", () => {
+    const tournaments = [
+      torneo("c", "2026-03-10", ab, cd),
+      torneo("a", "2026-03-10", ab, cd),
+      torneo("b", "2026-03-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w =>
+        w.torneos.map(t => t.slug)
+      )
+    ).toEqual([["a", "b", "c"]]);
+  });
+
+  it("counts each category separately", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-04-10", ab, cd, "Segunda"),
+      torneo("tres", "2026-05-10", ab, cd),
+      torneo("cuatro", "2026-07-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w => [
+        w.categoria,
+        w.torneos.map(t => t.slug),
+      ])
+    ).toEqual([["Tercera", ["uno", "tres", "cuatro"]]]);
   });
 });
