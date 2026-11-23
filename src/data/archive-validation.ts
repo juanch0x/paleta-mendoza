@@ -6,10 +6,19 @@
  * here. New rules are added to `archiveRules`.
  */
 
+import {
+  categoryOn,
+  isLowerCategory,
+  tournamentDate,
+  type Player,
+} from "../domain/player-stats.js";
+
 export type ArchiveMatch = {
   id: string;
   categoria: string;
   fase: string;
+  /** ISO match date; the earliest one is the tournament date. */
+  fecha?: string;
   sets: readonly unknown[];
 };
 
@@ -28,7 +37,7 @@ export type ArchiveToValidate = {
 
 /** Registry data the rules check archives against. */
 export type ArchiveValidationContext = {
-  players: readonly { id: string }[];
+  players: readonly Pick<Player, "id" | "categorias">[];
 };
 
 /** A rule returns one human-readable problem per violation, without the tournament prefix. */
@@ -73,10 +82,27 @@ const pairsReferenceKnownPlayers: ArchiveRule = (tournament, context) => {
   });
 };
 
+const playersNotBelowOfficialCategory: ArchiveRule = (tournament, context) => {
+  const fecha = tournamentDate(tournament);
+  if (!fecha) return [];
+  const byId = new Map(context.players.map(player => [player.id, player]));
+  return (tournament.parejas ?? []).flatMap(pareja =>
+    (pareja.jugadores ?? []).flatMap(id => {
+      const player = byId.get(id);
+      const official = player && categoryOn(player, fecha)?.categoria;
+      if (!official || !isLowerCategory(pareja.categoria, official)) return [];
+      return [
+        `la pareja ${pareja.id} tiene a ${id} jugando en ${pareja.categoria}, por debajo de su categoría oficial ${official} al ${fecha}.`,
+      ];
+    })
+  );
+};
+
 export const archiveRules: readonly ArchiveRule[] = [
   matchesHaveScore,
   categoriesHaveFinal,
   pairsReferenceKnownPlayers,
+  playersNotBelowOfficialCategory,
 ];
 
 export class ArchiveValidationError extends Error {

@@ -4,7 +4,7 @@ import IconX from "@/assets/icons/IconX.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
-import { SITE } from "@/config";
+import { SITE, STATISTICS_PAGE_PUBLISHED } from "@/config";
 import { hasActiveTournament } from "@/data/tournament-availability";
 
 const { pathname } = Astro.url;
@@ -107,6 +107,18 @@ const tournamentIsActive = hasActiveTournament();
               </span>
             </a>
           </li>
+          {
+            STATISTICS_PAGE_PUBLISHED && (
+              <li class="col-span-2">
+                <a
+                  href="/estadisticas"
+                  class:list={{ "active-nav": isActive("/estadisticas") }}
+                >
+                  Estadísticas
+                </a>
+              </li>
+            )
+          }
           {
             SITE.lightAndDarkMode && (
               <li class="col-span-2 flex items-center justify-center">
