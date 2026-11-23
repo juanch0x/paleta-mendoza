@@ -12,145 +12,169 @@
       "id": "1A-1",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Bautista Latuf / Alexis Corso"
+      "nombre": "Bautista Latuf / Alexis Corso",
+      "jugadores": ["bautista-latuf", "alexis-corso"]
     },
     {
       "id": "1A-2",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Ignacio Corso / Tomás Molteno"
+      "nombre": "Ignacio Corso / Tomás Molteno",
+      "jugadores": ["ignacio-corso", "tomas-molteno"]
     },
     {
       "id": "1A-3",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Juan Cuevas / Matías Poblete"
+      "nombre": "Juan Cuevas / Matías Poblete",
+      "jugadores": ["juan-cuevas", "matias-poblete"]
     },
     {
       "id": "1A-4",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Hernan Fontana / Fernando Laguillo"
+      "nombre": "Hernan Fontana / Fernando Laguillo",
+      "jugadores": ["hernan-fontana", "fernando-laguillo"]
     },
     {
       "id": "2A-1",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Gonzalo Martinez / Martin Armenault"
+      "nombre": "Gonzalo Martinez / Martin Armenault",
+      "jugadores": ["gonzalo-martinez", "martin-armenault"]
     },
     {
       "id": "2A-2",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Francisco Martín / Gonzalo Zulueta"
+      "nombre": "Francisco Martín / Gonzalo Zulueta",
+      "jugadores": ["francisco-martin", "gonzalo-zulueta"]
     },
     {
       "id": "2A-3",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Arturo Molteno / Fernando Losilla"
+      "nombre": "Arturo Molteno / Fernando Losilla",
+      "jugadores": ["arturo-molteno", "fernando-losilla"]
     },
     {
       "id": "2A-4",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Victor Vazquez / Marcos Bustamante"
+      "nombre": "Victor Vazquez / Marcos Bustamante",
+      "jugadores": ["victor-vazquez", "marcos-bustamante"]
     },
     {
       "id": "2A-5",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Ignacio Corso / Sebastian Masetto"
+      "nombre": "Ignacio Corso / Sebastian Masetto",
+      "jugadores": ["ignacio-corso", "sebastian-masetto"]
     },
     {
       "id": "2B-1",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Bautista Latuf / Luca Vives"
+      "nombre": "Bautista Latuf / Luca Vives",
+      "jugadores": ["bautista-latuf", "luca-vives"]
     },
     {
       "id": "2B-2",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Cristian Aranzabal / Cesar Mendoza"
+      "nombre": "Cristian Aranzabal / Cesar Mendoza",
+      "jugadores": ["cristian-aranzabal", "cesar-mendoza"]
     },
     {
       "id": "2B-3",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Ruben Poblete / Ariel Astesiano"
+      "nombre": "Ruben Poblete / Ariel Astesiano",
+      "jugadores": ["ruben-poblete", "ariel-astesiano"]
     },
     {
       "id": "2B-4",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Ernesto Retamales / Manolo Masetoo"
+      "nombre": "Ernesto Retamales / Manolo Masetoo",
+      "jugadores": ["ernesto-retamales", "manolo-masetoo"]
     },
     {
       "id": "3A-1",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Ignacio Corso / Sebastian Masetto"
+      "nombre": "Ignacio Corso / Sebastian Masetto",
+      "jugadores": ["ignacio-corso", "sebastian-masetto"]
     },
     {
       "id": "3A-2",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Álvaro Zulueta / Martin Guerra"
+      "nombre": "Álvaro Zulueta / Martin Guerra",
+      "jugadores": ["alvaro-zulueta", "martin-guerra"]
     },
     {
       "id": "3A-3",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Juan Portugal / Juan José Alvarez"
+      "nombre": "Juan Portugal / Juan José Alvarez",
+      "jugadores": ["juan-portugal", "juan-jose-alvarez"]
     },
     {
       "id": "3A-4",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Mariano López / Nicolás Quesada"
+      "nombre": "Mariano López / Nicolás Quesada",
+      "jugadores": ["mariano-lopez", "nicolas-quesada"]
     },
     {
       "id": "3A-5",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Benicio Zulueta / Santiago Tello"
+      "nombre": "Benicio Zulueta / Santiago Tello",
+      "jugadores": ["benicio-zulueta", "santiago-tello"]
     },
     {
       "id": "4A-1",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Isaias Fernandez / Gabriel Fernandez"
+      "nombre": "Isaias Fernandez / Gabriel Fernandez",
+      "jugadores": ["isaias-fernandez", "gabriel-fernandez"]
     },
     {
       "id": "4A-2",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Carlos Salis / Carlos Castrillejo"
+      "nombre": "Carlos Salis / Carlos Castrillejo",
+      "jugadores": ["carlos-salis", "carlos-castrillejo"]
     },
     {
       "id": "4A-3",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Benjamin Zamorano / Valentín Olguin"
+      "nombre": "Benjamin Zamorano / Valentín Olguin",
+      "jugadores": ["benjamin-zamorano", "valentin-olguin"]
     },
     {
       "id": "4B-1",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Juan Chondro / Gonzalo Marzal"
+      "nombre": "Juan Chondro / Gonzalo Marzal",
+      "jugadores": ["juan-chondro", "gonzalo-marzal"]
     },
     {
       "id": "4B-2",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Lautaro Quiroga / Mariano Briffi"
+      "nombre": "Lautaro Quiroga / Mariano Briffi",
+      "jugadores": ["lautaro-quiroga", "mariano-briffi"]
     },
     {
       "id": "4B-3",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Pedro Agüero / Diego Aguinaga"
+      "nombre": "Pedro Agüero / Diego Aguinaga",
+      "jugadores": ["pedro-aguero", "diego-aguinaga"]
     }
   ],
   "partidos": [
