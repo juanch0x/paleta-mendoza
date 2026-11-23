@@ -1,4 +1,5 @@
 import { tournamentDate } from "./archived-tournament.js";
+import { normalizePlayerName } from "./player-names.js";
 
 /** What period filtering needs from an archived tournament. */
 export type PeriodSource = {
@@ -209,11 +210,7 @@ function sortEditions(editions: readonly string[]): string[] {
 
 /** URL segment for an edition: "Apertura" becomes "apertura". */
 function slugifyEdition(edition: string): string {
-  return edition
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim()
+  return normalizePlayerName(edition)
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }
