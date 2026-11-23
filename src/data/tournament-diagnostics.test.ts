@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  diagnosePlayerRegistry,
   diagnoseTournamentSheets,
   diagnosticRanges,
   fetchTournamentSheetGrids,
@@ -333,3 +334,86 @@ function toCsv(grid: SheetGrid) {
     .map(row => row.map(value => String(value ?? "")).join(","))
     .join("\n");
 }
+
+describe("diagnosePlayerRegistry", () => {
+  it("lists players missing an official category or a position for the date", () => {
+    const players = [
+      {
+        id: "ana-alfa",
+        nombreOficial: "Ana Alfa",
+        categorias: [
+          {
+            desde: "2026-01-01",
+            categoria: "Tercera",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2026,
+            posicion: "delantero" as const,
+            origen: "provisoria" as const,
+          },
+        ],
+      },
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        categorias: [
+          {
+            desde: "2026-12-01",
+            categoria: "Tercera",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2026,
+            posicion: "zaguero" as const,
+            origen: "federacion" as const,
+          },
+        ],
+      },
+      {
+        id: "caro-gama",
+        nombreOficial: "Caro Gama",
+        categorias: [
+          {
+            desde: "2025-01-01",
+            categoria: "Segunda",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2025,
+            posicion: "zaguero" as const,
+            origen: "federacion" as const,
+          },
+        ],
+      },
+      { id: "dani-delta", nombreOficial: "Dani Delta" },
+    ];
+
+    expect(diagnosePlayerRegistry(players, "2026-11-23")).toEqual([
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        faltaCategoria: true,
+        faltaPosicion: false,
+      },
+      {
+        id: "caro-gama",
+        nombreOficial: "Caro Gama",
+        faltaCategoria: false,
+        faltaPosicion: true,
+      },
+      {
+        id: "dani-delta",
+        nombreOficial: "Dani Delta",
+        faltaCategoria: true,
+        faltaPosicion: true,
+      },
+    ]);
+  });
+});

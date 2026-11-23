@@ -8,6 +8,8 @@ import {
 } from "@/data/tournament-diagnostics";
 import Layout from "@/layouts/Layout.astro";
 import { hasActiveTournament } from "@/data/tournament-availability";
+import { diagnosePlayerRegistry } from "@/data/tournament-diagnostics";
+import { jsonPlayerRepository } from "@/data/repositories/json";
 
 if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 
@@ -31,6 +33,22 @@ if (import.meta.env.DEV) {
       "No se pudo ejecutar el diagnóstico local. Configurá GOOGLE_SHEETS_SPREADSHEET_ID y GOOGLE_SHEETS_API_KEY.";
   }
 }
+
+// Player registry: players still missing official category or position.
+const registryDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Argentina/Mendoza",
+}).format(new Date());
+const pendingPlayers = diagnosePlayerRegistry(
+  await jsonPlayerRepository.list(),
+  registryDate
+);
+const pendingLabel = (player: (typeof pendingPlayers)[number]) =>
+  [
+    player.faltaCategoria && "categoría oficial",
+    player.faltaPosicion && `posición ${registryDate.slice(0, 4)}`,
+  ]
+    .filter(Boolean)
+    .join(" y ");
 ---
 
 <Layout
@@ -80,6 +98,41 @@ if (import.meta.env.DEV) {
             </button>
           </form>
         ) : null
+      }
+    </section>
+    <section
+      class="border-border bg-background mt-8 rounded-2xl border p-5 sm:p-6"
+      aria-labelledby="registry-title"
+    >
+      <h2 id="registry-title" class="text-xl font-bold">
+        Registro de jugadores
+      </h2>
+      {
+        pendingPlayers.length === 0 ? (
+          <p class="text-foreground/70 mt-2">
+            Todos los jugadores tienen categoría oficial y posición.
+          </p>
+        ) : (
+          <>
+            <p class="mt-2">
+              {pendingPlayers.length}{" "}
+              {pendingPlayers.length === 1
+                ? "jugador sin datos oficiales completos"
+                : "jugadores sin datos oficiales completos"}
+              . Sus perfiles funcionan igual.
+            </p>
+            <ul class="border-border mt-4 divide-y rounded-xl border">
+              {pendingPlayers.map(player => (
+                <li class="p-4">
+                  <p class="font-semibold">{player.nombreOficial}</p>
+                  <p class="text-foreground/70 mt-1 text-sm">
+                    Falta: {pendingLabel(player)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
       }
     </section>
   </main>

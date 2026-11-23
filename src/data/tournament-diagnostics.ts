@@ -6,6 +6,7 @@ import {
   type TournamentSheetName,
 } from "./csv.js";
 import { parseSets } from "../domain/parse-sets.js";
+import { categoryOn, positionIn, type Player } from "../domain/player-stats.js";
 
 export const DIAGNOSTIC_SHEETS = [
   "parejas",
@@ -407,4 +408,40 @@ function columnToLetter(column: number): string {
     current = Math.floor((current - 1) / 26);
   }
   return result;
+}
+
+// ---------------------------------------------------------------------------
+// Player registry: pending official data (ticket 07)
+// ---------------------------------------------------------------------------
+
+export type PlayerMissingOfficialData = {
+  id: string;
+  nombreOficial: string;
+  faltaCategoria: boolean;
+  faltaPosicion: boolean;
+};
+
+/**
+ * Players with no official category in effect on `fecha` (ISO date) or no
+ * position for its year, in registry order. Non-blocking: these players
+ * still have a profile.
+ */
+export function diagnosePlayerRegistry(
+  players: readonly Player[],
+  fecha: string
+): PlayerMissingOfficialData[] {
+  const anio = Number(fecha.slice(0, 4));
+  return players.flatMap(player => {
+    const faltaCategoria = !categoryOn(player, fecha);
+    const faltaPosicion = !positionIn(player, anio);
+    if (!faltaCategoria && !faltaPosicion) return [];
+    return [
+      {
+        id: player.id,
+        nombreOficial: player.nombreOficial,
+        faltaCategoria,
+        faltaPosicion,
+      },
+    ];
+  });
 }
