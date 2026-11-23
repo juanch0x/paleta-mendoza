@@ -580,6 +580,36 @@ describe("diagnoseLikelyPromotions", () => {
     ).toEqual(["ana-alfa"]);
   });
 
+  it("still warns when the promotion is dated before the third tournament's final", () => {
+    const tres = torneo("tres", "2026-07-12", ab, cd);
+    const opening = {
+      ...tres.partidos[0],
+      id: "tres-grupo",
+      fase: "grupo",
+      fecha: "2026-07-10",
+    };
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      { ...tres, partidos: [opening, ...tres.partidos] },
+    ];
+    const promotedMidTournament = {
+      ...ana,
+      categorias: promotedOn("2026-07-11"),
+    };
+    const promotedOnFinalDay = {
+      ...beto,
+      categorias: promotedOn("2026-07-12"),
+    };
+
+    expect(
+      diagnoseLikelyPromotions(
+        [promotedMidTournament, promotedOnFinalDay],
+        tournaments
+      ).map(w => w.id)
+    ).toEqual(["ana-alfa"]);
+  });
+
   it("does not warn when another pair wins a tournament in between", () => {
     const tournaments = [
       torneo("uno", "2026-03-10", ab, cd),

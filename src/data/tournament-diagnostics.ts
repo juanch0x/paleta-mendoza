@@ -11,6 +11,7 @@ import { createPlayerMatcher } from "../domain/player-names.js";
 import {
   isoYear,
   tournamentDate,
+  tournamentEndDate,
   type ArchivedTournament,
 } from "../domain/archived-tournament.js";
 import type { Player } from "../domain/player.js";
@@ -512,8 +513,8 @@ export type LikelyPromotion = {
 
 /**
  * Players who won three consecutive archived tournaments of a category with
- * no promotion (`origen: "ascenso"`) recorded on or after the last of those
- * tournaments. Consecutive means consecutive among the archived tournaments
+ * no promotion (`origen: "ascenso"`) recorded on or after the last match date
+ * of the third of those tournaments (its final). Consecutive means consecutive among the archived tournaments
  * that decided that category's final, ordered by their earliest match date
  * (ties broken by slug). Results are in registry order, then category, then
  * chronological order. Non-blocking: the organizer records the promotion by
@@ -554,7 +555,7 @@ export function diagnoseLikelyPromotions(
         }
         streak.push(final);
         if (streak.length < TITLES_FOR_PROMOTION) continue;
-        if (!hasPromotionSince(player, final.date)) {
+        if (!hasPromotionSince(player, tournamentEndDate(final.tournament))) {
           found.push({
             id: player.id,
             nombreOficial: player.nombreOficial,

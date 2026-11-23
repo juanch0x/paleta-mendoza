@@ -29,6 +29,21 @@ export function tournamentDate(tournament: {
   return earliest;
 }
 
+/**
+ * The date a tournament ends on: the latest match date (ISO), normally its
+ * finals. Undefined when no match has a date.
+ */
+export function tournamentEndDate(tournament: {
+  partidos: readonly { fecha?: string }[];
+}): string | undefined {
+  let latest: string | undefined;
+  for (const partido of tournament.partidos) {
+    if (partido.fecha && (!latest || partido.fecha > latest))
+      latest = partido.fecha;
+  }
+  return latest;
+}
+
 /** Year of an ISO date (YYYY-MM-DD). */
 export function isoYear(fecha: string): number {
   return Number(fecha.slice(0, 4));
