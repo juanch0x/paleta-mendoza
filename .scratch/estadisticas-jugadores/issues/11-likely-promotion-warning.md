@@ -4,9 +4,13 @@
 
 **Blocked by:** 07 (Official category and position)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Diagnostics warns on three consecutive titles in the same category without a later promotion entry
-- [ ] No warning when a promotion entry exists after the third title
-- [ ] The warning names the player, category and the three tournaments
-- [ ] Covered by tournament diagnostics tests
+- [x] Diagnostics warns on three consecutive titles in the same category without a later promotion entry
+- [x] No warning when a promotion entry exists after the third title
+- [x] The warning names the player, category and the three tournaments
+- [x] Covered by tournament diagnostics tests
+
+## Comments
+
+Resolved in 0e54c9f. `diagnoseLikelyPromotions(players, tournaments)` in `src/data/tournament-diagnostics.ts`; "Posibles ascensos" section on the diagnostics page. Only an `origen: "ascenso"` entry dated on/after the third title silences it; runs reset after three.
