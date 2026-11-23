@@ -279,7 +279,7 @@ function buildHistorial(
  * whose `desde` is on or before that date. Undefined when none applies.
  */
 export function categoryOn(
-  player: Pick<Player, "categorias">,
+  player: Partial<Player>,
   fecha: string
 ): CategoriaOficial | undefined {
   let current: CategoriaOficial | undefined;
