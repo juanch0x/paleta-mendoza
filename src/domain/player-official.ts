@@ -3,6 +3,7 @@ import {
   tournamentYear,
   type ArchivedTournament,
 } from "./archived-tournament.js";
+import { compareCategories } from "./categories.js";
 import { matchResult } from "./match-result.js";
 import type {
   CategoriaOficial,
@@ -56,6 +57,8 @@ export type TitulosPorPosicion = {
   posicion: Posicion | undefined;
   provisoria: boolean;
   titulos: number;
+  /** That year's titles per category, highest category first. */
+  porCategoria: { categoria: string; titulos: number }[];
 };
 
 /**
@@ -82,38 +85,45 @@ function titlesByPosition(
   player: Player,
   tournaments: readonly ArchivedTournament[]
 ): TitulosPorPosicion[] {
-  const titlesByYear = new Map<number, number>();
+  const titlesByYear = new Map<number, Map<string, number>>();
   for (const tournament of tournaments) {
     const anio = tournamentYear(tournament);
     if (anio === undefined) continue;
-    const titles = titlesWonIn(tournament, player.id);
-    if (titles === 0) continue;
-    titlesByYear.set(anio, (titlesByYear.get(anio) ?? 0) + titles);
+    for (const categoria of categoriesWonIn(tournament, player.id)) {
+      const ofYear = titlesByYear.get(anio) ?? new Map<string, number>();
+      ofYear.set(categoria, (ofYear.get(categoria) ?? 0) + 1);
+      titlesByYear.set(anio, ofYear);
+    }
   }
   return [...titlesByYear]
     .sort(([a], [b]) => b - a)
-    .map(([anio, titulos]) => {
+    .map(([anio, byCategory]) => {
       const posicion = positionIn(player, anio);
+      const porCategoria = [...byCategory]
+        .map(([categoria, titulos]) => ({ categoria, titulos }))
+        .sort((a, b) => compareCategories(a.categoria, b.categoria));
       return {
         anio,
         posicion: posicion?.posicion,
         provisoria: posicion?.origen === "provisoria",
-        titulos,
+        titulos: porCategoria.reduce((sum, c) => sum + c.titulos, 0),
+        porCategoria,
       };
     });
 }
 
-/** Finals of `tournament` won by a pair that includes `playerId`. */
-function titlesWonIn(tournament: ArchivedTournament, playerId: string): number {
+/** Category of each final of `tournament` won by a pair with `playerId`. */
+function categoriesWonIn(
+  tournament: ArchivedTournament,
+  playerId: string
+): string[] {
   const parejas = new Map(tournament.parejas.map(p => [p.id, p]));
-  let titles = 0;
-  for (const partido of tournament.partidos) {
-    if (partido.fase !== "final") continue;
+  return tournament.partidos.flatMap(partido => {
+    if (partido.fase !== "final") return [];
     const winner = matchResult(partido)?.ganador;
-    if (winner && parejas.get(winner.id)?.jugadores.includes(playerId))
-      titles += 1;
-  }
-  return titles;
+    const pareja = winner && parejas.get(winner.id);
+    return pareja?.jugadores.includes(playerId) ? [pareja.categoria] : [];
+  });
 }
 
 function categoryChangesIn(

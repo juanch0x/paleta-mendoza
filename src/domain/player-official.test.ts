@@ -167,8 +167,68 @@ describe("buildOfficialProfile", () => {
     expect(
       buildOfficialProfile(player, tournaments, "2026-11-23").titulosPorPosicion
     ).toEqual([
-      { anio: 2026, posicion: "delantero", provisoria: true, titulos: 1 },
-      { anio: 2025, posicion: "zaguero", provisoria: false, titulos: 2 },
+      {
+        anio: 2026,
+        posicion: "delantero",
+        provisoria: true,
+        titulos: 1,
+        porCategoria: [{ categoria: "Tercera", titulos: 1 }],
+      },
+      {
+        anio: 2025,
+        posicion: "zaguero",
+        provisoria: false,
+        titulos: 2,
+        porCategoria: [{ categoria: "Tercera", titulos: 2 }],
+      },
+    ]);
+  });
+
+  it("breaks each year's titles down by category, highest first", () => {
+    const segunda = (slug: string, fecha: string): ArchivedTournament => {
+      const ana = { ...ab, id: "2A-1", categoria: "Segunda" };
+      const rival = { ...cd, id: "2A-2", categoria: "Segunda" };
+      return {
+        slug,
+        nombre: slug,
+        fecha: "Octubre 2026",
+        parejas: [ana, rival],
+        partidos: [
+          {
+            id: "1",
+            categoria: "Segunda",
+            fase: "final",
+            fecha,
+            a: { tipo: "pareja", pareja: ana },
+            b: { tipo: "pareja", pareja: rival },
+            sets: [
+              [12, 4],
+              [12, 3],
+            ],
+          },
+        ],
+      };
+    };
+    const tournaments = [
+      tournament("apertura-2026", "2026-04-10", ab),
+      tournament("invierno-2026", "2026-07-10", ab),
+      segunda("clausura-2026", "2026-10-10"),
+    ];
+
+    expect(
+      buildOfficialProfile(promoted, tournaments, "2026-11-23")
+        .titulosPorPosicion
+    ).toEqual([
+      {
+        anio: 2026,
+        posicion: undefined,
+        provisoria: false,
+        titulos: 3,
+        porCategoria: [
+          { categoria: "Segunda", titulos: 1 },
+          { categoria: "Tercera", titulos: 2 },
+        ],
+      },
     ]);
   });
 
@@ -182,7 +242,13 @@ describe("buildOfficialProfile", () => {
         "2026-11-23"
       ).titulosPorPosicion
     ).toEqual([
-      { anio: 2026, posicion: undefined, provisoria: false, titulos: 1 },
+      {
+        anio: 2026,
+        posicion: undefined,
+        provisoria: false,
+        titulos: 1,
+        porCategoria: [{ categoria: "Tercera", titulos: 1 }],
+      },
     ]);
   });
 });
