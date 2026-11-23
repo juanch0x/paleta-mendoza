@@ -4,8 +4,12 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-human
+**Status:** resolved
 
-- [ ] The real score of match 23 is recovered from the original source
-- [ ] The archive records the score and the "incomplete score" note is removed
-- [ ] Group standings for that zone render correctly with the new score
+- [x] The real score of match 23 is recovered from the original source
+- [x] The archive records the score and the "incomplete score" note is removed
+- [x] Group standings for that zone render correctly with the new score
+
+## Comments
+
+Score provided by the organizer: Luciarte / Marzal won 12-0 12-0 (stored as [0, 12], [0, 12] from pair A side).

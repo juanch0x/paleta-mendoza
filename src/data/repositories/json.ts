@@ -1,6 +1,6 @@
 import { getCollection } from "astro:content";
 
-import registry from "../torneos/registro.json";
+import { loadRegisteredArchives } from "../archives.js";
 import type {
   ArchivedTournamentRepository,
   ArchiveRecord,
@@ -17,21 +17,12 @@ export const jsonPlayerRepository: PlayerRepository = {
   },
 };
 
-const archives = import.meta.glob<ArchiveRecord>(
-  ["../torneos/archivos/*.json", "../torneos/archivos/*/torneo.json"],
-  { eager: true, import: "default" }
-);
-
-/** Archived tournaments listed in `torneos/registro.json`, in registry order. */
+/**
+ * Archived tournaments listed in `torneos/registro.json`, in registry order,
+ * each one checked by the shared archive validation.
+ */
 export const jsonArchivedTournamentRepository: ArchivedTournamentRepository = {
   async list() {
-    return registry.map(entry => {
-      const tournament =
-        archives[`../torneos/archivos/${entry.slug}/torneo.json`] ??
-        archives[`../torneos/archivos/${entry.slug}.json`];
-      if (!tournament)
-        throw new Error(`No se encontró el histórico ${entry.slug}.`);
-      return tournament;
-    });
+    return loadRegisteredArchives() as unknown as ArchiveRecord[];
   },
 };
