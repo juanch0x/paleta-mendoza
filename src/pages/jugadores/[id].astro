@@ -7,6 +7,7 @@ import {
   jsonPlayerRepository,
 } from "@/data/repositories/json";
 import { buildPlayerStats, type PlayerStats } from "@/domain/player-stats";
+import { buildOfficialProfile } from "@/domain/player-stats";
 
 export async function getStaticPaths() {
   const [players, tournaments] = await Promise.all([
@@ -25,6 +26,21 @@ const figures = [
   { label: "Títulos", value: stats.titulos },
   { label: "Subcampeonatos", value: stats.subcampeonatos },
 ];
+
+// Official category and position (ticket 07), as of the build date in Mendoza.
+const hoy = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Argentina/Mendoza",
+}).format(new Date());
+const anioActual = Number(hoy.slice(0, 4));
+const official = buildOfficialProfile(
+  player,
+  await jsonArchivedTournamentRepository.list(),
+  hoy
+);
+const POSICION_LABEL = { delantero: "Delantero", zaguero: "Zaguero" } as const;
+const ORIGEN_LABEL = { federacion: "federación", ascenso: "ascenso" } as const;
+const formatDate = (iso: string) => iso.split("-").reverse().join("/");
+const pendiente = "Todavía no está cargada";
 ---
 
 <Layout
@@ -53,6 +69,78 @@ const figures = [
           ))
         }
       </dl>
+
+      <section class="mt-10" aria-labelledby="oficial-titulo">
+        <h2 id="oficial-titulo" class="text-2xl font-bold">
+          Categoría y posición
+        </h2>
+        <dl class="mt-4 grid gap-4 sm:max-w-md">
+          <div class="border-border rounded-xl border p-5">
+            <dt class="text-lg font-semibold">Categoría oficial</dt>
+            <dd class="mt-2 text-2xl font-bold">
+              {official.categoria?.categoria ?? pendiente}
+            </dd>
+          </div>
+          <div class="border-border rounded-xl border p-5">
+            <dt class="text-lg font-semibold">Posición {anioActual}</dt>
+            <dd class="mt-2 text-2xl font-bold">
+              {
+                official.posicion
+                  ? POSICION_LABEL[official.posicion.posicion]
+                  : pendiente
+              }
+            </dd>
+          </div>
+        </dl>
+        {
+          official.posicionProvisoria && (
+            <p
+              class="border-accent mt-4 rounded-xl border-2 p-4 text-base sm:max-w-md"
+              role="note"
+            >
+              <strong>Posición provisoria.</strong> La cargó la organización y
+              todavía no es la lista oficial de la federación.
+            </p>
+          )
+        }
+        {
+          official.cambios.length > 0 && (
+            <div class="mt-6">
+              <h3 class="text-xl font-semibold">
+                Cambios de categoría en {anioActual}
+              </h3>
+              <ul class="mt-2 list-disc space-y-1 pl-6 text-base">
+                {official.cambios.map(cambio => (
+                  <li>
+                    Desde el {formatDate(cambio.desde)}: de {cambio.anterior} a{" "}
+                    {cambio.categoria} (por {ORIGEN_LABEL[cambio.origen]})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        <div class="mt-6">
+          <h3 class="text-xl font-semibold">Títulos por posición</h3>
+          {
+            official.titulosPorPosicion.length > 0 ? (
+              <ul class="mt-2 list-disc space-y-1 pl-6 text-base">
+                {official.titulosPorPosicion.map(year => (
+                  <li>
+                    {year.anio}: {year.titulos}{" "}
+                    {year.titulos === 1 ? "título" : "títulos"}
+                    {year.posicion
+                      ? ` como ${POSICION_LABEL[year.posicion].toLowerCase()}${year.provisoria ? " (posición provisoria)" : ""}`
+                      : " (posición sin cargar)"}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="mt-2 text-base">Sin títulos todavía.</p>
+            )
+          }
+        </div>
+      </section>
     </section>
   </main>
   <Footer />
