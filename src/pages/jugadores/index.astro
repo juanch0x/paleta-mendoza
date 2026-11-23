@@ -1,0 +1,89 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import { jsonPlayerRepository } from "@/data/repositories/json";
+
+const players = await jsonPlayerRepository.list();
+---
+
+<Layout
+  title="Jugadores"
+  description="Lista de todos los jugadores con buscador por nombre."
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <h1 class="text-3xl font-bold sm:text-4xl">Jugadores</h1>
+      <p class="mt-3 text-base">
+        Busque un jugador por su nombre y toque su nombre para ver sus
+        estadísticas.
+      </p>
+
+      <label for="player-search" class="mt-8 block text-lg font-semibold">
+        Buscar jugador por nombre
+      </label>
+      <input
+        id="player-search"
+        type="search"
+        autocomplete="off"
+        placeholder="Ej.: Flores"
+        class="border-border bg-muted/40 focus:border-accent focus:ring-accent/20 mt-2 w-full rounded-xl border px-4 py-4 text-lg transition outline-none focus:ring-2 sm:max-w-md"
+      />
+
+      <p id="player-count" class="mt-4 text-base" aria-live="polite">
+        {players.length} jugadores
+      </p>
+
+      <ul id="player-list" class="mt-4 grid gap-3 sm:grid-cols-2">
+        {
+          players.map(player => (
+            <li data-player-id={player.id} data-name={player.nombreOficial}>
+              <a
+                href={`/jugadores/${player.id}`}
+                class="border-border hover:border-accent focus-visible:border-accent flex min-h-14 items-center justify-between gap-3 rounded-xl border px-5 py-4 text-lg font-semibold"
+              >
+                <span>{player.nombreOficial}</span>
+                <span class="text-accent text-base font-normal">
+                  Ver estadísticas
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p id="player-empty" class="mt-4 hidden text-lg">
+        No se encontró ningún jugador con ese nombre.
+      </p>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  import { filterPlayers } from "@/domain/player-search";
+
+  const input = document.querySelector<HTMLInputElement>("#player-search");
+  const count = document.querySelector<HTMLElement>("#player-count");
+  const empty = document.querySelector<HTMLElement>("#player-empty");
+  const items = [
+    ...document.querySelectorAll<HTMLLIElement>("#player-list > li"),
+  ].map(element => ({
+    element,
+    nombreOficial: element.dataset.name ?? "",
+  }));
+
+  function applyFilter() {
+    const visible = new Set(filterPlayers(items, input?.value ?? ""));
+    for (const item of items) item.element.hidden = !visible.has(item);
+    if (count) {
+      count.textContent =
+        visible.size === 1 ? "1 jugador" : `${visible.size} jugadores`;
+    }
+    empty?.classList.toggle("hidden", visible.size > 0);
+  }
+
+  input?.addEventListener("input", applyFilter);
+  applyFilter();
+</script>
