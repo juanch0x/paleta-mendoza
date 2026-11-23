@@ -104,6 +104,45 @@ describe("diagnoseTournamentSheets", () => {
     ).toHaveLength(1);
   });
 
+  it("lists names missing from the player registry as non-blocking warnings", () => {
+    const players = [
+      { id: "ana-ficticia", nombreOficial: "Ana Ficticia" },
+      { id: "bea-ficticia", nombreOficial: "Bea Ficticia" },
+      { id: "carla-ficticia", nombreOficial: "Carla Ficticia" },
+    ];
+    const grids = structuredClone(validGrids);
+    grids[0].values[1] = [
+      "3A-1",
+      "Tercera",
+      "A",
+      "ana  FICTICIA",
+      "Beá Ficticia",
+    ];
+    grids[0].values[2] = [
+      "3A-2",
+      "Tercera",
+      "A",
+      "Carla Ficticia",
+      "Diana Ficticia",
+    ];
+
+    const diagnostics = diagnoseTournamentSheets(grids, undefined, {
+      players,
+    });
+
+    expect(diagnostics.valid).toBe(true);
+    expect(diagnostics.issues).toEqual([]);
+    expect(diagnostics.warnings).toEqual([
+      {
+        sheet: "parejas",
+        cell: "E3",
+        rule: "unknown-player",
+        message:
+          '"Diana Ficticia" (pareja 3A-2) no está en el registro de jugadores.',
+      },
+    ]);
+  });
+
   it("accumulates runtime-contract errors instead of aborting at the first one", () => {
     const grids = structuredClone(validGrids);
     grids[0].values.push(["3A-1", "", "A", "", "Diana"]);

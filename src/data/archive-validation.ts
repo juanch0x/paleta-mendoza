@@ -13,15 +13,29 @@ export type ArchiveMatch = {
   sets: readonly unknown[];
 };
 
+export type ArchivePareja = {
+  id: string;
+  categoria: string;
+  jugadores?: readonly string[];
+};
+
 export type ArchiveToValidate = {
   slug: string;
   nombre: string;
-  parejas?: readonly { categoria: string }[];
+  parejas?: readonly ArchivePareja[];
   partidos: readonly ArchiveMatch[];
 };
 
+/** Registry data the rules check archives against. */
+export type ArchiveValidationContext = {
+  players: readonly { id: string }[];
+};
+
 /** A rule returns one human-readable problem per violation, without the tournament prefix. */
-export type ArchiveRule = (tournament: ArchiveToValidate) => string[];
+export type ArchiveRule = (
+  tournament: ArchiveToValidate,
+  context: ArchiveValidationContext
+) => string[];
 
 const matchesHaveScore: ArchiveRule = tournament =>
   tournament.partidos
@@ -46,9 +60,23 @@ const categoriesHaveFinal: ArchiveRule = tournament => {
     .map(categoria => `la categoría ${categoria} no tiene final.`);
 };
 
+const pairsReferenceKnownPlayers: ArchiveRule = (tournament, context) => {
+  const known = new Set(context.players.map(player => player.id));
+  return (tournament.parejas ?? []).flatMap(pareja => {
+    if (pareja.jugadores?.length !== 2)
+      return [`la pareja ${pareja.id} está sin jugadores registrados.`];
+    return pareja.jugadores
+      .filter(id => !known.has(id))
+      .map(
+        id => `la pareja ${pareja.id} referencia al jugador desconocido ${id}.`
+      );
+  });
+};
+
 export const archiveRules: readonly ArchiveRule[] = [
   matchesHaveScore,
   categoriesHaveFinal,
+  pairsReferenceKnownPlayers,
 ];
 
 export class ArchiveValidationError extends Error {
@@ -62,13 +90,19 @@ export class ArchiveValidationError extends Error {
 }
 
 /** Returns every problem found by the archive rules; empty when the archive is valid. */
-export function findArchiveProblems(tournament: ArchiveToValidate): string[] {
-  return archiveRules.flatMap(rule => rule(tournament));
+export function findArchiveProblems(
+  tournament: ArchiveToValidate,
+  context: ArchiveValidationContext
+): string[] {
+  return archiveRules.flatMap(rule => rule(tournament, context));
 }
 
-/** Throws an ArchiveValidationError naming the tournament and every offending match or category. */
-export function validateArchive(tournament: ArchiveToValidate): void {
-  const problems = findArchiveProblems(tournament);
+/** Throws an ArchiveValidationError naming the tournament and every offending match, category or pair. */
+export function validateArchive(
+  tournament: ArchiveToValidate,
+  context: ArchiveValidationContext
+): void {
+  const problems = findArchiveProblems(tournament, context);
   if (problems.length > 0) {
     throw new ArchiveValidationError(
       `${tournament.slug} (${tournament.nombre})`,
