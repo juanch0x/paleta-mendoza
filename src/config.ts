@@ -18,3 +18,11 @@ export const SITE = {
   },
   dynamicOgImage: true,
 } as const;
+
+/**
+ * Publishes the statistics page (`/estadisticas`) and its main-navigation
+ * entry. Keep it off until the organizer loads the real official categories
+ * and positions (ticket 08 of `.scratch/estadisticas-jugadores`); while off,
+ * the page is not built and the entry is not shown.
+ */
+export const STATISTICS_PAGE_PUBLISHED: boolean = false;
