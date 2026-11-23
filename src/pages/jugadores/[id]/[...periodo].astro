@@ -1,5 +1,6 @@
 ---
 import Footer from "@/components/Footer.astro";
+import PeriodFilters from "@/components/players/PeriodFilters.astro";
 import RecordFiguresList from "@/components/players/RecordFiguresList.astro";
 import Header from "@/components/Header.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -7,22 +8,38 @@ import {
   jsonArchivedTournamentRepository,
   jsonPlayerRepository,
 } from "@/data/repositories/json";
-import { buildPlayerStats, type PlayerStats } from "@/domain/player-stats";
-import { buildOfficialProfile } from "@/domain/player-stats";
+import type { ArchiveRecord } from "@/data/repositories/types";
+import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
+import {
+  buildOfficialProfile,
+  buildPlayerStats,
+  type Player,
+} from "@/domain/player-stats";
 
+// One pre-rendered route per player and period of the tournaments they played;
+// every year together at /jugadores/[id].
 export async function getStaticPaths() {
   const [players, tournaments] = await Promise.all([
     jsonPlayerRepository.list(),
     jsonArchivedTournamentRepository.list(),
   ]);
-  return buildPlayerStats(players, tournaments).map(stats => ({
-    params: { id: stats.player.id },
-    props: { stats },
-  }));
+  return players.flatMap(player => {
+    const played = tournaments.filter(tournament =>
+      tournament.parejas.some(pareja => pareja.jugadores.includes(player.id))
+    );
+    return buildPeriodViews(played, { todosLosAnios: true }).map(view => ({
+      params: { id: player.id, periodo: view.path || undefined },
+      props: { player, view },
+    }));
+  });
 }
 
-const { stats } = Astro.props as { stats: PlayerStats };
-const { player, historial } = stats;
+const { player, view } = Astro.props as {
+  player: Player;
+  view: PeriodView<ArchiveRecord>;
+};
+const [stats] = buildPlayerStats([player], view.torneos);
+const { historial } = stats;
 const figures = [
   { label: "Títulos", value: stats.titulos },
   { label: "Subcampeonatos", value: stats.subcampeonatos },
@@ -33,11 +50,7 @@ const hoy = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Mendoza",
 }).format(new Date());
 const anioActual = Number(hoy.slice(0, 4));
-const official = buildOfficialProfile(
-  player,
-  await jsonArchivedTournamentRepository.list(),
-  hoy
-);
+const official = buildOfficialProfile(player, view.torneos, hoy);
 const POSICION_LABEL = { delantero: "Delantero", zaguero: "Zaguero" } as const;
 const ORIGEN_LABEL = { federacion: "federación", ascenso: "ascenso" } as const;
 const formatDate = (iso: string) => iso.split("-").reverse().join("/");
@@ -60,6 +73,17 @@ const pendiente = "Todavía no está cargada";
       <p class="mt-3 text-base">
         Resultados de los torneos finalizados. El torneo en curso no se cuenta.
       </p>
+      {
+        view.titulo && (
+          <h2 class="mt-6 text-2xl font-bold sm:text-3xl">
+            Período: {view.titulo}
+          </h2>
+        )
+      }
+      <PeriodFilters
+        basePath={`/jugadores/${player.id}`}
+        filtros={view.filtros}
+      />
       <dl class="mt-8 grid grid-cols-2 gap-4 sm:max-w-md">
         {
           figures.map(figure => (
@@ -137,7 +161,11 @@ const pendiente = "Todavía no está cargada";
                 ))}
               </ul>
             ) : (
-              <p class="mt-2 text-base">Sin títulos todavía.</p>
+              <p class="mt-2 text-base">
+                {view.path
+                  ? "Sin títulos en este período."
+                  : "Sin títulos todavía."}
+              </p>
             )
           }
         </div>
@@ -155,7 +183,9 @@ const pendiente = "Todavía no está cargada";
         ) : (
           <div class="mt-6 grid gap-5 sm:max-w-xl">
             <RecordFiguresList
-              title="Total de todos los torneos"
+              title={
+                view.path ? "Total del período" : "Total de todos los torneos"
+              }
               figuras={historial.total}
               headingLevel={3}
             />
