@@ -1,0 +1,59 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
+import { buildPlayerStats, type PlayerStats } from "@/domain/player-stats";
+
+export async function getStaticPaths() {
+  const [players, tournaments] = await Promise.all([
+    jsonPlayerRepository.list(),
+    jsonArchivedTournamentRepository.list(),
+  ]);
+  return buildPlayerStats(players, tournaments).map(stats => ({
+    params: { id: stats.player.id },
+    props: { stats },
+  }));
+}
+
+const { stats } = Astro.props as { stats: PlayerStats };
+const { player } = stats;
+const figures = [
+  { label: "Títulos", value: stats.titulos },
+  { label: "Subcampeonatos", value: stats.subcampeonatos },
+];
+---
+
+<Layout
+  title={player.nombreOficial}
+  description={`Estadísticas de ${player.nombreOficial} en los torneos finalizados.`}
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <p class="text-accent text-sm font-semibold tracking-[0.18em] uppercase">
+        Jugador
+      </p>
+      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">
+        {player.nombreOficial}
+      </h1>
+      <p class="mt-3 text-base">
+        Resultados de los torneos finalizados. El torneo en curso no se cuenta.
+      </p>
+      <dl class="mt-8 grid grid-cols-2 gap-4 sm:max-w-md">
+        {
+          figures.map(figure => (
+            <div class="border-border rounded-xl border p-5">
+              <dt class="text-lg font-semibold">{figure.label}</dt>
+              <dd class="mt-2 text-4xl font-bold">{figure.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </main>
+  <Footer />
+</Layout>
