@@ -4,6 +4,7 @@ import {
   type ArchivedTournament,
 } from "./archived-tournament.js";
 import { compareCategories, isLowerCategory } from "./categories.js";
+import { matchResult } from "./match-result.js";
 import type { Player, Posicion } from "./player.js";
 import { categoryOn, positionIn } from "./player-official.js";
 
@@ -175,14 +176,13 @@ function pairFigures(
     if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
     const isA = partido.a.pareja.id === pareja.id;
     if (!isA && partido.b.pareja.id !== pareja.id) continue;
-    const setsA = partido.sets.filter(([a, b]) => a > b).length;
-    const setsB = partido.sets.length - setsA;
-    const [won, lost] = isA ? [setsA, setsB] : [setsB, setsA];
-    if (won > lost) figures.partidosGanados += 1;
-    if (lost > won) figures.partidosPerdidos += 1;
-    if (partido.fase !== "final") continue;
-    figures.finales = 1;
-    if (won > lost) figures.titulos += 1;
+    if (partido.fase === "final") figures.finales = 1;
+    const result = matchResult(partido);
+    if (!result) continue;
+    const won = result.ganador.id === pareja.id;
+    if (won) figures.partidosGanados += 1;
+    else figures.partidosPerdidos += 1;
+    if (won && partido.fase === "final") figures.titulos += 1;
   }
   return figures;
 }

@@ -2,6 +2,7 @@ import {
   tournamentDate,
   type ArchivedTournament,
 } from "./archived-tournament.js";
+import { matchResult } from "./match-result.js";
 import type {
   CategoriaOficial,
   Player,
@@ -108,12 +109,9 @@ function titlesWonIn(tournament: ArchivedTournament, playerId: string): number {
   let titles = 0;
   for (const partido of tournament.partidos) {
     if (partido.fase !== "final") continue;
-    if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
-    const setsA = partido.sets.filter(([a, b]) => a > b).length;
-    const setsB = partido.sets.length - setsA;
-    if (setsA === setsB) continue;
-    const winner = setsA > setsB ? partido.a.pareja : partido.b.pareja;
-    if (parejas.get(winner.id)?.jugadores.includes(playerId)) titles += 1;
+    const winner = matchResult(partido)?.ganador;
+    if (winner && parejas.get(winner.id)?.jugadores.includes(playerId))
+      titles += 1;
   }
   return titles;
 }

@@ -1,5 +1,6 @@
 import type { ArchivedTournament } from "./archived-tournament.js";
 import { compareCategories } from "./categories.js";
+import { matchResult, setsWon } from "./match-result.js";
 import type { Player } from "./player.js";
 
 export type PlayerStats = {
@@ -33,19 +34,13 @@ export function buildPlayerStats(
     const parejas = new Map(tournament.parejas.map(p => [p.id, p]));
     for (const partido of tournament.partidos) {
       if (partido.fase !== "final") continue;
-      if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
-      const setsA = partido.sets.filter(([a, b]) => a > b).length;
-      const setsB = partido.sets.length - setsA;
-      if (setsA === setsB) continue;
-      const [winner, loser] =
-        setsA > setsB
-          ? [partido.a.pareja, partido.b.pareja]
-          : [partido.b.pareja, partido.a.pareja];
-      for (const id of parejas.get(winner.id)?.jugadores ?? []) {
+      const result = matchResult(partido);
+      if (!result) continue;
+      for (const id of parejas.get(result.ganador.id)?.jugadores ?? []) {
         const entry = stats.get(id);
         if (entry) entry.titulos += 1;
       }
-      for (const id of parejas.get(loser.id)?.jugadores ?? []) {
+      for (const id of parejas.get(result.perdedor.id)?.jugadores ?? []) {
         const entry = stats.get(id);
         if (entry) entry.subcampeonatos += 1;
       }
@@ -178,16 +173,17 @@ function buildHistorial(
       if (!reached.has(tally)) reached.set(tally, new Set());
       reached.get(tally)?.add(partido.fase);
 
-      const setsA = partido.sets.filter(([a, b]) => a > b).length;
-      const setsB = partido.sets.length - setsA;
-      const [won, lost] = isA ? [setsA, setsB] : [setsB, setsA];
-      tally.setsGanados += won;
-      tally.setsPerdidos += lost;
-      if (won > lost) tally.partidosGanados += 1;
-      if (lost > won) tally.partidosPerdidos += 1;
+      const [setsA, setsB] = setsWon(partido.sets);
+      tally.setsGanados += isA ? setsA : setsB;
+      tally.setsPerdidos += isA ? setsB : setsA;
+      const result = matchResult(partido);
+      if (!result) continue;
+      const won = result.ganador.id === pareja.id;
+      if (won) tally.partidosGanados += 1;
+      else tally.partidosPerdidos += 1;
 
-      if (partido.fase !== "final" || won === lost) continue;
-      if (won > lost) {
+      if (partido.fase !== "final") continue;
+      if (won) {
         tally.titulos += 1;
         const partner = pareja.jugadores.find(id => id !== playerId);
         if (partner) tally.companeros.add(partner);

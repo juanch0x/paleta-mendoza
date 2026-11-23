@@ -5,6 +5,7 @@ import {
   validateTournamentStatusRow,
   type TournamentSheetName,
 } from "./csv.js";
+import { matchResult } from "../domain/match-result.js";
 import { parseSets } from "../domain/parse-sets.js";
 import { createPlayerMatcher } from "../domain/player-names.js";
 import {
@@ -585,11 +586,8 @@ function decidedFinals(
   const finals = new Map<string, readonly string[]>();
   for (const partido of tournament.partidos) {
     if (partido.fase !== "final" || finals.has(partido.categoria)) continue;
-    if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
-    const setsA = partido.sets.filter(([a, b]) => a > b).length;
-    const setsB = partido.sets.length - setsA;
-    if (setsA === setsB) continue;
-    const winner = setsA > setsB ? partido.a.pareja : partido.b.pareja;
+    const winner = matchResult(partido)?.ganador;
+    if (!winner) continue;
     finals.set(partido.categoria, parejas.get(winner.id)?.jugadores ?? []);
   }
   return [...finals].map(([categoria, campeones]) => ({
