@@ -163,6 +163,75 @@ describe("freezeTournament", () => {
     expect(() => validateArchive(tournament, { players })).not.toThrow();
   });
 
+  it("refuses to freeze a player playing below their official category on the tournament date", () => {
+    const withCategories = players.map(player =>
+      player.id === "uno-ficticio"
+        ? {
+            ...player,
+            categorias: [
+              {
+                desde: "2026-01-01",
+                categoria: "Primera",
+                origen: "federacion",
+              },
+            ] as const,
+          }
+        : player
+    );
+    const segundaParejas = parejasCsv.replaceAll("Primera", "Segunda");
+    const segundaPartidos = completedPartidosCsv.replaceAll(
+      "Primera",
+      "Segunda"
+    );
+
+    expect(() =>
+      freezeTournament(
+        metadata,
+        segundaParejas,
+        segundaPartidos,
+        withCategories
+      )
+    ).toThrow(
+      /prueba-2026.*pareja 1A-1.*uno-ficticio.*Segunda.*categoría oficial Primera/
+    );
+    expect(() =>
+      freezeTournament(
+        metadata,
+        parejasCsv,
+        completedPartidosCsv,
+        withCategories
+      )
+    ).not.toThrow();
+  });
+
+  it("accepts a player promoted after the tournament date", () => {
+    const promotedLater = players.map(player =>
+      player.id === "uno-ficticio"
+        ? {
+            ...player,
+            categorias: [
+              {
+                desde: "2026-01-01",
+                categoria: "Segunda",
+                origen: "federacion",
+              },
+              { desde: "2026-09-10", categoria: "Primera", origen: "ascenso" },
+            ] as const,
+          }
+        : player
+    );
+    const segunda = (csv: string) => csv.replaceAll("Primera", "Segunda");
+
+    expect(() =>
+      freezeTournament(
+        metadata,
+        segunda(parejasCsv),
+        segunda(completedPartidosCsv),
+        promotedLater
+      )
+    ).not.toThrow();
+  });
+
   it("loads every registered archive, all of which pass the shared validation", () => {
     const archives = loadRegisteredArchives();
 
