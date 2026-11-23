@@ -3,7 +3,7 @@ import {
   type ArchivedPareja,
   type ArchivedTournament,
 } from "./archived-tournament.js";
-import { categoryRank, isLowerCategory } from "./categories.js";
+import { compareCategories, isLowerCategory } from "./categories.js";
 import type { Player, Posicion } from "./player.js";
 import { categoryOn, positionIn } from "./player-official.js";
 
@@ -140,8 +140,7 @@ export function buildAnnualTables(
 
   return [...tables.values()].sort(
     (a, b) =>
-      categoryRank(a.categoria) - categoryRank(b.categoria) ||
-      a.categoria.localeCompare(b.categoria, "es") ||
+      compareCategories(a.categoria, b.categoria) ||
       POSITION_ORDER.indexOf(a.posicion) - POSITION_ORDER.indexOf(b.posicion)
   );
 }

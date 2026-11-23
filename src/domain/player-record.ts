@@ -1,5 +1,5 @@
 import type { ArchivedTournament } from "./archived-tournament.js";
-import { categoryRank } from "./categories.js";
+import { compareCategories } from "./categories.js";
 import type { Player } from "./player.js";
 
 export type PlayerStats = {
@@ -90,8 +90,7 @@ export type PlayerHistorial = {
 };
 
 const byCategory = (a: CategoryRecord, b: CategoryRecord) =>
-  categoryRank(a.categoria) - categoryRank(b.categoria) ||
-  a.categoria.localeCompare(b.categoria, "es");
+  compareCategories(a.categoria, b.categoria);
 
 /** Reads the year from an archive display date such as "Octubre 2026". */
 export function yearOf(fecha: string): number {
