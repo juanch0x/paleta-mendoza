@@ -1,0 +1,194 @@
+import {
+  tournamentDate,
+  type ArchivedPareja,
+  type ArchivedTournament,
+} from "./archived-tournament.js";
+import { categoryRank, isLowerCategory } from "./categories.js";
+import type { Player, Posicion } from "./player.js";
+import { categoryOn, positionIn } from "./player-official.js";
+
+/** Figures the annual table shows and orders by. */
+export type TableFigures = {
+  titulos: number;
+  finales: number;
+  partidosGanados: number;
+  partidosPerdidos: number;
+};
+
+export type AnnualTableRow = TableFigures & {
+  player: Player;
+  /** Rank among regular rows (ties share it); undefined for lower-category rows. */
+  puesto: number | undefined;
+  /** True when the player's official category is lower than the table's. */
+  categoriaInferior: boolean;
+  posicionProvisoria: boolean;
+};
+
+export type AnnualTable = {
+  categoria: string;
+  posicion: Posicion;
+  filas: AnnualTableRow[];
+  /** True when any row uses a provisional position. */
+  posicionesProvisorias: boolean;
+};
+
+/**
+ * The single ordering criterion of the annual table: titles, then finals,
+ * then matches won. Replace it here when the federation's points table arrives.
+ */
+export function compareTableFigures(a: TableFigures, b: TableFigures): number {
+  return (
+    b.titulos - a.titulos ||
+    b.finales - a.finales ||
+    b.partidosGanados - a.partidosGanados
+  );
+}
+
+const POSITION_ORDER: readonly Posicion[] = ["delantero", "zaguero"];
+
+const emptyTableFigures = (): TableFigures => ({
+  titulos: 0,
+  finales: 0,
+  partidosGanados: 0,
+  partidosPerdidos: 0,
+});
+
+const addTableFigures = (into: TableFigures, from: TableFigures) => {
+  into.titulos += from.titulos;
+  into.finales += from.finales;
+  into.partidosGanados += from.partidosGanados;
+  into.partidosPerdidos += from.partidosPerdidos;
+};
+
+/**
+ * Annual tables per category and position over the given tournaments. The
+ * caller picks the set (a year, an edition, a single tournament).
+ *
+ * A tournament counts for a player only in the official category held on the
+ * tournament date (`tournamentDate`), under the position of that year. A
+ * player whose official category is lower than the one played appears in
+ * that table unranked, unless they also have results counting there (after a
+ * promotion), in which case only those count. Players without an official
+ * category or a position for the year are left out.
+ */
+export function buildAnnualTables(
+  players: readonly Player[],
+  tournaments: readonly ArchivedTournament[]
+): AnnualTable[] {
+  type Entry = {
+    player: Player;
+    categoria: string;
+    posicion: Posicion;
+    provisoria: boolean;
+    oficial: TableFigures | undefined;
+    inferior: TableFigures;
+  };
+  const entries = new Map<string, Entry>();
+  const byId = new Map(players.map(p => [p.id, p]));
+
+  for (const tournament of tournaments) {
+    const fecha = tournamentDate(tournament);
+    if (!fecha) continue;
+    for (const pareja of tournament.parejas) {
+      const figures = pairFigures(tournament, pareja);
+      for (const id of pareja.jugadores) {
+        const player = byId.get(id);
+        const official = player && categoryOn(player, fecha)?.categoria;
+        const posicion = player && positionIn(player, isoYear(fecha));
+        if (!player || !official || !posicion) continue;
+        const counts = official === pareja.categoria;
+        if (!counts && !isLowerCategory(official, pareja.categoria)) continue;
+
+        const key = `${pareja.categoria}|${posicion.posicion}|${id}`;
+        const entry = entries.get(key) ?? {
+          player,
+          categoria: pareja.categoria,
+          posicion: posicion.posicion,
+          provisoria: false,
+          oficial: undefined,
+          inferior: emptyTableFigures(),
+        };
+        entries.set(key, entry);
+        if (posicion.origen === "provisoria") entry.provisoria = true;
+        if (counts) entry.oficial ??= emptyTableFigures();
+        addTableFigures(entry.oficial ?? entry.inferior, figures);
+      }
+    }
+  }
+
+  const tables = new Map<string, AnnualTable>();
+  for (const entry of entries.values()) {
+    const key = `${entry.categoria}|${entry.posicion}`;
+    const table = tables.get(key) ?? {
+      categoria: entry.categoria,
+      posicion: entry.posicion,
+      filas: [],
+      posicionesProvisorias: false,
+    };
+    tables.set(key, table);
+    table.filas.push({
+      player: entry.player,
+      ...(entry.oficial ?? entry.inferior),
+      puesto: undefined,
+      categoriaInferior: !entry.oficial,
+      posicionProvisoria: entry.provisoria,
+    });
+    if (entry.provisoria) table.posicionesProvisorias = true;
+  }
+
+  for (const table of tables.values()) rankRows(table.filas);
+
+  return [...tables.values()].sort(
+    (a, b) =>
+      categoryRank(a.categoria) - categoryRank(b.categoria) ||
+      a.categoria.localeCompare(b.categoria, "es") ||
+      POSITION_ORDER.indexOf(a.posicion) - POSITION_ORDER.indexOf(b.posicion)
+  );
+}
+
+/** Sorts rows by the table criterion and ranks regular rows; ties share a rank. */
+function rankRows(filas: AnnualTableRow[]): void {
+  filas.sort(
+    (a, b) =>
+      compareTableFigures(a, b) ||
+      a.player.nombreOficial.localeCompare(b.player.nombreOficial, "es")
+  );
+  let ranked = 0;
+  let previous: AnnualTableRow | undefined;
+  for (const fila of filas) {
+    if (fila.categoriaInferior) continue;
+    ranked += 1;
+    fila.puesto =
+      previous && compareTableFigures(previous, fila) === 0
+        ? previous.puesto
+        : ranked;
+    previous = fila;
+  }
+}
+
+/** A pair's table figures in one tournament: matches, final reached, title. */
+function pairFigures(
+  tournament: ArchivedTournament,
+  pareja: ArchivedPareja
+): TableFigures {
+  const figures = emptyTableFigures();
+  for (const partido of tournament.partidos) {
+    if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
+    const isA = partido.a.pareja.id === pareja.id;
+    if (!isA && partido.b.pareja.id !== pareja.id) continue;
+    const setsA = partido.sets.filter(([a, b]) => a > b).length;
+    const setsB = partido.sets.length - setsA;
+    const [won, lost] = isA ? [setsA, setsB] : [setsB, setsA];
+    if (won > lost) figures.partidosGanados += 1;
+    if (lost > won) figures.partidosPerdidos += 1;
+    if (partido.fase !== "final") continue;
+    figures.finales = 1;
+    if (won > lost) figures.titulos += 1;
+  }
+  return figures;
+}
+
+/** Year of an ISO date (YYYY-MM-DD). */
+function isoYear(fecha: string): number {
+  return Number(fecha.slice(0, 4));
+}

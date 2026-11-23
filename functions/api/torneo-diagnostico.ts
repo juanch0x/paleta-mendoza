@@ -2,7 +2,7 @@ import {
   diagnoseTournamentSheets,
   fetchTournamentSheetGrids,
 } from "../../src/data/tournament-diagnostics";
-import type { Player } from "../../src/domain/player-stats";
+import type { Player } from "../../src/domain/player";
 
 type Env = {
   /** Cloudflare Pages static assets binding. */

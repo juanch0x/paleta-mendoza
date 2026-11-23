@@ -16,9 +16,8 @@ import {
 import type {
   ArchivedPareja,
   ArchivedTournament,
-  CategoriaOficial,
-  Player,
-} from "../domain/player-stats.js";
+} from "../domain/archived-tournament.js";
+import type { CategoriaOficial, Player } from "../domain/player.js";
 
 const validGrids: SheetGrid[] = [
   {

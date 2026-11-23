@@ -1,4 +1,4 @@
-import type { Player } from "./player-stats.js";
+import type { Player } from "./player.js";
 
 /** Lowercases and strips accents so "Núñez" and "nunez" compare equal. */
 const normalize = (value: string) =>

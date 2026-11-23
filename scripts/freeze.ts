@@ -3,7 +3,7 @@ import path from "node:path"
 
 import { fetchCsv } from "../src/data/fetch-csv.js"
 import { freezeTournament, type TournamentMetadata } from "../src/data/freeze.js"
-import type { Player } from "../src/domain/player-stats.js"
+import type { Player } from "../src/domain/player.js"
 
 type RegistryEntry = Pick<TournamentMetadata, "slug" | "nombre" | "fecha" | "clubLogo"> & { alcance: string }
 

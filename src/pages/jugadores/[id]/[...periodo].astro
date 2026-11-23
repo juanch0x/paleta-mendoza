@@ -10,11 +10,9 @@ import {
 } from "@/data/repositories/json";
 import type { ArchiveRecord } from "@/data/repositories/types";
 import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
-import {
-  buildOfficialProfile,
-  buildPlayerStats,
-  type Player,
-} from "@/domain/player-stats";
+import type { Player } from "@/domain/player";
+import { buildOfficialProfile } from "@/domain/player-official";
+import { buildPlayerStats } from "@/domain/player-record";
 
 // One pre-rendered route per player and period of the tournaments they played;
 // every year together at /jugadores/[id].
@@ -45,7 +43,7 @@ const figures = [
   { label: "Subcampeonatos", value: stats.subcampeonatos },
 ];
 
-// Official category and position (ticket 07), as of the build date in Mendoza.
+// Official category and position as of the build date in Mendoza.
 const hoy = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Mendoza",
 }).format(new Date());

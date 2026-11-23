@@ -10,7 +10,7 @@ import {
 import PeriodFilters from "@/components/players/PeriodFilters.astro";
 import type { ArchiveRecord } from "@/data/repositories/types";
 import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
-import { buildAnnualTables } from "@/domain/player-stats";
+import { buildAnnualTables } from "@/domain/annual-table";
 
 // One pre-rendered route per period (latest year first, at /estadisticas);
 // nothing is built while STATISTICS_PAGE_PUBLISHED is off.

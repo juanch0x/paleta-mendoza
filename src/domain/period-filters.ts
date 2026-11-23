@@ -1,4 +1,4 @@
-import { tournamentDate } from "./player-stats.js";
+import { tournamentDate } from "./archived-tournament.js";
 
 /** What period filtering needs from an archived tournament. */
 export type PeriodSource = {

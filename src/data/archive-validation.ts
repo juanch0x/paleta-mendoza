@@ -6,12 +6,10 @@
  * here. New rules are added to `archiveRules`.
  */
 
-import {
-  categoryOn,
-  isLowerCategory,
-  tournamentDate,
-  type Player,
-} from "../domain/player-stats.js";
+import { tournamentDate } from "../domain/archived-tournament.js";
+import { isLowerCategory } from "../domain/categories.js";
+import type { Player } from "../domain/player.js";
+import { categoryOn } from "../domain/player-official.js";
 
 export type ArchiveMatch = {
   id: string;

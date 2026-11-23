@@ -1,4 +1,4 @@
-import type { Player } from "./player-stats.js";
+import type { Player } from "./player.js";
 
 /**
  * Normalises a full player name for matching: strips accents, lowercases and

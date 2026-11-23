@@ -8,12 +8,11 @@ import {
 import { parseSets } from "../domain/parse-sets.js";
 import { createPlayerMatcher } from "../domain/player-names.js";
 import {
-  categoryOn,
-  positionIn,
   tournamentDate,
   type ArchivedTournament,
-  type Player,
-} from "../domain/player-stats.js";
+} from "../domain/archived-tournament.js";
+import type { Player } from "../domain/player.js";
+import { categoryOn, positionIn } from "../domain/player-official.js";
 
 export const DIAGNOSTIC_SHEETS = [
   "parejas",
@@ -467,10 +466,6 @@ function columnToLetter(column: number): string {
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// Player registry: pending official data (ticket 07)
-// ---------------------------------------------------------------------------
-
 export type PlayerMissingOfficialData = {
   id: string;
   nombreOficial: string;
@@ -502,10 +497,6 @@ export function diagnosePlayerRegistry(
     ];
   });
 }
-
-// ---------------------------------------------------------------------------
-// Likely unrecorded promotions (ticket 11)
-// ---------------------------------------------------------------------------
 
 const TITLES_FOR_PROMOTION = 3;
 

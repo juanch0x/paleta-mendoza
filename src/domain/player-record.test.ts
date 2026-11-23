@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildPlayerStats,
-  type ArchivedPareja,
-  type ArchivedTournament,
-  type Player,
-} from "./player-stats.js";
+import type {
+  ArchivedPareja,
+  ArchivedTournament,
+} from "./archived-tournament.js";
+import type { Player } from "./player.js";
+import { buildPlayerStats } from "./player-record.js";
 import type { PartidoResuelto, SetScore } from "./types.js";
 
 const player = (id: string, nombreOficial: string): Player => ({
