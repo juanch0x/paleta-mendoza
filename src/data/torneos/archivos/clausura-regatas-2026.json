@@ -891,8 +891,10 @@
           "nombre": "Manuel Luciarte / Gonzalo Marzal"
         }
       },
-      "sets": [],
-      "nota": "Marcador histórico incompleto; revisar fuente original."
+      "sets": [
+        [0, 12],
+        [0, 12]
+      ]
     },
     {
       "id": "24",
