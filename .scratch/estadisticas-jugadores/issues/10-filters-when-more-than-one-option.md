@@ -4,10 +4,14 @@
 
 **Blocked by:** 09 (Annual table)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Year, edition-within-year and tournament filters, each with a visible text label
-- [ ] A filter renders only when it has more than one option
-- [ ] Without filters, a heading states the year and edition covered
-- [ ] Edition filter is always scoped to a year
-- [ ] Verified with fixtures containing two years and both editions
+- [x] Year, edition-within-year and tournament filters, each with a visible text label
+- [x] A filter renders only when it has more than one option
+- [x] Without filters, a heading states the year and edition covered
+- [x] Edition filter is always scoped to a year
+- [x] Verified with fixtures containing two years and both editions
+
+## Comments
+
+Resolved in 10920c9, 668cb9a. `buildPeriodViews` in `src/domain/period-filters.ts`; pre-rendered period routes; profile moved to `src/pages/jugadores/[id]/[...periodo].astro`. Edition read from each archive `edition` field. Note: with the three Clausura 2026 archives, the tournament filter has 3 options and is shown, following the "more than one option" rule (the "today no filter is visible" note was inaccurate).
