@@ -4,7 +4,7 @@ import Header from "@/components/Header.astro";
 import ActiveTournament from "@/components/tournament/ActiveTournament";
 import TournamentIdentity from "@/components/tournament/TournamentIdentity";
 import Layout from "@/layouts/Layout.astro";
-import registry from "@/data/torneos/registro.json";
+import { loadRegisteredArchives } from "@/data/archives";
 import type { ActiveTournament as TournamentData } from "@/data/active-tournament";
 
 type Archive = {
@@ -21,27 +21,10 @@ type Archive = {
 };
 
 export function getStaticPaths() {
-  const archives = import.meta.glob(
-    [
-      "../../data/torneos/archivos/*.json",
-      "../../data/torneos/archivos/*/torneo.json",
-    ],
-    {
-      eager: true,
-      import: "default",
-    }
-  );
-
-  return registry.map(entry => {
-    const tournament = (archives[
-      `../../data/torneos/archivos/${entry.slug}/torneo.json`
-    ] ?? archives[`../../data/torneos/archivos/${entry.slug}.json`]) as
-      | Archive
-      | undefined;
-    if (!tournament)
-      throw new Error(`No se encontró el histórico ${entry.slug}.`);
-    return { params: { slug: entry.slug }, props: { tournament } };
-  });
+  return loadRegisteredArchives().map(tournament => ({
+    params: { slug: tournament.slug },
+    props: { tournament: tournament as unknown as Archive },
+  }));
 }
 
 const { tournament } = Astro.props as { tournament: Archive };
