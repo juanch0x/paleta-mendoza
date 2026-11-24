@@ -2,6 +2,8 @@
 export type Player = {
   id: string;
   nombreOficial: string;
+  /** Other names the player appears under in tournament sheets. */
+  alias?: readonly string[];
   /** Official category history; see `categoryOn`. */
   categorias?: readonly CategoriaOficial[];
   /** One position per year. */

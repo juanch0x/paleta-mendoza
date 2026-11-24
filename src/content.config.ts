@@ -46,6 +46,9 @@ const jugadores = defineCollection({
         .string()
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El id debe ser un slug."),
       nombreOficial: z.string().trim().min(1),
+      // Other names the player appears under in tournament sheets, so a
+      // freeze still resolves them to this id.
+      alias: z.array(z.string().trim().min(1)).optional(),
       // Official category history. The category in effect on a date is the
       // latest entry whose `desde` is on or before it.
       categorias: z
