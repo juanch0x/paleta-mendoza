@@ -1,0 +1,35 @@
+---
+type Props = {
+  categorias: readonly string[];
+  /** Category shown on the page. */
+  actual: string;
+  /** Page URL of a category, keeping the period being viewed. */
+  href: (categoria: string) => string;
+};
+
+const { categorias, actual, href } = Astro.props;
+---
+
+<nav aria-label="Elegir categoría" class="mt-6">
+  <p class="text-lg font-semibold">Categoría</p>
+  <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {
+      categorias.map(categoria => (
+        <li>
+          <a
+            href={href(categoria)}
+            aria-current={categoria === actual ? "page" : undefined}
+            class:list={[
+              "flex min-h-14 w-full items-center justify-center rounded-xl border-2 px-4 py-3 text-center text-lg font-bold",
+              categoria === actual
+                ? "border-accent bg-accent text-background"
+                : "border-border hover:border-accent underline underline-offset-4",
+            ]}
+          >
+            {categoria}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

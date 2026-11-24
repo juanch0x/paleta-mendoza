@@ -7,25 +7,69 @@ import {
   jsonArchivedTournamentRepository,
   jsonPlayerRepository,
 } from "@/data/repositories/json";
+import CategoryTabs from "@/components/players/CategoryTabs.astro";
 import PeriodFilters from "@/components/players/PeriodFilters.astro";
 import type { ArchiveRecord } from "@/data/repositories/types";
 import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
-import { buildAnnualTables } from "@/domain/annual-table";
+import { buildAnnualTables, type AnnualTable } from "@/domain/annual-table";
+import { categorySlug, compareCategories } from "@/domain/categories";
 
-// One pre-rendered route per period (latest year first, at /estadisticas);
-// nothing is built while STATISTICS_PAGE_PUBLISHED is off.
+// One pre-rendered route per category and period, at
+// /estadisticas/<categoria>[/<periodo>]. /estadisticas shows the highest
+// category of the latest period. Every period gets a page for every category
+// that appears in any period, so tab and filter links never break. Nothing is
+// built while STATISTICS_PAGE_PUBLISHED is off.
 export async function getStaticPaths() {
   if (!STATISTICS_PAGE_PUBLISHED) return [];
-  const archives = await jsonArchivedTournamentRepository.list();
-  return buildPeriodViews(archives).map(view => ({
-    params: { slug: view.path || undefined },
-    props: { view },
+  const [archives, players] = await Promise.all([
+    jsonArchivedTournamentRepository.list(),
+    jsonPlayerRepository.list(),
+  ]);
+  const views = buildPeriodViews(archives).map(view => ({
+    view,
+    tables: buildAnnualTables(players, view.torneos),
   }));
+  const categorias = [
+    ...new Set(views.flatMap(v => v.tables.map(t => t.categoria))),
+  ].sort(compareCategories);
+
+  return views.flatMap(({ view, tables }) => {
+    const page = (categoria: string | undefined) => ({
+      view,
+      categorias,
+      categoria,
+      tables: tables.filter(t => t.categoria === categoria),
+    });
+    return [
+      ...(view.path === ""
+        ? [{ params: { slug: undefined }, props: page(categorias[0]) }]
+        : []),
+      ...categorias.map(categoria => ({
+        params: {
+          slug: [categorySlug(categoria), view.path].filter(Boolean).join("/"),
+        },
+        props: page(categoria),
+      })),
+    ];
+  });
 }
 
-const { view } = Astro.props as { view: PeriodView<ArchiveRecord> };
-const players = await jsonPlayerRepository.list();
-const tables = buildAnnualTables(players, view.torneos);
+const { view, categorias, categoria, tables } = Astro.props as {
+  view: PeriodView<ArchiveRecord>;
+  categorias: string[];
+  categoria: string | undefined;
+  tables: AnnualTable[];
+};
+
+const categoryPath = (cat: string) =>
+  `/estadisticas/${categorySlug(cat)}${view.path ? `/${view.path}` : ""}`;
+const canonicalURL =
+  categoria && new URL(categoryPath(categoria), Astro.site).href;
+
+const filas = tables.flatMap(t => t.filas);
+const provisorias = tables.some(t => t.posicionesProvisorias);
+const hayAscensos = filas.some(f => f.ascendio);
+const hayInferiores = filas.some(f => f.categoriaInferior);
 
 const POSICION_LABEL = {
   delantero: "Delanteros",
@@ -34,8 +78,9 @@ const POSICION_LABEL = {
 ---
 
 <Layout
-  title={`Estadísticas ${view.titulo}`}
+  title={`Estadísticas ${categoria ?? ""} ${view.titulo}`.replace(/\s+/g, " ")}
   description="Tabla anual por categoría y posición de los torneos finalizados."
+  canonicalURL={canonicalURL || undefined}
 >
   <Header />
   <main id="main-content">
@@ -44,11 +89,41 @@ const POSICION_LABEL = {
         Estadísticas
         <span class="mt-2 block text-2xl sm:text-3xl">{view.titulo}</span>
       </h1>
-      <PeriodFilters basePath="/estadisticas" filtros={view.filtros} />
-      <p class="mt-3 text-base">
-        Tabla anual por categoría y posición. Solo se cuentan los torneos
-        finalizados que cada jugador jugó en su categoría oficial de ese
-        momento. El torneo en curso no se cuenta.
+
+      {
+        provisorias && (
+          <p
+            class="border-accent mt-6 rounded-xl border-2 p-4 text-base"
+            role="note"
+          >
+            <strong>Posiciones provisorias.</strong> Algunas posiciones las
+            cargó la organización y todavía no son la lista oficial de la
+            federación.
+          </p>
+        )
+      }
+
+      {
+        categoria && (
+          <CategoryTabs
+            categorias={categorias}
+            actual={categoria}
+            href={categoryPath}
+          />
+        )
+      }
+
+      <PeriodFilters
+        basePath={categoria
+          ? `/estadisticas/${categorySlug(categoria)}`
+          : "/estadisticas"}
+        filtros={view.filtros}
+      />
+
+      <p class="mt-6 text-base">
+        Tabla anual por posición. Solo se cuentan los torneos finalizados que
+        cada jugador jugó en su categoría oficial de ese momento. El torneo en
+        curso no se cuenta.
       </p>
       <p class="mt-3 text-base">
         Orden: más títulos primero; si empatan, más finales; si siguen
@@ -56,91 +131,169 @@ const POSICION_LABEL = {
       </p>
 
       {
-        tables.length === 0 ? (
-          <p class="mt-8 text-lg">
-            Todavía no hay jugadores con categoría y posición oficial cargadas.
-          </p>
-        ) : (
+        (hayAscensos || hayInferiores) && (
           <div
-            class="border-border bg-muted/40 mt-6 rounded-xl border p-4 text-base"
+            class="border-border bg-muted/40 mt-6 grid gap-2 rounded-xl border p-4 text-base"
             role="note"
           >
-            <strong>Filas en gris:</strong> jugadores de una categoría inferior
-            que jugaron en esta. Se muestran sus resultados, pero no tienen
-            puesto (aparece "–") y no afectan el orden de los demás.
+            <p>
+              <strong>Filas en gris:</strong> no tienen puesto (aparece "–") y
+              no afectan el orden de los demás.
+            </p>
+            {hayAscensos && (
+              <p>
+                <strong>(ascendió):</strong> el jugador subió de categoría. Se
+                muestran los resultados que logró en esta antes de ascender.
+              </p>
+            )}
+            {hayInferiores && (
+              <p>
+                <strong>(categoría inferior):</strong> jugador de una categoría
+                inferior que jugó en esta. Se muestran sus resultados.
+              </p>
+            )}
           </div>
         )
       }
 
       {
-        tables.map(table => (
-          <section class="mt-10">
-            <h2 class="text-2xl font-bold">
-              {table.categoria} · {POSICION_LABEL[table.posicion]}
+        tables.length === 0 ? (
+          <p class="mt-8 text-lg">
+            {categoria
+              ? `Todavía no hay jugadores de ${categoria} con resultados en este período.`
+              : "Todavía no hay jugadores con categoría y posición oficial cargadas."}
+          </p>
+        ) : (
+          <section class="mt-8" aria-labelledby="tabla-titulo">
+            <h2 id="tabla-titulo" class="text-2xl font-bold">
+              {categoria}
             </h2>
-            {table.posicionesProvisorias && (
-              <p
-                class="border-accent mt-3 rounded-xl border-2 p-4 text-base"
-                role="note"
-              >
-                <strong>Posiciones provisorias.</strong> Algunas posiciones las
-                cargó la organización y todavía no son la lista oficial de la
-                federación.
-              </p>
-            )}
-            <table class="mt-4 w-full text-left text-base">
-              <thead>
-                <tr class="border-border border-b-2">
-                  <th scope="col" class="py-2 pr-2">
-                    Puesto
-                  </th>
-                  <th scope="col" class="py-2 pr-2">
-                    Jugador
-                  </th>
-                  <th scope="col" class="py-2 pr-2 text-right">
-                    Títulos
-                  </th>
-                  <th scope="col" class="py-2 pr-2 text-right">
-                    Finales
-                  </th>
-                  <th scope="col" class="py-2 text-right">
-                    Partidos ganados
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {table.filas.map(fila => (
-                  <tr
-                    class:list={[
-                      "border-border border-b",
-                      fila.categoriaInferior && "bg-muted/60 opacity-70",
-                    ]}
-                  >
-                    <td class="py-3 pr-2 font-semibold">
-                      {fila.puesto ?? "–"}
-                    </td>
-                    <td class="py-3 pr-2">
-                      <a
-                        href={`/jugadores/${fila.player.id}`}
-                        class="font-semibold underline underline-offset-4"
-                      >
-                        {fila.player.nombreOficial}
-                      </a>
-                      {fila.categoriaInferior && (
-                        <span class="block text-sm">(categoría inferior)</span>
-                      )}
-                    </td>
-                    <td class="py-3 pr-2 text-right">{fila.titulos}</td>
-                    <td class="py-3 pr-2 text-right">{fila.finales}</td>
-                    <td class="py-3 text-right">{fila.partidosGanados}</td>
+            <p class="mt-2 text-base sm:hidden">
+              Deslizá la tabla hacia los costados para ver todas las columnas.
+            </p>
+            <div
+              class="tabla-scroll border-border mt-3 overflow-x-auto rounded-xl border"
+              role="region"
+              aria-labelledby="tabla-titulo"
+              tabindex="0"
+            >
+              <table class="w-full min-w-[34rem] text-left text-base">
+                <thead>
+                  <tr class="border-border border-b-2">
+                    <th scope="col" class="col-puesto py-3 pr-2 pl-3">
+                      Puesto
+                    </th>
+                    <th scope="col" class="col-jugador py-3 pr-3">
+                      Jugador
+                    </th>
+                    <th scope="col" class="px-3 py-3 text-right">
+                      Títulos
+                    </th>
+                    <th scope="col" class="px-3 py-3 text-right">
+                      Finales
+                    </th>
+                    <th
+                      scope="col"
+                      class="py-3 pr-3 pl-3 text-right whitespace-nowrap"
+                    >
+                      Partidos ganados
+                    </th>
                   </tr>
+                </thead>
+                {tables.map(table => (
+                  <tbody>
+                    <tr class="separador">
+                      <th
+                        colspan="5"
+                        scope="colgroup"
+                        class="border-border border-y-2 py-3 text-left text-lg font-bold"
+                      >
+                        <span class="sticky left-3 pl-3">
+                          {POSICION_LABEL[table.posicion]}
+                        </span>
+                      </th>
+                    </tr>
+                    {table.filas.map(fila => {
+                      const gris = fila.ascendio || fila.categoriaInferior;
+                      return (
+                        <tr
+                          class:list={[
+                            "border-border border-b",
+                            gris && "gris",
+                          ]}
+                        >
+                          <td class="col-puesto py-3 pr-2 pl-3 font-semibold">
+                            {fila.puesto ?? "–"}
+                          </td>
+                          <td class="col-jugador py-3 pr-3">
+                            <a
+                              href={`/jugadores/${fila.player.id}`}
+                              class="font-semibold underline underline-offset-4"
+                            >
+                              {fila.player.nombreOficial}
+                            </a>
+                            {fila.ascendio && (
+                              <span class="block text-sm">(ascendió)</span>
+                            )}
+                            {fila.categoriaInferior && (
+                              <span class="block text-sm">
+                                (categoría inferior)
+                              </span>
+                            )}
+                          </td>
+                          <td class="px-3 py-3 text-right tabular-nums">
+                            {fila.titulos}
+                          </td>
+                          <td class="px-3 py-3 text-right tabular-nums">
+                            {fila.finales}
+                          </td>
+                          <td class="py-3 pr-3 pl-3 text-right tabular-nums">
+                            {fila.partidosGanados}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
                 ))}
-              </tbody>
-            </table>
+              </table>
+            </div>
           </section>
-        ))
+        )
       }
     </section>
   </main>
   <Footer />
 </Layout>
+
+<style>
+  /* Rank and name stay visible while the figures scroll sideways. Cells get
+     an opaque background so scrolled figures don't show through. */
+  .tabla-scroll th,
+  .tabla-scroll td {
+    background-color: var(--color-background);
+  }
+  .col-puesto {
+    position: sticky;
+    left: 0;
+    width: 5rem;
+    min-width: 5rem;
+  }
+  .col-jugador {
+    position: sticky;
+    left: 5rem;
+    min-width: 11rem;
+    box-shadow: inset -1px 0 0 var(--color-border);
+  }
+  /* The muted tint is layered over the page colour so it stays opaque even
+     where --color-muted is translucent (dark mode). */
+  .separador th {
+    background: linear-gradient(var(--color-muted), var(--color-muted))
+      var(--color-background);
+  }
+  .gris td {
+    --tinte: color-mix(in srgb, var(--color-muted) 60%, transparent);
+    background: linear-gradient(var(--tinte), var(--tinte))
+      var(--color-background);
+    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  }
+</style>

@@ -30,3 +30,13 @@ export function compareCategories(a: string, b: string): number {
 export function isLowerCategory(a: string, b: string): boolean {
   return isKnown(a) && isKnown(b) && compareCategories(a, b) > 0;
 }
+
+/** URL segment for a category: "Séptima" becomes "septima". */
+export function categorySlug(categoria: string): string {
+  return categoria
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
