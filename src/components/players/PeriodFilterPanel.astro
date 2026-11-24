@@ -1,0 +1,43 @@
+---
+import IconAdjustmentsHorizontal from "@/assets/icons/IconAdjustmentsHorizontal.svg";
+import type { PeriodFilter } from "@/domain/period-filters";
+import PeriodFilters from "./PeriodFilters.astro";
+
+type Props = {
+  /** Page path the filter routes hang from, e.g. "/jugadores/ana". */
+  basePath: string;
+  /** The period shown, e.g. "2026 · Clausura". */
+  titulo: string;
+  filtros: PeriodFilter[];
+};
+
+const { basePath, titulo, filtros } = Astro.props;
+---
+
+{
+  filtros.length > 0 ? (
+    <details class="filtro-periodo mt-6">
+      <summary class="border-accent bg-background hover:bg-accent/5 inline-flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-full border-2 px-5 py-2 text-lg font-semibold transition">
+        <IconAdjustmentsHorizontal
+          aria-hidden="true"
+          class="text-accent h-6 w-6 shrink-0"
+        />
+        <span>{`Filtrar · ${titulo}`}</span>
+      </summary>
+      <div class="border-border bg-muted/25 mt-3 rounded-2xl border p-4 sm:p-6">
+        <p class="text-base">
+          Elegí el período. La página se actualiza al tocar una opción.
+        </p>
+        <PeriodFilters basePath={basePath} filtros={filtros} />
+      </div>
+    </details>
+  ) : (
+    titulo && <p class="mt-6 text-lg font-semibold">Período: {titulo}</p>
+  )
+}
+
+<style>
+  .filtro-periodo summary::-webkit-details-marker {
+    display: none;
+  }
+</style>
