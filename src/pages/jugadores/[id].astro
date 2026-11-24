@@ -1,5 +1,6 @@
 ---
 import Footer from "@/components/Footer.astro";
+import RecordFiguresList from "@/components/players/RecordFiguresList.astro";
 import Header from "@/components/Header.astro";
 import Layout from "@/layouts/Layout.astro";
 import {
@@ -20,7 +21,7 @@ export async function getStaticPaths() {
 }
 
 const { stats } = Astro.props as { stats: PlayerStats };
-const { player } = stats;
+const { player, historial } = stats;
 const figures = [
   { label: "Títulos", value: stats.titulos },
   { label: "Subcampeonatos", value: stats.subcampeonatos },
@@ -53,6 +54,64 @@ const figures = [
           ))
         }
       </dl>
+    </section>
+    <section aria-labelledby="historial-titulo" class="pb-16">
+      <h2 id="historial-titulo" class="text-2xl font-bold sm:text-3xl">
+        Historial completo
+      </h2>
+      {
+        historial.porAnio.length === 0 ? (
+          <p class="mt-3 text-lg">
+            Todavía no tiene partidos en torneos finalizados.
+          </p>
+        ) : (
+          <div class="mt-6 grid gap-5 sm:max-w-xl">
+            <RecordFiguresList
+              title="Total de todos los torneos"
+              figuras={historial.total}
+              headingLevel={3}
+            />
+          </div>
+        )
+      }
+      {
+        historial.porAnio.map(year => (
+          <div class="mt-10">
+            <h3 class="text-2xl font-bold">Año {year.anio}</h3>
+            <div class="mt-4 grid gap-5 sm:max-w-xl">
+              {year.porCategoria.length > 1 && (
+                <RecordFiguresList
+                  title={`Total del año ${year.anio}`}
+                  figuras={year.total}
+                />
+              )}
+              {year.porCategoria.map(record => (
+                <RecordFiguresList
+                  title={`${year.anio} · Categoría ${record.categoria}`}
+                  figuras={record.figuras}
+                />
+              ))}
+            </div>
+          </div>
+        ))
+      }
+      {
+        historial.porAnio.length > 1 && (
+          <div class="mt-10">
+            <h3 class="text-2xl font-bold">
+              Por categoría, todos los años juntos
+            </h3>
+            <div class="mt-4 grid gap-5 sm:max-w-xl">
+              {historial.porCategoria.map(record => (
+                <RecordFiguresList
+                  title={`Categoría ${record.categoria}`}
+                  figuras={record.figuras}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      }
     </section>
   </main>
   <Footer />
