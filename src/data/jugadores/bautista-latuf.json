@@ -2,7 +2,8 @@
   "id": "bautista-latuf",
   "nombreOficial": "Bautista Latuf",
   "categorias": [
-    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" },
+    { "desde": "2026-08-28", "categoria": "Segunda", "origen": "ascenso" }
   ],
   "posiciones": [
     { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }

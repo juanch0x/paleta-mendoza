@@ -298,28 +298,4 @@ describe("buildAnnualTables", () => {
       rows(buildAnnualTables(players, [t]), "Tercera")?.map(r => r.id)
     ).toEqual(["caro", "dani", "ana", "beto", "eli", "fede"]);
   });
-
-  it("flags tables with provisional positions", () => {
-    const players = [
-      player("ana", "delantero", enTercera, "provisoria"),
-      player("beto", "zaguero"),
-      player("caro"),
-      player("dani", "zaguero"),
-    ];
-    const tables = buildAnnualTables(players, [
-      tournament(
-        "t1",
-        "2026-08-01",
-        pareja("3A-1", ["ana", "beto"]),
-        pareja("3A-2", ["caro", "dani"])
-      ),
-    ]);
-
-    expect(table(tables, "Tercera", "delantero")?.posicionesProvisorias).toBe(
-      true
-    );
-    expect(table(tables, "Tercera", "zaguero")?.posicionesProvisorias).toBe(
-      false
-    );
-  });
 });

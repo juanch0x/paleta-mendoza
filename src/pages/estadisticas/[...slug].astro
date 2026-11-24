@@ -67,11 +67,6 @@ const categoryPath = (cat: string) =>
 const canonicalURL =
   categoria && new URL(categoryPath(categoria), Astro.site).href;
 
-const filas = tables.flatMap(t => t.filas);
-const provisorias = tables.some(t => t.posicionesProvisorias);
-const hayAscensos = filas.some(f => f.ascendio);
-const hayInferiores = filas.some(f => f.categoriaInferior);
-
 const POSICION_LABEL = {
   delantero: "Delanteros",
   zaguero: "Zagueros",
@@ -80,7 +75,7 @@ const POSICION_LABEL = {
 
 <Layout
   title={`Estadísticas ${categoria ?? ""} ${view.titulo}`.replace(/\s+/g, " ")}
-  description="Tabla anual por categoría y posición de los torneos finalizados."
+  description="Estadísticas por categoría y posición de los torneos finalizados."
   canonicalURL={canonicalURL || undefined}
 >
   <Header />
@@ -90,19 +85,6 @@ const POSICION_LABEL = {
         Estadísticas
         <span class="mt-2 block text-2xl sm:text-3xl">{view.titulo}</span>
       </h1>
-
-      {
-        provisorias && (
-          <p
-            class="border-accent bg-accent/5 mt-6 rounded-xl border-2 p-4 text-base"
-            role="note"
-          >
-            <strong>Posiciones provisorias.</strong> Algunas posiciones las
-            cargó la organización y todavía no son la lista oficial de la
-            federación.
-          </p>
-        )
-      }
 
       {
         categoria && (
@@ -119,43 +101,8 @@ const POSICION_LABEL = {
           ? `/estadisticas/${categorySlug(categoria)}`
           : "/estadisticas"}
         filtros={view.filtros}
+        anchor={categoria ? "categorias" : undefined}
       />
-
-      <p class="mt-6 text-base">
-        Tabla anual por posición. Solo se cuentan los torneos finalizados que
-        cada jugador jugó en su categoría oficial de ese momento. El torneo en
-        curso no se cuenta.
-      </p>
-      <p class="mt-3 text-base">
-        Orden: más títulos primero; si empatan, más finales; si siguen
-        empatados, más partidos ganados.
-      </p>
-
-      {
-        (hayAscensos || hayInferiores) && (
-          <div
-            class="border-border bg-background mt-6 grid gap-2 rounded-xl border border-dashed p-4 text-base"
-            role="note"
-          >
-            <p>
-              <strong>Filas en gris:</strong> no tienen puesto (aparece "–") y
-              no afectan el orden de los demás.
-            </p>
-            {hayAscensos && (
-              <p>
-                <strong>(ascendió):</strong> el jugador subió de categoría. Se
-                muestran los resultados que logró en esta antes de ascender.
-              </p>
-            )}
-            {hayInferiores && (
-              <p>
-                <strong>(categoría inferior):</strong> jugador de una categoría
-                inferior que jugó en esta. Se muestran sus resultados.
-              </p>
-            )}
-          </div>
-        )
-      }
 
       {
         tables.length === 0 ? (

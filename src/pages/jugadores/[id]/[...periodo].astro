@@ -42,52 +42,65 @@ const { player, view } = Astro.props as {
 };
 const [stats] = buildPlayerStats([player], view.torneos);
 const { historial } = stats;
-const figures = [
-  { label: "Títulos", value: stats.titulos },
-  { label: "Subcampeonatos", value: stats.subcampeonatos },
-];
 
 // Official category and position as of the build date in Mendoza.
 const hoy = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Mendoza",
 }).format(new Date());
 const anioActual = isoYear(hoy);
-const official = buildOfficialProfile(player, view.torneos, hoy);
+const official = buildOfficialProfile(player, hoy);
 const POSICION_LABEL = { delantero: "Delantero", zaguero: "Zaguero" } as const;
 const ORIGEN_LABEL = { federacion: "federación", ascenso: "ascenso" } as const;
 const formatDate = (iso: string) => iso.split("-").reverse().join("/");
-const pendiente = "Todavía no está cargada";
+const pendiente = "Sin cargar";
+const resumen = [
+  { label: "Títulos", value: stats.titulos },
+  { label: "Subcampeonatos", value: stats.subcampeonatos },
+  {
+    label: "Categoría oficial",
+    value: official.categoria?.categoria ?? pendiente,
+  },
+  {
+    label: `Posición ${anioActual}`,
+    value: official.posicion
+      ? POSICION_LABEL[official.posicion.posicion]
+      : pendiente,
+  },
+];
 
 // History columns: the total, then each year and category, skipping any
 // column that would repeat another one.
 const unicoAnio = historial.porAnio.length === 1;
 const unicoRecorte =
   unicoAnio && historial.porAnio[0].porCategoria.length === 1;
-const columnas = [
-  {
-    titulo: unicoRecorte
-      ? `${historial.porAnio[0].anio} · ${historial.porAnio[0].porCategoria[0].categoria}`
-      : "Total",
-    figuras: historial.total,
-  },
-  ...(unicoRecorte
-    ? []
-    : historial.porAnio.flatMap(year => [
+const columnas = unicoRecorte
+  ? [
+      {
+        ruta: [
+          String(historial.porAnio[0].anio),
+          historial.porAnio[0].porCategoria[0].categoria,
+        ],
+        figuras: historial.total,
+      },
+    ]
+  : [
+      { ruta: ["Total"], figuras: historial.total },
+      ...historial.porAnio.flatMap(year => [
         ...(!unicoAnio && year.porCategoria.length > 1
-          ? [{ titulo: `Total ${year.anio}`, figuras: year.total }]
+          ? [{ ruta: [String(year.anio), "Total"], figuras: year.total }]
           : []),
         ...year.porCategoria.map(record => ({
-          titulo: `${year.anio} · ${record.categoria}`,
+          ruta: [String(year.anio), record.categoria],
           figuras: record.figuras,
         })),
-      ])),
-  ...(!unicoAnio && historial.porCategoria.length > 1
-    ? historial.porCategoria.map(record => ({
-        titulo: `${record.categoria} · todos los años`,
-        figuras: record.figuras,
-      }))
-    : []),
-];
+      ]),
+      ...(!unicoAnio && historial.porCategoria.length > 1
+        ? historial.porCategoria.map(record => ({
+            ruta: ["Todos los años", record.categoria],
+            figuras: record.figuras,
+          }))
+        : []),
+    ];
 ---
 
 <Layout
@@ -112,112 +125,36 @@ const columnas = [
         filtros={view.filtros}
       />
 
-      <dl class="mt-6 grid grid-cols-2 gap-3 sm:max-w-md">
-        {
-          figures.map(figure => (
-            <div class="border-border bg-background rounded-xl border p-4">
-              <dt class="text-foreground/70 text-sm font-semibold">
-                {figure.label}
-              </dt>
-              <dd class="mt-1 text-2xl font-bold tabular-nums">
-                {figure.value}
-              </dd>
-            </div>
-          ))
-        }
-      </dl>
-
       <section
-        class="border-border bg-muted/25 mt-8 rounded-2xl border p-4 sm:p-6"
-        aria-labelledby="oficial-titulo"
+        class="border-border bg-background mt-6 rounded-2xl border p-4 sm:p-6"
+        aria-label="Resumen"
       >
-        <h2 id="oficial-titulo" class="text-2xl font-bold sm:text-3xl">
-          Categoría y posición
-        </h2>
-        <dl class="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
-          <div class="border-border bg-background rounded-xl border p-4">
-            <dt class="text-foreground/70 text-sm font-semibold">
-              Categoría oficial
-            </dt>
-            <dd class="mt-1 text-xl font-bold">
-              {official.categoria?.categoria ?? pendiente}
-            </dd>
-          </div>
-          <div class="border-border bg-background rounded-xl border p-4">
-            <dt class="text-foreground/70 text-sm font-semibold">
-              Posición {anioActual}
-            </dt>
-            <dd class="mt-1 text-xl font-bold">
-              {
-                official.posicion
-                  ? POSICION_LABEL[official.posicion.posicion]
-                  : pendiente
-              }
-            </dd>
-          </div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
+          {
+            resumen.map(item => (
+              <div>
+                <dt class="text-foreground/70 text-sm font-semibold">
+                  {item.label}
+                </dt>
+                <dd class="mt-1 text-2xl font-bold tabular-nums">
+                  {item.value}
+                </dd>
+              </div>
+            ))
+          }
         </dl>
         {
-          official.posicionProvisoria && (
-            <p
-              class="border-accent bg-accent/5 mt-4 rounded-xl border-2 p-4 text-base sm:max-w-md"
-              role="note"
-            >
-              <strong>Posición provisoria.</strong> La cargó la organización y
-              todavía no es la lista oficial de la federación.
-            </p>
-          )
-        }
-        {
           official.cambios.length > 0 && (
-            <div class="mt-6">
-              <h3 class="text-xl font-semibold">
-                Cambios de categoría en {anioActual}
-              </h3>
-              <ul class="mt-2 list-disc space-y-1 pl-6 text-base">
-                {official.cambios.map(cambio => (
-                  <li>
-                    Desde el {formatDate(cambio.desde)}: de {cambio.anterior} a{" "}
-                    {cambio.categoria} (por {ORIGEN_LABEL[cambio.origen]})
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul class="border-border mt-5 space-y-1 border-t pt-4 text-base">
+              {official.cambios.map(cambio => (
+                <li>
+                  Desde el {formatDate(cambio.desde)}: de {cambio.anterior} a{" "}
+                  {cambio.categoria} (por {ORIGEN_LABEL[cambio.origen]})
+                </li>
+              ))}
+            </ul>
           )
         }
-        <div class="mt-6">
-          <h3 class="text-xl font-semibold">
-            Títulos por posición, año y categoría
-          </h3>
-          {
-            official.titulosPorPosicion.length > 0 ? (
-              <ul class="mt-2 list-disc space-y-1 pl-6 text-base">
-                {official.titulosPorPosicion.map(year => (
-                  <li>
-                    {year.anio}: {year.titulos}{" "}
-                    {year.titulos === 1 ? "título" : "títulos"}
-                    {year.posicion
-                      ? ` como ${POSICION_LABEL[year.posicion].toLowerCase()}${year.provisoria ? " (posición provisoria)" : ""}`
-                      : " (posición sin cargar)"}
-                    <ul class="mt-1 list-[circle] space-y-1 pl-6">
-                      {year.porCategoria.map(record => (
-                        <li>
-                          Categoría {record.categoria}: {record.titulos}{" "}
-                          {record.titulos === 1 ? "título" : "títulos"}
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p class="mt-2 text-base">
-                {view.path
-                  ? "Sin títulos en este período."
-                  : "Sin títulos todavía."}
-              </p>
-            )
-          }
-        </div>
       </section>
 
       <section

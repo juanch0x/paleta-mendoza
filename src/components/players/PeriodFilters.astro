@@ -5,10 +5,13 @@ type Props = {
   /** Page path the filter routes hang from, e.g. "/estadisticas". */
   basePath: string;
   filtros: PeriodFilter[];
+  /** Element id the links land on, so the new page keeps the reader's place. */
+  anchor?: string;
 };
 
-const { basePath, filtros } = Astro.props;
-const href = (path: string) => (path ? `${basePath}/${path}` : basePath);
+const { basePath, filtros, anchor } = Astro.props;
+const href = (path: string) =>
+  `${path ? `${basePath}/${path}` : basePath}${anchor ? `#${anchor}` : ""}`;
 ---
 
 {

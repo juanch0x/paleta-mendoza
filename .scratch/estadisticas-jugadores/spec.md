@@ -14,7 +14,7 @@ A public statistics module with three pages:
 
 - **Statistics** (`/estadisticas`): an annual table per category and position, counting only tournaments a player played in the official category they held on that date. Players who played in that category but belong to a lower one appear in the same table, greyed out, without a rank number.
 - **Players** (`/jugadores`): a searchable list of all players.
-- **Player profile** (`/jugadores/[id]`): titles, runner-up finishes, finals, semifinals, matches and sets won/lost, distinct partners they won titles with, and titles by position, broken down by year and by category.
+- **Player profile** (`/jugadores/[id]`): titles, runner-up finishes, finals, semifinals, matches and sets won/lost, and distinct partners they won titles with, broken down by year and by category, plus official category and position in one summary card.
 
 To support it, the site gains a **player registry**: one record per player with a stable id, an official name, a dated history of official categories, and a per-year position. Archived tournaments reference players by id instead of by free-text name. Data integrity is enforced: the freeze step and the build fail when an archived tournament is incomplete or references an unknown player, while the live tournament only surfaces warnings in the existing diagnostics page.
 
@@ -41,13 +41,13 @@ To support it, the site gains a **player registry**: one record per player with 
 17. As a visitor, I want the annual table ordered by titles, then finals, then matches won, so that the ordering is predictable and fair.
 18. As a visitor, I want only tournaments played in the player's official category to count in the annual table, so that the table reflects the federation's promotion logic.
 19. As a visitor, I want to also see in the same table players from a lower category who played in this one, greyed out and without a rank number, so that I can see their results without them affecting the ranking.
-20. As a visitor, I want a short legend above the table explaining what the greyed-out rows mean, so that I do not have to guess.
+20. ~~Legend above the table~~ Dropped: the in-table markers "(categoría inferior)" and "(ascendió)" are enough.
 21. As a visitor, I want greyed-out rows to show "(categoría inferior)" under the player's name, so that the reason is explicit without a hover or an icon.
 22. As an older visitor on a phone, I want the tables and controls to be readable and labeled with text, so that I can use the page without hidden interactions.
 23. As a visitor, I want to filter by year and by season within a year (Apertura / Clausura), so that I can look at a specific period.
 24. As a visitor, I want filters to appear only when they have more than one option, so that the page is not cluttered with useless controls.
 25. As a visitor, when no filter is available, I want a clear heading such as "2026 · Clausura", so that I know which period the data covers.
-26. As a visitor, I want to be told when positions are provisional, so that I do not take them as official federation data.
+26. ~~Provisional-position notice~~ Dropped: the whole site is unofficial, so every figure is provisional.
 27. As a visitor, I want players without an official category to still have a profile, so that their results are visible even before the federation list is loaded.
 28. As a visitor, I want a "Estadísticas" entry in the main navigation, so that I can find the module.
 29. As a visitor, I want statistics to include only finished, archived tournaments, so that numbers do not move while a tournament is in progress.
@@ -97,7 +97,7 @@ To support it, the site gains a **player registry**: one record per player with 
 - Players who played in a category above their official one are shown in that category's table, greyed out, unranked, with "(categoría inferior)". Playing below the official category is a data error.
 - Players promoted out of a category (their official category at the end of the viewed period, i.e. its last match date, is higher than the table's) stay in that table greyed out, unranked, with "(ascendió)"; the next player takes their rank. If the period ends before the promotion date they show normally.
 - Players with no official category for the tournament date are excluded from the annual table but still have a profile.
-- Statistics by position use the player's position for that year. Positions marked provisional trigger one visible notice at the top of the page.
+- Statistics by position use the player's position for that year. No notice is shown for provisional positions (the site is unofficial); the `origen` field is kept for when the federation list arrives.
 - Annual table ordering: titles, then finals, then matches won. Defined in a single place.
 - Page layout: one page per category (`/estadisticas/<categoria>[/<periodo>]`, `/estadisticas` shows the highest category), selected with category tabs; one table per category with a titled row separating Delanteros and Zagueros.
 - Filters: year, and season (Apertura / Clausura) within a year. The season comes from the archive `edition` when it is Apertura or Clausura, otherwise from the tournament name or slug; the build fails when neither says. Each filter renders only when it has more than one option. The player profile also offers a single tournament of the season, and shows its filters in a panel opened from one labelled "Filtrar · <período>" button.
@@ -119,7 +119,7 @@ To support it, the site gains a **player registry**: one record per player with 
 ## Testing Decisions
 
 - Good tests exercise external behaviour through the module's public function with in-memory fixtures (small synthetic tournaments and player records), not internal helpers. Fixtures use invented names and ids, never real player data.
-- **Seam 1 (main, new): player statistics function.** Covers titles, runner-ups, finals, semis, match/set counts, distinct title partners, titles by position, category in effect on a date, mid-year promotion split, lower-category players marked and unranked, players without category excluded from the table, provisional-position flag, and table ordering. Prior art: the existing standings, resolver and set-parsing domain tests.
+- **Seam 1 (main, new): player statistics function.** Covers titles, runner-ups, finals, semis, match/set counts, distinct title partners, category in effect on a date, mid-year promotion split, lower-category players marked and unranked, players without category excluded from the table, and table ordering. Prior art: the existing standings, resolver and set-parsing domain tests.
 - **Seam 2 (existing, extended): archive validation via the freeze tests.** Covers missing score, missing final, unmatched name (with name/pair/row in the error), normalised matching (accents, case, spaces), and playing below official category. The build calls the same function, so it needs no separate test.
 - **Seam 3 (existing): tournament diagnostics tests.** Covers unmatched live names as warnings, three-consecutive-titles promotion warning, and missing category/position listing.
 - Pages are not tested directly; they only render data produced by seam 1.
