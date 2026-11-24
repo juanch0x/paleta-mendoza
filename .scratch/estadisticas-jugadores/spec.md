@@ -44,7 +44,7 @@ To support it, the site gains a **player registry**: one record per player with 
 20. As a visitor, I want a short legend above the table explaining what the greyed-out rows mean, so that I do not have to guess.
 21. As a visitor, I want greyed-out rows to show "(categoría inferior)" under the player's name, so that the reason is explicit without a hover or an icon.
 22. As an older visitor on a phone, I want the tables and controls to be readable and labeled with text, so that I can use the page without hidden interactions.
-23. As a visitor, I want to filter by year, by edition within a year (Apertura / Clausura), and by a single tournament, so that I can look at a specific period.
+23. As a visitor, I want to filter by year and by season within a year (Apertura / Clausura), so that I can look at a specific period.
 24. As a visitor, I want filters to appear only when they have more than one option, so that the page is not cluttered with useless controls.
 25. As a visitor, when no filter is available, I want a clear heading such as "2026 · Clausura", so that I know which period the data covers.
 26. As a visitor, I want to be told when positions are provisional, so that I do not take them as official federation data.
@@ -95,10 +95,12 @@ To support it, the site gains a **player registry**: one record per player with 
 - A tournament counts toward a player's annual table entry only when the tournament category equals the player's official category on the tournament date.
 - After a mid-year promotion, results before the promotion date count in the old category; results from that date count in the new one.
 - Players who played in a category above their official one are shown in that category's table, greyed out, unranked, with "(categoría inferior)". Playing below the official category is a data error.
+- Players promoted out of a category (their official category at the end of the viewed period, i.e. its last match date, is higher than the table's) stay in that table greyed out, unranked, with "(ascendió)"; the next player takes their rank. If the period ends before the promotion date they show normally.
 - Players with no official category for the tournament date are excluded from the annual table but still have a profile.
-- Statistics by position use the player's position for that year. Positions marked provisional trigger a visible notice on the table.
+- Statistics by position use the player's position for that year. Positions marked provisional trigger one visible notice at the top of the page.
 - Annual table ordering: titles, then finals, then matches won. Defined in a single place.
-- Filters: year, edition within a year, single tournament. Each filter renders only when it has more than one option.
+- Page layout: one page per category (`/estadisticas/<categoria>[/<periodo>]`, `/estadisticas` shows the highest category), selected with category tabs; one table per category with a titled row separating Delanteros and Zagueros.
+- Filters: year, and season (Apertura / Clausura) within a year. The season comes from the archive `edition` when it is Apertura or Clausura, otherwise from the tournament name or slug; the build fails when neither says. Each filter renders only when it has more than one option.
 
 ### Modules
 
