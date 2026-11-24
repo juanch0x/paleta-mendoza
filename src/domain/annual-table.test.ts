@@ -152,6 +152,78 @@ describe("buildAnnualTables", () => {
     });
   });
 
+  it("greys out players promoted out of the table by the end of the period and skips them when ranking", () => {
+    const promovido = player("gabi", "zaguero", [
+      { desde: "2026-01-01", categoria: "Cuarta", origen: "federacion" },
+      { desde: "2026-10-30", categoria: "Tercera", origen: "ascenso" },
+    ]);
+    const enCuarta = [
+      { desde: "2026-01-01", categoria: "Cuarta", origen: "federacion" },
+    ] as const;
+    const players = [
+      promovido,
+      player("ana", "delantero", enCuarta),
+      player("beto", "zaguero", enCuarta),
+      player("caro", "delantero", enCuarta),
+    ];
+    const campeones = pareja("4A-1", ["ana", "gabi"], "Cuarta");
+    const finalistas = pareja("4A-2", ["caro", "beto"], "Cuarta");
+    const septiembre: ArchivedTournament = {
+      slug: "septiembre",
+      nombre: "septiembre",
+      fecha: "Octubre 2026",
+      parejas: [campeones, finalistas],
+      partidos: [
+        won("1", "grupo", "2026-10-02", campeones, finalistas),
+        won("2", "final", "2026-10-30", campeones, finalistas),
+      ],
+    };
+
+    const zagueros = buildAnnualTables(players, [septiembre]).find(
+      t => t.categoria === "Cuarta" && t.posicion === "zaguero"
+    );
+
+    expect(
+      zagueros?.filas.map(f => [f.player.id, f.puesto, f.ascendio])
+    ).toEqual([
+      ["gabi", undefined, true],
+      ["beto", 1, false],
+    ]);
+  });
+
+  it("shows a promoted player normally when the period ends before the promotion", () => {
+    const promovido = player("gabi", "zaguero", [
+      { desde: "2026-01-01", categoria: "Cuarta", origen: "federacion" },
+      { desde: "2026-10-30", categoria: "Tercera", origen: "ascenso" },
+    ]);
+    const enCuarta = [
+      { desde: "2026-01-01", categoria: "Cuarta", origen: "federacion" },
+    ] as const;
+    const players = [
+      promovido,
+      player("ana", "delantero", enCuarta),
+      player("beto", "zaguero", enCuarta),
+      player("caro", "delantero", enCuarta),
+    ];
+    const t = tournament(
+      "agosto",
+      "2026-08-01",
+      pareja("4A-1", ["ana", "gabi"], "Cuarta"),
+      pareja("4A-2", ["caro", "beto"], "Cuarta")
+    );
+
+    const zagueros = buildAnnualTables(players, [t]).find(
+      t => t.categoria === "Cuarta" && t.posicion === "zaguero"
+    );
+
+    expect(
+      zagueros?.filas.map(f => [f.player.id, f.puesto, f.ascendio])
+    ).toEqual([
+      ["gabi", 1, false],
+      ["beto", 2, false],
+    ]);
+  });
+
   it("shows lower-category players unranked and skips them when ranking", () => {
     const players = [
       player("ana", "delantero", [

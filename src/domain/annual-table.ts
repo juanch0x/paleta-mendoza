@@ -1,6 +1,7 @@
 import {
   isoYear,
   tournamentDate,
+  tournamentEndDate,
   type ArchivedPareja,
   type ArchivedTournament,
 } from "./archived-tournament.js";
@@ -19,10 +20,18 @@ export type TableFigures = {
 
 export type AnnualTableRow = TableFigures & {
   player: Player;
-  /** Rank among regular rows (ties share it); undefined for lower-category rows. */
+  /**
+   * Rank among regular rows (ties share it); undefined for lower-category
+   * and promoted rows.
+   */
   puesto: number | undefined;
   /** True when the player's official category is lower than the table's. */
   categoriaInferior: boolean;
+  /**
+   * True when the player was promoted out of the table's category: their
+   * official category at the end of the period is higher than the table's.
+   */
+  ascendio: boolean;
   posicionProvisoria: boolean;
 };
 
@@ -70,8 +79,10 @@ const addTableFigures = (into: TableFigures, from: TableFigures) => {
  * tournament date (`tournamentDate`), under the position of that year. A
  * player whose official category is lower than the one played appears in
  * that table unranked, unless they also have results counting there (after a
- * promotion), in which case only those count. Players without an official
- * category or a position for the year are left out.
+ * promotion), in which case only those count. A player whose official
+ * category at the end of the period (the last match date) is higher than the
+ * table's was promoted out of it: their row stays, unranked. Players without
+ * an official category or a position for the year are left out.
  */
 export function buildAnnualTables(
   players: readonly Player[],
@@ -87,6 +98,7 @@ export function buildAnnualTables(
   };
   const entries = new Map<string, Entry>();
   const byId = new Map(players.map(p => [p.id, p]));
+  const periodEnd = latestEndDate(tournaments);
 
   for (const tournament of tournaments) {
     const fecha = tournamentDate(tournament);
@@ -128,11 +140,17 @@ export function buildAnnualTables(
       posicionesProvisorias: false,
     };
     tables.set(key, table);
+    const finalCategory =
+      periodEnd && categoryOn(entry.player, periodEnd)?.categoria;
     table.filas.push({
       player: entry.player,
       ...(entry.oficial ?? entry.inferior),
       puesto: undefined,
       categoriaInferior: !entry.oficial,
+      ascendio:
+        !!entry.oficial &&
+        !!finalCategory &&
+        isLowerCategory(entry.categoria, finalCategory),
       posicionProvisoria: entry.provisoria,
     });
     if (entry.provisoria) table.posicionesProvisorias = true;
@@ -147,7 +165,10 @@ export function buildAnnualTables(
   );
 }
 
-/** Sorts rows by the table criterion and ranks regular rows; ties share a rank. */
+/**
+ * Sorts rows by the table criterion and ranks regular rows; ties share a rank.
+ * Lower-category and promoted rows keep their place but take no rank.
+ */
 function rankRows(filas: AnnualTableRow[]): void {
   filas.sort(
     (a, b) =>
@@ -157,7 +178,7 @@ function rankRows(filas: AnnualTableRow[]): void {
   let ranked = 0;
   let previous: AnnualTableRow | undefined;
   for (const fila of filas) {
-    if (fila.categoriaInferior) continue;
+    if (fila.categoriaInferior || fila.ascendio) continue;
     ranked += 1;
     fila.puesto =
       previous && compareTableFigures(previous, fila) === 0
@@ -165,6 +186,18 @@ function rankRows(filas: AnnualTableRow[]): void {
         : ranked;
     previous = fila;
   }
+}
+
+/** The last match date over every tournament; undefined when none is dated. */
+function latestEndDate(
+  tournaments: readonly ArchivedTournament[]
+): string | undefined {
+  let latest: string | undefined;
+  for (const tournament of tournaments) {
+    const end = tournamentEndDate(tournament);
+    if (end && (!latest || end > latest)) latest = end;
+  }
+  return latest;
 }
 
 /** A pair's table figures in one tournament: matches, final reached, title. */

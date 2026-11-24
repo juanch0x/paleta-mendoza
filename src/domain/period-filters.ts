@@ -10,10 +10,14 @@ export type PeriodSource = {
   partidos: readonly { fecha?: string }[];
 };
 
+/** The two seasons of a year, in calendar order. */
+export const SEASONS = ["Apertura", "Clausura"] as const;
+export type Season = (typeof SEASONS)[number];
+
 export type PeriodOption = { etiqueta: string; path: string; actual: boolean };
 
 export type PeriodFilter = {
-  etiqueta: "Año" | "Edición" | "Torneo";
+  etiqueta: "Año" | "Temporada";
   opciones: PeriodOption[];
 };
 
@@ -27,7 +31,7 @@ export type PeriodView<T extends PeriodSource> = {
   filtros: PeriodFilter[];
 };
 
-type Dated<T> = { torneo: T; fecha: string; anio: number };
+type Dated<T> = { torneo: T; fecha: string; anio: number; season: Season };
 
 export type PeriodOptions = {
   /**
@@ -38,12 +42,32 @@ export type PeriodOptions = {
 };
 
 /**
+ * The season a tournament belongs to: its archive `edition` when that is
+ * "Apertura" or "Clausura", otherwise the one its name or slug mentions.
+ * Throws when neither says, so a mislabelled archive fails the build.
+ */
+export function tournamentSeason(torneo: PeriodSource): Season {
+  const fromEdition = seasonsIn(torneo.edition);
+  if (fromEdition.length === 1) return fromEdition[0];
+  const fromName = seasonsIn(`${torneo.nombre} ${torneo.slug}`);
+  if (fromName.length === 1) return fromName[0];
+  throw new Error(
+    `No se pudo determinar la temporada (Apertura o Clausura) del torneo ${torneo.slug} (${torneo.nombre}): ni su edición "${torneo.edition}" ni su nombre la indican.`
+  );
+}
+
+const seasonsIn = (text: string): Season[] => {
+  const normalized = normalizePlayerName(text);
+  return SEASONS.filter(season => normalized.includes(season.toLowerCase()));
+};
+
+/**
  * Every period a page can show over `tournaments`, one view per pre-rendered
- * route, the default view (path "") first. Periods narrow year, then edition
- * within that year, then a single tournament of that edition; a filter is
- * only listed when it has more than one choice. Years come from ISO match
- * dates (`tournamentDate`) and editions from the archive's `edition` field.
- * Tournaments without match dates are left out.
+ * route, the default view (path "") first. Periods narrow year, then season
+ * (Apertura or Clausura) within that year; a filter is only listed when it
+ * has more than one choice. Years come from ISO match dates
+ * (`tournamentDate`) and seasons from `tournamentSeason`. Tournaments without
+ * match dates are left out.
  */
 export function buildPeriodViews<T extends PeriodSource>(
   tournaments: readonly T[],
@@ -98,121 +122,55 @@ export function buildPeriodViews<T extends PeriodSource>(
     ...allYearsView,
     ...anios.flatMap(anio => {
       const ofYear = dated.filter(d => d.anio === anio);
-      const editions = sortEditions(ofYear.map(d => d.torneo.edition));
-      const editionPath = (edition: string) =>
-        `${anio}/${slugifyEdition(edition)}`;
+      const seasons = SEASONS.filter(season =>
+        ofYear.some(d => d.season === season)
+      );
+      const seasonPath = (season: Season) => `${anio}/${season.toLowerCase()}`;
+      const ofSeason = (season: Season) =>
+        ofYear.filter(d => d.season === season).map(d => d.torneo);
 
-      const editionFilter = (actual: string | undefined): PeriodFilter[] =>
-        editions.length > 1
-          ? [
-              {
-                etiqueta: "Edición",
-                opciones: [
-                  {
-                    etiqueta: `Todo ${anio}`,
-                    path: yearPath(anio),
-                    actual: actual === undefined,
-                  },
-                  ...editions.map(edition => ({
-                    etiqueta: edition,
-                    path: editionPath(edition),
-                    actual: edition === actual,
-                  })),
-                ],
-              },
-            ]
-          : [];
-
-      /**
-       * Views of one edition of the year, and of each of its tournaments when
-       * there are several. With a single edition the year view is that edition.
-       */
-      const editionViews = (edition: string): PeriodView<T>[] => {
-        const scopePath =
-          editions.length > 1 ? editionPath(edition) : yearPath(anio);
-        const ofEdition = ofYear
-          .filter(d => d.torneo.edition === edition)
-          .map(d => d.torneo);
-        const tournamentFilter = (
-          actual: string | undefined
-        ): PeriodFilter[] =>
-          ofEdition.length > 1
-            ? [
-                {
-                  etiqueta: "Torneo",
-                  opciones: [
-                    {
-                      etiqueta: "Todos los torneos",
-                      path: scopePath,
-                      actual: actual === undefined,
-                    },
-                    ...ofEdition.map(torneo => ({
-                      etiqueta: torneo.nombre,
-                      path: tournamentPath(torneo),
-                      actual: torneo.slug === actual,
-                    })),
-                  ],
-                },
-              ]
-            : [];
-        const filtros = (actual: string | undefined) => [
-          ...yearFilter(anio),
-          ...editionFilter(edition),
-          ...tournamentFilter(actual),
-        ];
-
+      // With a single season the year view is that season.
+      if (seasons.length === 1)
         return [
           {
-            path: scopePath,
-            titulo: `${anio} · ${edition}`,
-            torneos: ofEdition,
-            filtros: filtros(undefined),
+            path: yearPath(anio),
+            titulo: `${anio} · ${seasons[0]}`,
+            torneos: ofSeason(seasons[0]),
+            filtros: yearFilter(anio),
           },
-          ...(ofEdition.length > 1
-            ? ofEdition.map(torneo => ({
-                path: tournamentPath(torneo),
-                titulo: `${anio} · ${torneo.nombre}`,
-                torneos: [torneo],
-                filtros: filtros(torneo.slug),
-              }))
-            : []),
         ];
-      };
 
-      if (editions.length === 1) return editionViews(editions[0]);
+      const seasonFilter = (actual: Season | undefined): PeriodFilter => ({
+        etiqueta: "Temporada",
+        opciones: [
+          {
+            etiqueta: `Todo ${anio}`,
+            path: yearPath(anio),
+            actual: actual === undefined,
+          },
+          ...seasons.map(season => ({
+            etiqueta: season,
+            path: seasonPath(season),
+            actual: season === actual,
+          })),
+        ],
+      });
       return [
         {
           path: yearPath(anio),
-          titulo: `${anio} · ${editions.join(" y ")}`,
+          titulo: `${anio} · ${seasons.join(" y ")}`,
           torneos: ofYear.map(d => d.torneo),
-          filtros: [...yearFilter(anio), ...editionFilter(undefined)],
+          filtros: [...yearFilter(anio), seasonFilter(undefined)],
         },
-        ...editions.flatMap(editionViews),
+        ...seasons.map(season => ({
+          path: seasonPath(season),
+          titulo: `${anio} · ${season}`,
+          torneos: ofSeason(season),
+          filtros: [...yearFilter(anio), seasonFilter(season)],
+        })),
       ];
     }),
   ];
-}
-
-const tournamentPath = (torneo: PeriodSource) => `torneo/${torneo.slug}`;
-
-/** Apertura comes before Clausura; any other edition follows, alphabetically. */
-const EDITION_ORDER = ["Apertura", "Clausura"];
-
-function sortEditions(editions: readonly string[]): string[] {
-  const rank = (edition: string) => {
-    const index = EDITION_ORDER.indexOf(edition);
-    return index === -1 ? EDITION_ORDER.length : index;
-  };
-  return [...new Set(editions)].sort(
-    (a, b) => rank(a) - rank(b) || a.localeCompare(b, "es")
-  );
-}
-
-/** URL segment for an edition: "Apertura" becomes "apertura". */
-function slugifyEdition(edition: string): string {
-  return normalizePlayerName(edition)
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 /** Tournaments with a match date, most recent first. Undated ones are left out. */
@@ -222,7 +180,16 @@ function datedTournaments<T extends PeriodSource>(
   return tournaments
     .flatMap(torneo => {
       const fecha = tournamentDate(torneo);
-      return fecha ? [{ torneo, fecha, anio: isoYear(fecha) }] : [];
+      return fecha
+        ? [
+            {
+              torneo,
+              fecha,
+              anio: isoYear(fecha),
+              season: tournamentSeason(torneo),
+            },
+          ]
+        : [];
     })
     .sort((a, b) => b.fecha.localeCompare(a.fecha));
 }
