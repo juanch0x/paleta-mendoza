@@ -4,11 +4,15 @@
 
 **Blocked by:** 01 (Recover the missing score of Regatas match 23), so the build stays green when this lands
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] One validation function is used by both the freeze step and the build
-- [ ] A match without sets fails validation, naming tournament and match
-- [ ] A category without a final fails validation, naming tournament and category
-- [ ] The three current archives pass validation
-- [ ] The build fails when an archive is deliberately broken
-- [ ] Covered through the existing freeze tests
+- [x] One validation function is used by both the freeze step and the build
+- [x] A match without sets fails validation, naming tournament and match
+- [x] A category without a final fails validation, naming tournament and category
+- [x] The three current archives pass validation
+- [x] The build fails when an archive is deliberately broken
+- [x] Covered through the existing freeze tests
+
+## Comments
+
+Resolved in bd86659: `validateArchive` in `src/data/archive-validation.ts`, used by `freeze.ts` and by `loadRegisteredArchives` in `src/data/archives.ts`. New rules are appended to `archiveRules`.

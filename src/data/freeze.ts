@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { validateArchive } from "./archive-validation.js";
 import type { ClubId } from "./clubs.js";
 import { construirPartidos } from "../domain/resolver.js";
 import type { Pareja, PartidoResuelto } from "../domain/types.js";
@@ -92,12 +93,7 @@ export function freezeTournament(
     new Map(parejas.map(pareja => [pareja.id, pareja]))
   );
 
-  const pendientes = partidos.filter(partido => partido.sets.length === 0);
-  if (pendientes.length > 0) {
-    throw new Error(
-      `No se puede congelar: quedan ${pendientes.length} partido(s) sin resultado (${pendientes.map(partido => partido.id).join(", ")}).`
-    );
-  }
+  validateArchive({ ...metadata, parejas, partidos });
 
   const unresolved = partidos.filter(
     partido => partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja"
