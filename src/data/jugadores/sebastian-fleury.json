@@ -1,4 +1,10 @@
 {
   "id": "sebastian-fleury",
-  "nombreOficial": "Sebastián Fleury"
+  "nombreOficial": "Sebastián Fleury",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Segunda", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
 }

@@ -1,4 +1,10 @@
 {
   "id": "bautista-latuf",
-  "nombreOficial": "Bautista Latuf"
+  "nombreOficial": "Bautista Latuf",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
 }

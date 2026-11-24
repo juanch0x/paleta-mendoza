@@ -1,4 +1,10 @@
 {
   "id": "lautaro-quiroga",
-  "nombreOficial": "Lautaro Quiroga"
+  "nombreOficial": "Lautaro Quiroga",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Cuarta", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
 }

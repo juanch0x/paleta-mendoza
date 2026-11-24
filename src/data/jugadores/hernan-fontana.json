@@ -1,4 +1,10 @@
 {
   "id": "hernan-fontana",
-  "nombreOficial": "Hernán Fontana"
+  "nombreOficial": "Hernán Fontana",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Primera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
 }

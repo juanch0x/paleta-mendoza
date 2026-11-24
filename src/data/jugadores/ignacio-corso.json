@@ -1,4 +1,10 @@
 {
   "id": "ignacio-corso",
-  "nombreOficial": "Ignacio Corso"
+  "nombreOficial": "Ignacio Corso",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

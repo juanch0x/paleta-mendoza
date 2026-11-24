@@ -1,4 +1,10 @@
 {
   "id": "alvaro-zulueta",
-  "nombreOficial": "Álvaro Zulueta"
+  "nombreOficial": "Álvaro Zulueta",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
 }

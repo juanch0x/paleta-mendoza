@@ -1,5 +1,11 @@
 {
   "id": "manolo-masetto",
   "nombreOficial": "Manolo Masetto",
-  "alias": ["Armando Masetto", "Manolo Masetoo"]
+  "alias": ["Armando Masetto", "Manolo Masetoo"],
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Segunda", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

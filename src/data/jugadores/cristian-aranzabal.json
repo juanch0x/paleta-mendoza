@@ -1,4 +1,10 @@
 {
   "id": "cristian-aranzabal",
-  "nombreOficial": "Cristian Aranzabal"
+  "nombreOficial": "Cristian Aranzabal",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Segunda", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }
