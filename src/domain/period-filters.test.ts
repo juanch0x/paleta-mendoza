@@ -149,6 +149,88 @@ describe("buildPeriodViews", () => {
     ).toThrow(/Apertura o Clausura.*maipu-2026/);
   });
 
+  it("can offer a tournament filter within a season that has several tournaments", () => {
+    const views = buildPeriodViews(
+      [
+        torneo("c2", "Clausura", "2026-10-03"),
+        torneo("c1", "Clausura", "2026-08-10"),
+        torneo("ap", "Apertura", "2026-04-11"),
+      ],
+      { porTorneo: true }
+    );
+    const byPath = new Map(views.map(v => [v.path, v]));
+
+    expect(views.map(v => v.path)).toEqual([
+      "",
+      "2026/apertura",
+      "2026/clausura",
+      "torneo/c2",
+      "torneo/c1",
+    ]);
+    const torneoFiltro = (actual: string) => ({
+      etiqueta: "Torneo",
+      opciones: [
+        {
+          etiqueta: "Todos los torneos",
+          path: "2026/clausura",
+          actual: actual === "",
+        },
+        {
+          etiqueta: "Clausura · c2",
+          path: "torneo/c2",
+          actual: actual === "c2",
+        },
+        {
+          etiqueta: "Clausura · c1",
+          path: "torneo/c1",
+          actual: actual === "c1",
+        },
+      ],
+    });
+    expect(byPath.get("2026/clausura")?.filtros).toContainEqual(
+      torneoFiltro("")
+    );
+    expect(byPath.get("2026/apertura")?.filtros.map(f => f.etiqueta)).toEqual([
+      "Temporada",
+    ]);
+    const c1 = byPath.get("torneo/c1");
+    expect(c1?.titulo).toBe("2026 · Clausura · c1");
+    expect(c1?.torneos.map(t => t.slug)).toEqual(["c1"]);
+    expect(
+      c1?.filtros.map(f => f.opciones.find(o => o.actual)?.etiqueta)
+    ).toEqual(["Clausura", "Clausura · c1"]);
+  });
+
+  it("offers the tournament filter on the year view when the year has one season", () => {
+    const views = buildPeriodViews(
+      [
+        torneo("c2", "Clausura", "2026-10-03"),
+        torneo("c1", "Clausura", "2026-08-10"),
+        torneo("v", "Clausura", "2025-09-01"),
+      ],
+      { todosLosAnios: true, porTorneo: true }
+    );
+    const byPath = new Map(views.map(v => [v.path, v]));
+
+    expect(views.map(v => v.path)).toEqual([
+      "",
+      "2026",
+      "torneo/c2",
+      "torneo/c1",
+      "2025",
+    ]);
+    expect(byPath.get("2026")?.filtros.map(f => f.etiqueta)).toEqual([
+      "Año",
+      "Torneo",
+    ]);
+    expect(byPath.get("torneo/c2")?.filtros[1].opciones[0]).toEqual({
+      etiqueta: "Todos los torneos",
+      path: "2026",
+      actual: false,
+    });
+    expect(byPath.get("2025")?.filtros.map(f => f.etiqueta)).toEqual(["Año"]);
+  });
+
   it("can default to every year, with each year as a filter option", () => {
     const views = buildPeriodViews(
       [
