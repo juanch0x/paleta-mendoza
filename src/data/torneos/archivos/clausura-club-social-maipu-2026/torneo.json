@@ -96,8 +96,8 @@
       "id": "2B-4",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Ernesto Retamales / Manolo Masetoo",
-      "jugadores": ["ernesto-retamales", "manolo-masetoo"]
+      "nombre": "Ernesto Retamales / Manolo Masetto",
+      "jugadores": ["ernesto-retamales", "manolo-masetto"]
     },
     {
       "id": "3A-1",
@@ -257,7 +257,7 @@
           "id": "2B-4",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Ernesto Retamales / Manolo Masetoo"
+          "nombre": "Ernesto Retamales / Manolo Masetto"
         }
       },
       "b": {
@@ -538,7 +538,7 @@
           "id": "2B-4",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Ernesto Retamales / Manolo Masetoo"
+          "nombre": "Ernesto Retamales / Manolo Masetto"
         }
       }
     },
@@ -1110,7 +1110,7 @@
           "id": "2B-4",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Ernesto Retamales / Manolo Masetoo"
+          "nombre": "Ernesto Retamales / Manolo Masetto"
         }
       }
     },
@@ -1436,7 +1436,7 @@
           "id": "2B-4",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Ernesto Retamales / Manolo Masetoo"
+          "nombre": "Ernesto Retamales / Manolo Masetto"
         }
       },
       "b": {
@@ -1567,7 +1567,7 @@
           "id": "2B-4",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Ernesto Retamales / Manolo Masetoo"
+          "nombre": "Ernesto Retamales / Manolo Masetto"
         }
       }
     },

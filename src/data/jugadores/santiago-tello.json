@@ -1,4 +1,10 @@
 {
   "id": "santiago-tello",
-  "nombreOficial": "Santiago Tello"
+  "nombreOficial": "Santiago Tello",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

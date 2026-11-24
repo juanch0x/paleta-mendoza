@@ -1,4 +1,11 @@
 {
   "id": "gabriel-fernandez",
-  "nombreOficial": "Gabriel Fernández"
+  "nombreOficial": "Gabriel Fernández",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Cuarta", "origen": "federacion" },
+    { "desde": "2026-10-30", "categoria": "Tercera", "origen": "ascenso" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

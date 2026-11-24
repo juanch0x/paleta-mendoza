@@ -1,4 +1,10 @@
 {
   "id": "ariel-vives",
-  "nombreOficial": "Ariel Vives"
+  "nombreOficial": "Ariel Vives",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Segunda", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

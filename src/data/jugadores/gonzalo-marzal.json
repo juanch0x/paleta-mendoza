@@ -1,4 +1,10 @@
 {
   "id": "gonzalo-marzal",
-  "nombreOficial": "Gonzalo Marzal"
+  "nombreOficial": "Gonzalo Marzal",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Cuarta", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
 }

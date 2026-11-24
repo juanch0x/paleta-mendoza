@@ -14,12 +14,19 @@ export function normalizePlayerName(name: string): string {
     .trim();
 }
 
-/** Returns a lookup that finds the registry player whose official name matches. */
+/**
+ * Returns a lookup that finds the registry player whose official name, or one
+ * of their aliases, matches.
+ */
 export function createPlayerMatcher(
   players: readonly Player[]
 ): (name: string) => Player | undefined {
   const byName = new Map(
-    players.map(player => [normalizePlayerName(player.nombreOficial), player])
+    players.flatMap(player =>
+      [player.nombreOficial, ...(player.alias ?? [])].map(
+        name => [normalizePlayerName(name), player] as const
+      )
+    )
   );
   return name => byName.get(normalizePlayerName(name));
 }
