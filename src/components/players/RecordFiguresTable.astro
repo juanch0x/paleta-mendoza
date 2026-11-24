@@ -1,0 +1,65 @@
+---
+import type { RecordFigures } from "@/domain/player-record";
+import ScrollTable from "./ScrollTable.astro";
+
+type Props = {
+  /** Id of the heading that names the table. */
+  labelledby: string;
+  /** One column per slice of the record, e.g. a year and category. */
+  columnas: { titulo: string; figuras: RecordFigures }[];
+};
+
+const { labelledby, columnas } = Astro.props;
+const filas: { label: string; value: (f: RecordFigures) => number }[] = [
+  { label: "Títulos", value: f => f.titulos },
+  { label: "Subcampeonatos", value: f => f.subcampeonatos },
+  { label: "Finales jugadas", value: f => f.finales },
+  { label: "Semifinales jugadas", value: f => f.semifinales },
+  { label: "Partidos ganados", value: f => f.partidosGanados },
+  { label: "Partidos perdidos", value: f => f.partidosPerdidos },
+  { label: "Sets ganados", value: f => f.setsGanados },
+  { label: "Sets perdidos", value: f => f.setsPerdidos },
+  {
+    label: "Compañeros distintos con los que ganó títulos",
+    value: f => f.companerosCampeones,
+  },
+];
+---
+
+<ScrollTable labelledby={labelledby}>
+  <table class="w-full text-base">
+    <thead class="text-sm font-semibold">
+      <tr>
+        <th scope="col" class="col-fija py-3">
+          <span class="sr-only">Dato</span>
+        </th>
+        {
+          columnas.map(columna => (
+            <th
+              scope="col"
+              class="min-w-28 px-4 py-3 text-center sm:whitespace-nowrap"
+            >
+              {columna.titulo}
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        filas.map(fila => (
+          <tr class="border-border border-t">
+            <th scope="row" class="col-fija py-3 font-semibold">
+              {fila.label}
+            </th>
+            {columnas.map(columna => (
+              <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
+                {fila.value(columna.figuras)}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</ScrollTable>

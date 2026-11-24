@@ -9,6 +9,7 @@ import {
 } from "@/data/repositories/json";
 import CategoryTabs from "@/components/players/CategoryTabs.astro";
 import PeriodFilters from "@/components/players/PeriodFilters.astro";
+import ScrollTable from "@/components/players/ScrollTable.astro";
 import type { ArchiveRecord } from "@/data/repositories/types";
 import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
 import { buildAnnualTables, type AnnualTable } from "@/domain/annual-table";
@@ -171,15 +172,7 @@ const POSICION_LABEL = {
             <h2 id="tabla-titulo" class="text-2xl font-bold sm:text-3xl">
               {categoria}
             </h2>
-            <p class="text-foreground/70 mt-2 text-base sm:hidden">
-              Deslizá la tabla hacia los costados para ver todas las columnas.
-            </p>
-            <div
-              class="tabla-scroll border-border bg-background -mx-4 mt-4 overflow-x-auto border-y sm:mx-0 sm:rounded-xl sm:border"
-              role="region"
-              aria-labelledby="tabla-titulo"
-              tabindex="0"
-            >
+            <ScrollTable labelledby="tabla-titulo">
               <table class="w-full text-base">
                 <thead class="text-left text-sm font-semibold">
                   <tr>
@@ -269,7 +262,7 @@ const POSICION_LABEL = {
                   </tbody>
                 ))}
               </table>
-            </div>
+            </ScrollTable>
           </section>
         )
       }
@@ -277,55 +270,3 @@ const POSICION_LABEL = {
   </main>
   <Footer />
 </Layout>
-
-<style>
-  /* Rank and name stay visible while the figures scroll sideways. Every cell
-     gets an opaque background so scrolled figures don't show through; tints
-     (the site's bg-muted/70 header, grey rows) are layered over the page
-     colour because --color-muted is translucent in dark mode. */
-  .tabla-scroll th,
-  .tabla-scroll td {
-    --tinte: transparent;
-    background: linear-gradient(var(--tinte), var(--tinte))
-      var(--color-background);
-  }
-  .tabla-scroll thead th,
-  .separador th {
-    --tinte: color-mix(in srgb, var(--color-muted) 70%, transparent);
-  }
-  .gris td {
-    --tinte: color-mix(in srgb, var(--color-muted) 50%, transparent);
-    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
-  }
-  /* On phones the sticky columns stay narrow (names wrap) so the figures
-     have room to scroll into view beside them. */
-  .col-puesto {
-    position: sticky;
-    left: 0;
-    width: 4rem;
-    min-width: 4rem;
-    padding-inline: 0.5rem 0.25rem;
-  }
-  .col-jugador {
-    position: sticky;
-    left: 4rem;
-    min-width: 8rem;
-    max-width: 8.5rem;
-    padding-inline: 0.5rem 0.75rem;
-    text-align: left;
-    box-shadow: inset -1px 0 0 var(--color-border);
-  }
-  @media (min-width: 640px) {
-    .col-puesto {
-      width: 6rem;
-      min-width: 6rem;
-      padding-inline: 1rem;
-    }
-    .col-jugador {
-      left: 6rem;
-      min-width: 13rem;
-      max-width: none;
-      padding-inline: 1rem;
-    }
-  }
-</style>

@@ -100,7 +100,7 @@ To support it, the site gains a **player registry**: one record per player with 
 - Statistics by position use the player's position for that year. Positions marked provisional trigger one visible notice at the top of the page.
 - Annual table ordering: titles, then finals, then matches won. Defined in a single place.
 - Page layout: one page per category (`/estadisticas/<categoria>[/<periodo>]`, `/estadisticas` shows the highest category), selected with category tabs; one table per category with a titled row separating Delanteros and Zagueros.
-- Filters: year, and season (Apertura / Clausura) within a year. The season comes from the archive `edition` when it is Apertura or Clausura, otherwise from the tournament name or slug; the build fails when neither says. Each filter renders only when it has more than one option.
+- Filters: year, and season (Apertura / Clausura) within a year. The season comes from the archive `edition` when it is Apertura or Clausura, otherwise from the tournament name or slug; the build fails when neither says. Each filter renders only when it has more than one option. The player profile also offers a single tournament of the season, and shows its filters in a panel opened from one labelled "Filtrar · <período>" button.
 
 ### Modules
 

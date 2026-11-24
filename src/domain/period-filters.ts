@@ -17,7 +17,7 @@ export type Season = (typeof SEASONS)[number];
 export type PeriodOption = { etiqueta: string; path: string; actual: boolean };
 
 export type PeriodFilter = {
-  etiqueta: "Año" | "Temporada";
+  etiqueta: "Año" | "Temporada" | "Torneo";
   opciones: PeriodOption[];
 };
 
@@ -39,6 +39,11 @@ export type PeriodOptions = {
    * (the annual table). Only applies when there are several years.
    */
   todosLosAnios?: boolean;
+  /**
+   * Also offer each tournament of a season on its own (the profile), when the
+   * season has several.
+   */
+  porTorneo?: boolean;
 };
 
 /**
@@ -64,14 +69,15 @@ const seasonsIn = (text: string): Season[] => {
 /**
  * Every period a page can show over `tournaments`, one view per pre-rendered
  * route, the default view (path "") first. Periods narrow year, then season
- * (Apertura or Clausura) within that year; a filter is only listed when it
- * has more than one choice. Years come from ISO match dates
+ * (Apertura or Clausura) within that year, then, with `porTorneo`, a single
+ * tournament of that season; a filter is only listed when it has more than
+ * one choice. Years come from ISO match dates
  * (`tournamentDate`) and seasons from `tournamentSeason`. Tournaments without
  * match dates are left out.
  */
 export function buildPeriodViews<T extends PeriodSource>(
   tournaments: readonly T[],
-  { todosLosAnios = false }: PeriodOptions = {}
+  { todosLosAnios = false, porTorneo = false }: PeriodOptions = {}
 ): PeriodView<T>[] {
   const dated = datedTournaments(tournaments);
   const anios = [...new Set(dated.map(d => d.anio))].sort((a, b) => b - a);
@@ -129,49 +135,96 @@ export function buildPeriodViews<T extends PeriodSource>(
       const ofSeason = (season: Season) =>
         ofYear.filter(d => d.season === season).map(d => d.torneo);
 
-      // With a single season the year view is that season.
-      if (seasons.length === 1)
+      const seasonFilter = (actual: Season | undefined): PeriodFilter[] =>
+        seasons.length > 1
+          ? [
+              {
+                etiqueta: "Temporada",
+                opciones: [
+                  {
+                    etiqueta: `Todo ${anio}`,
+                    path: yearPath(anio),
+                    actual: actual === undefined,
+                  },
+                  ...seasons.map(season => ({
+                    etiqueta: season,
+                    path: seasonPath(season),
+                    actual: season === actual,
+                  })),
+                ],
+              },
+            ]
+          : [];
+
+      /**
+       * The view of one season, followed by one view per tournament of it
+       * when asked for and there are several. With a single season the year
+       * view is that season.
+       */
+      const seasonViews = (season: Season): PeriodView<T>[] => {
+        const scopePath =
+          seasons.length > 1 ? seasonPath(season) : yearPath(anio);
+        const torneos = ofSeason(season);
+        const tournamentFilter = (
+          actual: string | undefined
+        ): PeriodFilter[] =>
+          porTorneo && torneos.length > 1
+            ? [
+                {
+                  etiqueta: "Torneo",
+                  opciones: [
+                    {
+                      etiqueta: "Todos los torneos",
+                      path: scopePath,
+                      actual: actual === undefined,
+                    },
+                    ...torneos.map(torneo => ({
+                      etiqueta: torneo.nombre,
+                      path: tournamentPath(torneo),
+                      actual: torneo.slug === actual,
+                    })),
+                  ],
+                },
+              ]
+            : [];
+        const filtros = (actual: string | undefined) => [
+          ...yearFilter(anio),
+          ...seasonFilter(season),
+          ...tournamentFilter(actual),
+        ];
         return [
           {
-            path: yearPath(anio),
-            titulo: `${anio} · ${seasons[0]}`,
-            torneos: ofSeason(seasons[0]),
-            filtros: yearFilter(anio),
+            path: scopePath,
+            titulo: `${anio} · ${season}`,
+            torneos,
+            filtros: filtros(undefined),
           },
+          ...(tournamentFilter(undefined).length > 0
+            ? torneos.map(torneo => ({
+                path: tournamentPath(torneo),
+                titulo: `${anio} · ${torneo.nombre}`,
+                torneos: [torneo],
+                filtros: filtros(torneo.slug),
+              }))
+            : []),
         ];
+      };
 
-      const seasonFilter = (actual: Season | undefined): PeriodFilter => ({
-        etiqueta: "Temporada",
-        opciones: [
-          {
-            etiqueta: `Todo ${anio}`,
-            path: yearPath(anio),
-            actual: actual === undefined,
-          },
-          ...seasons.map(season => ({
-            etiqueta: season,
-            path: seasonPath(season),
-            actual: season === actual,
-          })),
-        ],
-      });
+      if (seasons.length === 1) return seasonViews(seasons[0]);
       return [
         {
           path: yearPath(anio),
           titulo: `${anio} · ${seasons.join(" y ")}`,
           torneos: ofYear.map(d => d.torneo),
-          filtros: [...yearFilter(anio), seasonFilter(undefined)],
+          filtros: [...yearFilter(anio), ...seasonFilter(undefined)],
         },
-        ...seasons.map(season => ({
-          path: seasonPath(season),
-          titulo: `${anio} · ${season}`,
-          torneos: ofSeason(season),
-          filtros: [...yearFilter(anio), seasonFilter(season)],
-        })),
+        ...seasons.flatMap(seasonViews),
       ];
     }),
   ];
 }
+
+const tournamentPath = (torneo: PeriodSource) => `torneo/${torneo.slug}`;
 
 /** Tournaments with a match date, most recent first. Undated ones are left out. */
 function datedTournaments<T extends PeriodSource>(
