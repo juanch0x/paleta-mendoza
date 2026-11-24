@@ -47,7 +47,7 @@
       "id": "2A-1",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Ariel Vives / Lucas Vives",
+      "nombre": "Ariel Vives / Luca Vives",
       "jugadores": ["ariel-vives", "luca-vives"]
     },
     {
@@ -89,7 +89,7 @@
       "id": "2B-2",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Goyo Tomasiello / Armando Masetto",
+      "nombre": "Goyo Tomasiello / Manolo Masetto",
       "jugadores": ["goyo-tomasiello", "manolo-masetto"]
     },
     {
@@ -138,7 +138,7 @@
       "id": "3A-4",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Mario Margutti / Mario Cuevas",
+      "nombre": "Mario Margutti / Pipino Cuevas",
       "jugadores": ["mario-margutti", "pipino-cuevas"]
     },
     {
@@ -270,7 +270,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -309,7 +309,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "sets": [
@@ -369,7 +369,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -634,7 +634,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "b": {
@@ -665,7 +665,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -949,7 +949,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -1032,7 +1032,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -1093,7 +1093,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "b": {
@@ -1194,7 +1194,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -1225,7 +1225,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "sets": [
@@ -1800,7 +1800,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "sets": [
