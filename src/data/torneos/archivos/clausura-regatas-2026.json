@@ -48,7 +48,7 @@
       "categoria": "Segunda",
       "zona": "A",
       "nombre": "Ariel Vives / Lucas Vives",
-      "jugadores": ["ariel-vives", "lucas-vives"]
+      "jugadores": ["ariel-vives", "luca-vives"]
     },
     {
       "id": "2A-2",
@@ -90,7 +90,7 @@
       "categoria": "Segunda",
       "zona": "B",
       "nombre": "Goyo Tomasiello / Armando Masetto",
-      "jugadores": ["goyo-tomasiello", "armando-masetto"]
+      "jugadores": ["goyo-tomasiello", "manolo-masetto"]
     },
     {
       "id": "2B-3",
@@ -139,7 +139,7 @@
       "categoria": "Tercera",
       "zona": "A",
       "nombre": "Mario Margutti / Mario Cuevas",
-      "jugadores": ["mario-margutti", "mario-cuevas"]
+      "jugadores": ["mario-margutti", "pipino-cuevas"]
     },
     {
       "id": "3B-1",
