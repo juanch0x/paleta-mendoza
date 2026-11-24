@@ -25,4 +25,4 @@ export const SITE = {
  * and positions (ticket 08 of `.scratch/estadisticas-jugadores`); while off,
  * the page is not built and the entry is not shown.
  */
-export const STATISTICS_PAGE_PUBLISHED: boolean = false;
+export const STATISTICS_PAGE_PUBLISHED: boolean = true;
