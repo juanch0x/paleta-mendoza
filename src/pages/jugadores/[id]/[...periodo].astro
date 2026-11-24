@@ -73,31 +73,34 @@ const resumen = [
 const unicoAnio = historial.porAnio.length === 1;
 const unicoRecorte =
   unicoAnio && historial.porAnio[0].porCategoria.length === 1;
-const columnas = [
-  {
-    titulo: unicoRecorte
-      ? `${historial.porAnio[0].anio} · ${historial.porAnio[0].porCategoria[0].categoria}`
-      : "Total",
-    figuras: historial.total,
-  },
-  ...(unicoRecorte
-    ? []
-    : historial.porAnio.flatMap(year => [
+const columnas = unicoRecorte
+  ? [
+      {
+        ruta: [
+          String(historial.porAnio[0].anio),
+          historial.porAnio[0].porCategoria[0].categoria,
+        ],
+        figuras: historial.total,
+      },
+    ]
+  : [
+      { ruta: ["Total"], figuras: historial.total },
+      ...historial.porAnio.flatMap(year => [
         ...(!unicoAnio && year.porCategoria.length > 1
-          ? [{ titulo: `Total ${year.anio}`, figuras: year.total }]
+          ? [{ ruta: [String(year.anio), "Total"], figuras: year.total }]
           : []),
         ...year.porCategoria.map(record => ({
-          titulo: `${year.anio} · ${record.categoria}`,
+          ruta: [String(year.anio), record.categoria],
           figuras: record.figuras,
         })),
-      ])),
-  ...(!unicoAnio && historial.porCategoria.length > 1
-    ? historial.porCategoria.map(record => ({
-        titulo: `${record.categoria} · todos los años`,
-        figuras: record.figuras,
-      }))
-    : []),
-];
+      ]),
+      ...(!unicoAnio && historial.porCategoria.length > 1
+        ? historial.porCategoria.map(record => ({
+            ruta: ["Todos los años", record.categoria],
+            figuras: record.figuras,
+          }))
+        : []),
+    ];
 ---
 
 <Layout
