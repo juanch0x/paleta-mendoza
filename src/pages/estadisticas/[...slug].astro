@@ -93,7 +93,7 @@ const POSICION_LABEL = {
       {
         provisorias && (
           <p
-            class="border-accent mt-6 rounded-xl border-2 p-4 text-base"
+            class="border-accent bg-accent/5 mt-6 rounded-xl border-2 p-4 text-base"
             role="note"
           >
             <strong>Posiciones provisorias.</strong> Algunas posiciones las
@@ -133,7 +133,7 @@ const POSICION_LABEL = {
       {
         (hayAscensos || hayInferiores) && (
           <div
-            class="border-border bg-muted/40 mt-6 grid gap-2 rounded-xl border p-4 text-base"
+            class="border-border bg-background mt-6 grid gap-2 rounded-xl border border-dashed p-4 text-base"
             role="note"
           >
             <p>
@@ -158,57 +158,63 @@ const POSICION_LABEL = {
 
       {
         tables.length === 0 ? (
-          <p class="mt-8 text-lg">
+          <p class="border-border bg-background text-foreground/70 mt-8 rounded-xl border border-dashed p-5 text-lg">
             {categoria
               ? `Todavía no hay jugadores de ${categoria} con resultados en este período.`
               : "Todavía no hay jugadores con categoría y posición oficial cargadas."}
           </p>
         ) : (
-          <section class="mt-8" aria-labelledby="tabla-titulo">
-            <h2 id="tabla-titulo" class="text-2xl font-bold">
+          <section
+            class="border-border bg-muted/25 mt-8 rounded-2xl border p-4 sm:p-6"
+            aria-labelledby="tabla-titulo"
+          >
+            <h2 id="tabla-titulo" class="text-2xl font-bold sm:text-3xl">
               {categoria}
             </h2>
-            <p class="mt-2 text-base sm:hidden">
+            <p class="text-foreground/70 mt-2 text-base sm:hidden">
               Deslizá la tabla hacia los costados para ver todas las columnas.
             </p>
             <div
-              class="tabla-scroll border-border mt-3 overflow-x-auto rounded-xl border"
+              class="tabla-scroll border-border bg-background -mx-4 mt-4 overflow-x-auto border-y sm:mx-0 sm:rounded-xl sm:border"
               role="region"
               aria-labelledby="tabla-titulo"
               tabindex="0"
             >
-              <table class="w-full min-w-[34rem] text-left text-base">
-                <thead>
-                  <tr class="border-border border-b-2">
-                    <th scope="col" class="col-puesto py-3 pr-2 pl-3">
+              <table class="w-full text-base">
+                <thead class="text-left text-sm font-semibold">
+                  <tr>
+                    <th scope="col" class="col-puesto px-4 py-3">
                       Puesto
                     </th>
-                    <th scope="col" class="col-jugador py-3 pr-3">
+                    <th scope="col" class="col-jugador px-4 py-3">
                       Jugador
-                    </th>
-                    <th scope="col" class="px-3 py-3 text-right">
-                      Títulos
-                    </th>
-                    <th scope="col" class="px-3 py-3 text-right">
-                      Finales
                     </th>
                     <th
                       scope="col"
-                      class="py-3 pr-3 pl-3 text-right whitespace-nowrap"
+                      class="min-w-24 px-4 py-3 text-center whitespace-nowrap"
                     >
+                      Títulos
+                    </th>
+                    <th
+                      scope="col"
+                      class="min-w-24 px-4 py-3 text-center whitespace-nowrap"
+                    >
+                      Finales
+                    </th>
+                    <th scope="col" class="min-w-28 px-4 py-3 text-center">
                       Partidos ganados
                     </th>
                   </tr>
                 </thead>
                 {tables.map(table => (
                   <tbody>
-                    <tr class="separador">
+                    <tr class="separador border-border border-t">
                       <th
                         colspan="5"
                         scope="colgroup"
-                        class="border-border border-y-2 py-3 text-left text-lg font-bold"
+                        class="text-accent py-3 text-left text-base font-bold tracking-wide uppercase"
                       >
-                        <span class="sticky left-3 pl-3">
+                        <span class="sticky left-0 px-4">
                           {POSICION_LABEL[table.posicion]}
                         </span>
                       </th>
@@ -218,14 +224,21 @@ const POSICION_LABEL = {
                       return (
                         <tr
                           class:list={[
-                            "border-border border-b",
+                            "border-border border-t",
                             gris && "gris",
                           ]}
                         >
-                          <td class="col-puesto py-3 pr-2 pl-3 font-semibold">
-                            {fila.puesto ?? "–"}
+                          <td
+                            class:list={[
+                              "col-puesto px-4 py-3 font-bold whitespace-nowrap tabular-nums",
+                              !gris && "text-accent",
+                            ]}
+                          >
+                            {fila.puesto === undefined
+                              ? "–"
+                              : `${fila.puesto}°`}
                           </td>
-                          <td class="col-jugador py-3 pr-3">
+                          <td class="col-jugador px-4 py-3">
                             <a
                               href={`/jugadores/${fila.player.id}`}
                               class="font-semibold underline underline-offset-4"
@@ -241,13 +254,13 @@ const POSICION_LABEL = {
                               </span>
                             )}
                           </td>
-                          <td class="px-3 py-3 text-right tabular-nums">
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
                             {fila.titulos}
                           </td>
-                          <td class="px-3 py-3 text-right tabular-nums">
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
                             {fila.finales}
                           </td>
-                          <td class="py-3 pr-3 pl-3 text-right tabular-nums">
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
                             {fila.partidosGanados}
                           </td>
                         </tr>
@@ -266,34 +279,53 @@ const POSICION_LABEL = {
 </Layout>
 
 <style>
-  /* Rank and name stay visible while the figures scroll sideways. Cells get
-     an opaque background so scrolled figures don't show through. */
+  /* Rank and name stay visible while the figures scroll sideways. Every cell
+     gets an opaque background so scrolled figures don't show through; tints
+     (the site's bg-muted/70 header, grey rows) are layered over the page
+     colour because --color-muted is translucent in dark mode. */
   .tabla-scroll th,
   .tabla-scroll td {
-    background-color: var(--color-background);
+    --tinte: transparent;
+    background: linear-gradient(var(--tinte), var(--tinte))
+      var(--color-background);
   }
+  .tabla-scroll thead th,
+  .separador th {
+    --tinte: color-mix(in srgb, var(--color-muted) 70%, transparent);
+  }
+  .gris td {
+    --tinte: color-mix(in srgb, var(--color-muted) 50%, transparent);
+    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  }
+  /* On phones the sticky columns stay narrow (names wrap) so the figures
+     have room to scroll into view beside them. */
   .col-puesto {
     position: sticky;
     left: 0;
-    width: 5rem;
-    min-width: 5rem;
+    width: 4rem;
+    min-width: 4rem;
+    padding-inline: 0.5rem 0.25rem;
   }
   .col-jugador {
     position: sticky;
-    left: 5rem;
-    min-width: 11rem;
+    left: 4rem;
+    min-width: 8rem;
+    max-width: 8.5rem;
+    padding-inline: 0.5rem 0.75rem;
+    text-align: left;
     box-shadow: inset -1px 0 0 var(--color-border);
   }
-  /* The muted tint is layered over the page colour so it stays opaque even
-     where --color-muted is translucent (dark mode). */
-  .separador th {
-    background: linear-gradient(var(--color-muted), var(--color-muted))
-      var(--color-background);
-  }
-  .gris td {
-    --tinte: color-mix(in srgb, var(--color-muted) 60%, transparent);
-    background: linear-gradient(var(--tinte), var(--tinte))
-      var(--color-background);
-    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  @media (min-width: 640px) {
+    .col-puesto {
+      width: 6rem;
+      min-width: 6rem;
+      padding-inline: 1rem;
+    }
+    .col-jugador {
+      left: 6rem;
+      min-width: 13rem;
+      max-width: none;
+      padding-inline: 1rem;
+    }
   }
 </style>

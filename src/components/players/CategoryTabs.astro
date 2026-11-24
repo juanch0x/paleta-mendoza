@@ -20,10 +20,10 @@ const { categorias, actual, href } = Astro.props;
             href={href(categoria)}
             aria-current={categoria === actual ? "page" : undefined}
             class:list={[
-              "flex min-h-14 w-full items-center justify-center rounded-xl border-2 px-4 py-3 text-center text-lg font-bold",
+              "flex min-h-14 w-full items-center justify-center rounded-full border-2 px-4 py-3 text-center text-lg font-bold transition",
               categoria === actual
                 ? "border-accent bg-accent text-background"
-                : "border-border hover:border-accent underline underline-offset-4",
+                : "border-border bg-background hover:border-accent",
             ]}
           >
             {categoria}
