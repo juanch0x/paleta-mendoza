@@ -2,13 +2,17 @@
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import {
+  diagnoseLikelyPromotions,
   diagnosePlayerRegistry,
   diagnoseTournamentSheets,
   fetchTournamentSheetGrids,
   type TournamentDiagnostics,
 } from "@/data/tournament-diagnostics";
 import Layout from "@/layouts/Layout.astro";
-import { jsonPlayerRepository } from "@/data/repositories/json";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
 import { hasActiveTournament } from "@/data/tournament-availability";
 
 if (!hasActiveTournament()) return Astro.redirect("/torneos/");
@@ -40,9 +44,13 @@ if (import.meta.env.DEV) {
 const registryDate = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Mendoza",
 }).format(new Date());
-const pendingPlayers = diagnosePlayerRegistry(
-  await jsonPlayerRepository.list(),
-  registryDate
+const registryPlayers = await jsonPlayerRepository.list();
+const pendingPlayers = diagnosePlayerRegistry(registryPlayers, registryDate);
+
+// Three consecutive titles in a category with no promotion recorded after them.
+const likelyPromotions = diagnoseLikelyPromotions(
+  registryPlayers,
+  await jsonArchivedTournamentRepository.list()
 );
 const pendingLabel = (player: (typeof pendingPlayers)[number]) =>
   [
@@ -129,6 +137,40 @@ const pendingLabel = (player: (typeof pendingPlayers)[number]) =>
                   <p class="font-semibold">{player.nombreOficial}</p>
                   <p class="text-foreground/70 mt-1 text-sm">
                     Falta: {pendingLabel(player)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </section>
+    <section
+      class="border-border bg-background mt-8 rounded-2xl border p-5 sm:p-6"
+      aria-labelledby="promotions-title"
+    >
+      <h2 id="promotions-title" class="text-xl font-bold">Posibles ascensos</h2>
+      {
+        likelyPromotions.length === 0 ? (
+          <p class="text-foreground/70 mt-2">
+            Ningún jugador ganó tres torneos seguidos de una categoría sin un
+            ascenso registrado.
+          </p>
+        ) : (
+          <>
+            <p class="mt-2">
+              Estos jugadores ganaron tres torneos seguidos de una categoría y
+              no tienen un ascenso registrado después. Revisá si corresponde
+              cargarlo en el registro.
+            </p>
+            <ul class="border-border mt-4 divide-y rounded-xl border">
+              {likelyPromotions.map(promotion => (
+                <li class="p-4">
+                  <p class="font-semibold">
+                    {promotion.nombreOficial} · {promotion.categoria}
+                  </p>
+                  <p class="text-foreground/70 mt-1 text-sm">
+                    {promotion.torneos.map(torneo => torneo.nombre).join(", ")}
                   </p>
                 </li>
               ))}
