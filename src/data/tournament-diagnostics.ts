@@ -6,6 +6,7 @@ import {
   type TournamentSheetName,
 } from "./csv.js";
 import { parseSets } from "../domain/parse-sets.js";
+import { createPlayerMatcher } from "../domain/player-names.js";
 import { categoryOn, positionIn, type Player } from "../domain/player-stats.js";
 
 export const DIAGNOSTIC_SHEETS = [
@@ -35,6 +36,13 @@ export type TournamentDiagnostics = {
   checkedAt: string;
   scannedRanges: Record<SheetName, string>;
   issues: TournamentDiagnosticIssue[];
+  /** Non-blocking findings: they never make the sheet invalid. */
+  warnings: TournamentDiagnosticIssue[];
+};
+
+/** Registry data the live sheet is compared against; omitted checks are skipped. */
+export type TournamentDiagnosticsContext = {
+  players?: readonly Player[];
 };
 
 export type GoogleSheetsFetch = typeof fetch;
@@ -98,9 +106,11 @@ export async function fetchTournamentSheetGrids(
 
 export function diagnoseTournamentSheets(
   grids: readonly SheetGrid[],
-  checkedAt = new Date().toISOString()
+  checkedAt = new Date().toISOString(),
+  context: TournamentDiagnosticsContext = {}
 ): TournamentDiagnostics {
   const issues: TournamentDiagnosticIssue[] = [];
+  const warnings: TournamentDiagnosticIssue[] = [];
   const gridByName = new Map(grids.map(grid => [grid.name, grid]));
   const headersBySheet = new Map<SheetName, Headers>();
 
@@ -125,12 +135,53 @@ export function diagnoseTournamentSheets(
     issues
   );
 
+  if (context.players) {
+    warnUnknownPlayers(
+      gridByName.get("parejas"),
+      headersBySheet.get("parejas")!,
+      context.players,
+      warnings
+    );
+  }
+
   return {
     valid: issues.length === 0,
     checkedAt,
     scannedRanges: diagnosticRanges(),
     issues,
+    warnings,
   };
+}
+
+/**
+ * The live tournament keeps working with unregistered names; they are only
+ * surfaced so the organizer can fix them before the freeze step rejects them.
+ */
+function warnUnknownPlayers(
+  grid: SheetGrid | undefined,
+  headers: Headers,
+  players: readonly Player[],
+  warnings: TournamentDiagnosticIssue[]
+) {
+  if (!grid) return;
+  const match = createPlayerMatcher(players);
+
+  forEachPhysicalDataRow(grid, (row, values) => {
+    const parejaId = valueAt(values, headers, "id");
+    if (!parejaId) return;
+    for (const field of ["jugador_1", "jugador_2"]) {
+      const nombre = valueAt(values, headers, field);
+      if (!nombre || match(nombre)) continue;
+      addIssue(
+        warnings,
+        "parejas",
+        row,
+        columnFor("parejas", field, headers),
+        "unknown-player",
+        `"${nombre}" (pareja ${parejaId}) no está en el registro de jugadores.`
+      );
+    }
+  });
 }
 
 function readHeaders(

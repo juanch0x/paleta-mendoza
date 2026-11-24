@@ -4,10 +4,14 @@
 
 **Blocked by:** 02 (Archive integrity check), 03 (Player registry and minimal player profile)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Freeze matches names with accent, case and whitespace normalisation, always on the full name
-- [ ] An unmatched name fails the freeze with name, pair and sheet row in the message
-- [ ] Unknown player ids in an archive fail the shared archive validation
-- [ ] Diagnostics page lists unmatched names of the live tournament as non-blocking warnings
-- [ ] Covered through freeze tests and tournament diagnostics tests
+- [x] Freeze matches names with accent, case and whitespace normalisation, always on the full name
+- [x] An unmatched name fails the freeze with name, pair and sheet row in the message
+- [x] Unknown player ids in an archive fail the shared archive validation
+- [x] Diagnostics page lists unmatched names of the live tournament as non-blocking warnings
+- [x] Covered through freeze tests and tournament diagnostics tests
+
+## Comments
+
+Resolved in 15a2728, 27113bb (merge e64c9b1). Matching: `createPlayerMatcher`/`normalizePlayerName` in `src/domain/player-names.ts`. `freezeTournament(metadata, parejasCsv, partidosCsv, players)`; `validateArchive(tournament, { players })`, rules `(tournament, context) => string[]`. `diagnoseTournamentSheets(grids, checkedAt?, { players })` returns non-blocking `warnings`. Production diagnostics read `/jugadores/registro.json` via Cloudflare `env.ASSETS` (unverified in deploy).
