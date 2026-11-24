@@ -1,56 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type {
-  ArchivedPareja,
-  ArchivedTournament,
-} from "./archived-tournament.js";
 import type { Player } from "./player.js";
 import { buildOfficialProfile, categoryOn } from "./player-official.js";
-import type { PartidoResuelto } from "./types.js";
-
-const pareja = (
-  id: string,
-  jugadores: readonly [string, string]
-): ArchivedPareja => ({
-  id,
-  categoria: "Tercera",
-  nombre: jugadores.join(" / "),
-  jugadores,
-});
-
-const ab = pareja("3A-1", ["ana-alfa", "beto-beta"]);
-const cd = pareja("3A-2", ["caro-gama", "dani-delta"]);
-
-/** A one-category tournament whose final, played on `fecha`, `winner` wins. */
-const tournament = (
-  slug: string,
-  fecha: string,
-  winner: ArchivedPareja
-): ArchivedTournament => {
-  const loser = winner === ab ? cd : ab;
-  const match = (id: string, fase: string, day: string): PartidoResuelto => ({
-    id,
-    categoria: "Tercera",
-    fase,
-    fecha: day,
-    a: { tipo: "pareja", pareja: winner },
-    b: { tipo: "pareja", pareja: loser },
-    sets: [
-      [12, 5],
-      [12, 6],
-    ],
-  });
-  return {
-    slug,
-    nombre: slug,
-    fecha,
-    parejas: [ab, cd],
-    partidos: [
-      match("2", "final", `${fecha.slice(0, 8)}28`),
-      match("1", "grupo", fecha),
-    ],
-  };
-};
 
 const promoted: Player = {
   id: "ana-alfa",
@@ -90,7 +41,7 @@ describe("buildOfficialProfile", () => {
   };
 
   it("shows the category in effect on the reference date and the position for its year", () => {
-    const profile = buildOfficialProfile(withPosition, [], "2026-11-23");
+    const profile = buildOfficialProfile(withPosition, "2026-11-23");
 
     expect(profile.categoria?.categoria).toBe("Segunda");
     expect(profile.posicion).toEqual({
@@ -98,20 +49,17 @@ describe("buildOfficialProfile", () => {
       posicion: "delantero",
       origen: "provisoria",
     });
-    expect(profile.posicionProvisoria).toBe(true);
   });
 
   it("works for a player without category or position", () => {
     const profile = buildOfficialProfile(
       { id: "beto-beta", nombreOficial: "Beto Beta" },
-      [],
       "2026-11-23"
     );
 
     expect(profile).toMatchObject({
       categoria: undefined,
       posicion: undefined,
-      posicionProvisoria: false,
     });
   });
 
@@ -125,7 +73,7 @@ describe("buildOfficialProfile", () => {
       ],
     };
 
-    expect(buildOfficialProfile(player, [], "2026-11-23").cambios).toEqual([
+    expect(buildOfficialProfile(player, "2026-11-23").cambios).toEqual([
       {
         desde: "2026-01-01",
         anterior: "Cuarta",
@@ -139,115 +87,12 @@ describe("buildOfficialProfile", () => {
         origen: "ascenso",
       },
     ]);
-    expect(buildOfficialProfile(promoted, [], "2026-11-23").cambios).toEqual([
+    expect(buildOfficialProfile(promoted, "2026-11-23").cambios).toEqual([
       {
         desde: "2026-09-15",
         anterior: "Tercera",
         categoria: "Segunda",
         origen: "ascenso",
-      },
-    ]);
-  });
-
-  it("splits titles by year under the position recorded for that year", () => {
-    const player: Player = {
-      ...promoted,
-      posiciones: [
-        { anio: 2025, posicion: "zaguero", origen: "federacion" },
-        { anio: 2026, posicion: "delantero", origen: "provisoria" },
-      ],
-    };
-    const tournaments = [
-      tournament("apertura-2025", "2025-04-10", ab),
-      tournament("clausura-2025", "2025-09-10", ab),
-      tournament("apertura-2026", "2026-04-10", ab),
-      tournament("clausura-2026", "2026-09-10", cd),
-    ];
-
-    expect(
-      buildOfficialProfile(player, tournaments, "2026-11-23").titulosPorPosicion
-    ).toEqual([
-      {
-        anio: 2026,
-        posicion: "delantero",
-        provisoria: true,
-        titulos: 1,
-        porCategoria: [{ categoria: "Tercera", titulos: 1 }],
-      },
-      {
-        anio: 2025,
-        posicion: "zaguero",
-        provisoria: false,
-        titulos: 2,
-        porCategoria: [{ categoria: "Tercera", titulos: 2 }],
-      },
-    ]);
-  });
-
-  it("breaks each year's titles down by category, highest first", () => {
-    const segunda = (slug: string, fecha: string): ArchivedTournament => {
-      const ana = { ...ab, id: "2A-1", categoria: "Segunda" };
-      const rival = { ...cd, id: "2A-2", categoria: "Segunda" };
-      return {
-        slug,
-        nombre: slug,
-        fecha: "Octubre 2026",
-        parejas: [ana, rival],
-        partidos: [
-          {
-            id: "1",
-            categoria: "Segunda",
-            fase: "final",
-            fecha,
-            a: { tipo: "pareja", pareja: ana },
-            b: { tipo: "pareja", pareja: rival },
-            sets: [
-              [12, 4],
-              [12, 3],
-            ],
-          },
-        ],
-      };
-    };
-    const tournaments = [
-      tournament("apertura-2026", "2026-04-10", ab),
-      tournament("invierno-2026", "2026-07-10", ab),
-      segunda("clausura-2026", "2026-10-10"),
-    ];
-
-    expect(
-      buildOfficialProfile(promoted, tournaments, "2026-11-23")
-        .titulosPorPosicion
-    ).toEqual([
-      {
-        anio: 2026,
-        posicion: undefined,
-        provisoria: false,
-        titulos: 3,
-        porCategoria: [
-          { categoria: "Segunda", titulos: 1 },
-          { categoria: "Tercera", titulos: 2 },
-        ],
-      },
-    ]);
-  });
-
-  it("keeps titles of a year without a recorded position, with no position", () => {
-    const tournaments = [tournament("apertura-2026", "2026-04-10", ab)];
-
-    expect(
-      buildOfficialProfile(
-        { id: "beto-beta", nombreOficial: "Beto Beta" },
-        tournaments,
-        "2026-11-23"
-      ).titulosPorPosicion
-    ).toEqual([
-      {
-        anio: 2026,
-        posicion: undefined,
-        provisoria: false,
-        titulos: 1,
-        porCategoria: [{ categoria: "Tercera", titulos: 1 }],
       },
     ]);
   });
