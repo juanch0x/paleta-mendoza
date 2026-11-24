@@ -2,12 +2,19 @@
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import {
+  diagnoseLikelyPromotions,
+  diagnosePlayerRegistry,
   diagnoseTournamentSheets,
   fetchTournamentSheetGrids,
   type TournamentDiagnostics,
 } from "@/data/tournament-diagnostics";
 import Layout from "@/layouts/Layout.astro";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
 import { hasActiveTournament } from "@/data/tournament-availability";
+import { isoYear } from "@/domain/archived-tournament";
 
 if (!hasActiveTournament()) return Astro.redirect("/torneos/");
 
@@ -24,13 +31,35 @@ if (import.meta.env.DEV) {
       throw new Error("Google Sheets no está configurado");
 
     localDiagnostics = diagnoseTournamentSheets(
-      await fetchTournamentSheetGrids(spreadsheetId, apiKey)
+      await fetchTournamentSheetGrids(spreadsheetId, apiKey),
+      undefined,
+      { players: await jsonPlayerRepository.list() }
     );
   } catch {
     localError =
       "No se pudo ejecutar el diagnóstico local. Configurá GOOGLE_SHEETS_SPREADSHEET_ID y GOOGLE_SHEETS_API_KEY.";
   }
 }
+
+// Player registry: players still missing official category or position.
+const registryDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Argentina/Mendoza",
+}).format(new Date());
+const registryPlayers = await jsonPlayerRepository.list();
+const pendingPlayers = diagnosePlayerRegistry(registryPlayers, registryDate);
+
+// Three consecutive titles in a category with no promotion recorded after them.
+const likelyPromotions = diagnoseLikelyPromotions(
+  registryPlayers,
+  await jsonArchivedTournamentRepository.list()
+);
+const pendingLabel = (player: (typeof pendingPlayers)[number]) =>
+  [
+    player.faltaCategoria && "categoría oficial",
+    player.faltaPosicion && `posición ${isoYear(registryDate)}`,
+  ]
+    .filter(Boolean)
+    .join(" y ");
 ---
 
 <Layout
@@ -82,13 +111,87 @@ if (import.meta.env.DEV) {
         ) : null
       }
     </section>
+    <section
+      class="border-border bg-background mt-8 rounded-2xl border p-5 sm:p-6"
+      aria-labelledby="registry-title"
+    >
+      <h2 id="registry-title" class="text-xl font-bold">
+        Registro de jugadores
+      </h2>
+      {
+        pendingPlayers.length === 0 ? (
+          <p class="text-foreground/70 mt-2">
+            Todos los jugadores tienen categoría oficial y posición.
+          </p>
+        ) : (
+          <>
+            <p class="mt-2">
+              {pendingPlayers.length}{" "}
+              {pendingPlayers.length === 1
+                ? "jugador sin datos oficiales completos"
+                : "jugadores sin datos oficiales completos"}
+              . Sus perfiles funcionan igual.
+            </p>
+            <ul class="border-border mt-4 divide-y rounded-xl border">
+              {pendingPlayers.map(player => (
+                <li class="p-4">
+                  <p class="font-semibold">{player.nombreOficial}</p>
+                  <p class="text-foreground/70 mt-1 text-sm">
+                    Falta: {pendingLabel(player)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </section>
+    <section
+      class="border-border bg-background mt-8 rounded-2xl border p-5 sm:p-6"
+      aria-labelledby="promotions-title"
+    >
+      <h2 id="promotions-title" class="text-xl font-bold">Posibles ascensos</h2>
+      {
+        likelyPromotions.length === 0 ? (
+          <p class="text-foreground/70 mt-2">
+            Ningún jugador ganó tres torneos seguidos de una categoría sin un
+            ascenso registrado.
+          </p>
+        ) : (
+          <>
+            <p class="mt-2">
+              Estos jugadores ganaron tres torneos seguidos de una categoría y
+              no tienen un ascenso registrado después. Revisá si corresponde
+              cargarlo en el registro.
+            </p>
+            <ul class="border-border mt-4 divide-y rounded-xl border">
+              {likelyPromotions.map(promotion => (
+                <li class="p-4">
+                  <p class="font-semibold">
+                    {promotion.nombreOficial} · {promotion.categoria}
+                  </p>
+                  <p class="text-foreground/70 mt-1 text-sm">
+                    {promotion.torneos.map(torneo => torneo.nombre).join(", ")}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </section>
   </main>
   <Footer />
 </Layout>
 
 <script>
   type Issue = { sheet: string; cell: string; rule: string; message: string };
-  type Diagnostics = { valid: boolean; checkedAt: string; issues: Issue[] };
+  type Diagnostics = {
+    valid: boolean;
+    checkedAt: string;
+    issues: Issue[];
+    warnings?: Issue[];
+  };
   const result = document.querySelector<HTMLElement>("#diagnostic-result");
   const embedded =
     result?.querySelector<HTMLElement>("[data-diagnostics]")?.dataset
@@ -103,10 +206,17 @@ if (import.meta.env.DEV) {
       ? "text-green-700 dark:text-green-300"
       : "text-red-700 dark:text-red-300";
     const issues = diagnostics.issues.length
-      ? `<ul class="border-border mt-5 divide-y rounded-xl border">${diagnostics.issues.map(issue => `<li class="p-4"><p class="font-semibold">${escapeHtml(issue.sheet)}!${escapeHtml(issue.cell)}</p><p class="text-foreground/70 mt-1 text-sm">${escapeHtml(issue.message)}</p></li>`).join("")}</ul>`
+      ? issueList(diagnostics.issues)
       : '<p class="text-foreground/70 mt-2">No se encontraron valores huérfanos, campos obligatorios faltantes ni referencias inválidas.</p>';
-    result.innerHTML = `<p class="${tone} text-xl font-bold">${title}</p>${issues}`;
+    const warnings = diagnostics.warnings ?? [];
+    const warningSection = warnings.length
+      ? `<h2 class="mt-8 text-lg font-bold text-amber-700 dark:text-amber-300">${warnings.length} advertencia${warnings.length === 1 ? "" : "s"}</h2><p class="text-foreground/70 mt-1 text-sm">No afectan al torneo en curso, pero hay que corregirlas antes de archivarlo.</p>${issueList(warnings)}`
+      : "";
+    result.innerHTML = `<p class="${tone} text-xl font-bold">${title}</p>${issues}${warningSection}`;
   };
+
+  const issueList = (items: Issue[]) =>
+    `<ul class="border-border mt-5 divide-y rounded-xl border">${items.map(issue => `<li class="p-4"><p class="font-semibold">${escapeHtml(issue.sheet)}!${escapeHtml(issue.cell)}</p><p class="text-foreground/70 mt-1 text-sm">${escapeHtml(issue.message)}</p></li>`).join("")}</ul>`;
 
   const escapeHtml = (value: string) =>
     value.replace(

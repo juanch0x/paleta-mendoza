@@ -1,0 +1,219 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import { STATISTICS_PAGE_PUBLISHED } from "@/config";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
+import CategoryTabs from "@/components/players/CategoryTabs.astro";
+import PeriodFilters from "@/components/players/PeriodFilters.astro";
+import ScrollTable from "@/components/players/ScrollTable.astro";
+import type { ArchiveRecord } from "@/data/repositories/types";
+import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
+import { buildAnnualTables, type AnnualTable } from "@/domain/annual-table";
+import { categorySlug, compareCategories } from "@/domain/categories";
+
+// One pre-rendered route per category and period, at
+// /estadisticas/<categoria>[/<periodo>]. /estadisticas shows the highest
+// category of the latest period. Every period gets a page for every category
+// that appears in any period, so tab and filter links never break. Nothing is
+// built while STATISTICS_PAGE_PUBLISHED is off.
+export async function getStaticPaths() {
+  if (!STATISTICS_PAGE_PUBLISHED) return [];
+  const [archives, players] = await Promise.all([
+    jsonArchivedTournamentRepository.list(),
+    jsonPlayerRepository.list(),
+  ]);
+  const views = buildPeriodViews(archives).map(view => ({
+    view,
+    tables: buildAnnualTables(players, view.torneos),
+  }));
+  const categorias = [
+    ...new Set(views.flatMap(v => v.tables.map(t => t.categoria))),
+  ].sort(compareCategories);
+
+  return views.flatMap(({ view, tables }) => {
+    const page = (categoria: string | undefined) => ({
+      view,
+      categorias,
+      categoria,
+      tables: tables.filter(t => t.categoria === categoria),
+    });
+    return [
+      ...(view.path === ""
+        ? [{ params: { slug: undefined }, props: page(categorias[0]) }]
+        : []),
+      ...categorias.map(categoria => ({
+        params: {
+          slug: [categorySlug(categoria), view.path].filter(Boolean).join("/"),
+        },
+        props: page(categoria),
+      })),
+    ];
+  });
+}
+
+const { view, categorias, categoria, tables } = Astro.props as {
+  view: PeriodView<ArchiveRecord>;
+  categorias: string[];
+  categoria: string | undefined;
+  tables: AnnualTable[];
+};
+
+const categoryPath = (cat: string) =>
+  `/estadisticas/${categorySlug(cat)}${view.path ? `/${view.path}` : ""}`;
+const canonicalURL =
+  categoria && new URL(categoryPath(categoria), Astro.site).href;
+
+const POSICION_LABEL = {
+  delantero: "Delanteros",
+  zaguero: "Zagueros",
+} as const;
+---
+
+<Layout
+  title={`Estadísticas ${categoria ?? ""} ${view.titulo}`.replace(/\s+/g, " ")}
+  description="Estadísticas por categoría y posición de los torneos finalizados."
+  canonicalURL={canonicalURL || undefined}
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <h1 class="text-3xl font-bold sm:text-4xl">
+        Estadísticas
+        <span class="mt-2 block text-2xl sm:text-3xl">{view.titulo}</span>
+      </h1>
+
+      {
+        categoria && (
+          <CategoryTabs
+            categorias={categorias}
+            actual={categoria}
+            href={categoryPath}
+          />
+        )
+      }
+
+      <PeriodFilters
+        basePath={categoria
+          ? `/estadisticas/${categorySlug(categoria)}`
+          : "/estadisticas"}
+        filtros={view.filtros}
+        anchor={categoria ? "categorias" : undefined}
+      />
+
+      {
+        tables.length === 0 ? (
+          <p class="border-border bg-background text-foreground/70 mt-8 rounded-xl border border-dashed p-5 text-lg">
+            {categoria
+              ? `Todavía no hay jugadores de ${categoria} con resultados en este período.`
+              : "Todavía no hay jugadores con categoría y posición oficial cargadas."}
+          </p>
+        ) : (
+          <section
+            class="border-border bg-muted/25 mt-8 rounded-2xl border p-4 sm:p-6"
+            aria-labelledby="tabla-titulo"
+          >
+            <h2 id="tabla-titulo" class="text-2xl font-bold sm:text-3xl">
+              {categoria}
+            </h2>
+            <ScrollTable labelledby="tabla-titulo">
+              <table class="w-full text-base">
+                <thead class="text-left text-sm font-semibold">
+                  <tr>
+                    <th scope="col" class="col-puesto px-4 py-3">
+                      Puesto
+                    </th>
+                    <th scope="col" class="col-jugador px-4 py-3">
+                      Jugador
+                    </th>
+                    <th
+                      scope="col"
+                      class="min-w-24 px-4 py-3 text-center whitespace-nowrap"
+                    >
+                      Títulos
+                    </th>
+                    <th
+                      scope="col"
+                      class="min-w-24 px-4 py-3 text-center whitespace-nowrap"
+                    >
+                      Finales
+                    </th>
+                    <th scope="col" class="min-w-28 px-4 py-3 text-center">
+                      Partidos ganados
+                    </th>
+                  </tr>
+                </thead>
+                {tables.map(table => (
+                  <tbody>
+                    <tr class="separador border-border border-t">
+                      <th
+                        colspan="5"
+                        scope="colgroup"
+                        class="text-accent py-3 text-left text-base font-bold tracking-wide uppercase"
+                      >
+                        <span class="sticky left-0 px-4">
+                          {POSICION_LABEL[table.posicion]}
+                        </span>
+                      </th>
+                    </tr>
+                    {table.filas.map(fila => {
+                      const gris = fila.ascendio || fila.categoriaInferior;
+                      return (
+                        <tr
+                          class:list={[
+                            "border-border border-t",
+                            gris && "gris",
+                          ]}
+                        >
+                          <td
+                            class:list={[
+                              "col-puesto px-4 py-3 font-bold whitespace-nowrap tabular-nums",
+                              !gris && "text-accent",
+                            ]}
+                          >
+                            {fila.puesto === undefined
+                              ? "–"
+                              : `${fila.puesto}°`}
+                          </td>
+                          <td class="col-jugador px-4 py-3">
+                            <a
+                              href={`/jugadores/${fila.player.id}`}
+                              class="font-semibold underline underline-offset-4"
+                            >
+                              {fila.player.nombreOficial}
+                            </a>
+                            {fila.ascendio && (
+                              <span class="block text-sm">(ascendió)</span>
+                            )}
+                            {fila.categoriaInferior && (
+                              <span class="block text-sm">
+                                (categoría inferior)
+                              </span>
+                            )}
+                          </td>
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
+                            {fila.titulos}
+                          </td>
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
+                            {fila.finales}
+                          </td>
+                          <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
+                            {fila.partidosGanados}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                ))}
+              </table>
+            </ScrollTable>
+          </section>
+        )
+      }
+    </section>
+  </main>
+  <Footer />
+</Layout>

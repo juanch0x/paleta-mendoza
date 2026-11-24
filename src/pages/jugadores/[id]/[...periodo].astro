@@ -1,0 +1,183 @@
+---
+import Footer from "@/components/Footer.astro";
+import PeriodFilterPanel from "@/components/players/PeriodFilterPanel.astro";
+import RecordFiguresTable from "@/components/players/RecordFiguresTable.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
+import type { ArchiveRecord } from "@/data/repositories/types";
+import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
+import { isoYear } from "@/domain/archived-tournament";
+import type { Player } from "@/domain/player";
+import { buildOfficialProfile } from "@/domain/player-official";
+import { buildPlayerStats } from "@/domain/player-record";
+
+// One pre-rendered route per player and period of the tournaments they played;
+// every year together at /jugadores/[id], down to a single tournament.
+export async function getStaticPaths() {
+  const [players, tournaments] = await Promise.all([
+    jsonPlayerRepository.list(),
+    jsonArchivedTournamentRepository.list(),
+  ]);
+  return players.flatMap(player => {
+    const played = tournaments.filter(tournament =>
+      tournament.parejas.some(pareja => pareja.jugadores.includes(player.id))
+    );
+    return buildPeriodViews(played, {
+      todosLosAnios: true,
+      porTorneo: true,
+    }).map(view => ({
+      params: { id: player.id, periodo: view.path || undefined },
+      props: { player, view },
+    }));
+  });
+}
+
+const { player, view } = Astro.props as {
+  player: Player;
+  view: PeriodView<ArchiveRecord>;
+};
+const [stats] = buildPlayerStats([player], view.torneos);
+const { historial } = stats;
+
+// Official category and position as of the build date in Mendoza.
+const hoy = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Argentina/Mendoza",
+}).format(new Date());
+const anioActual = isoYear(hoy);
+const official = buildOfficialProfile(player, hoy);
+const POSICION_LABEL = { delantero: "Delantero", zaguero: "Zaguero" } as const;
+const ORIGEN_LABEL = { federacion: "federación", ascenso: "ascenso" } as const;
+const formatDate = (iso: string) => iso.split("-").reverse().join("/");
+const pendiente = "Sin cargar";
+const resumen = [
+  { label: "Títulos", value: stats.titulos },
+  { label: "Subcampeonatos", value: stats.subcampeonatos },
+  {
+    label: "Categoría oficial",
+    value: official.categoria?.categoria ?? pendiente,
+  },
+  {
+    label: `Posición ${anioActual}`,
+    value: official.posicion
+      ? POSICION_LABEL[official.posicion.posicion]
+      : pendiente,
+  },
+];
+
+// History columns: the total, then each year and category, skipping any
+// column that would repeat another one.
+const unicoAnio = historial.porAnio.length === 1;
+const unicoRecorte =
+  unicoAnio && historial.porAnio[0].porCategoria.length === 1;
+const columnas = unicoRecorte
+  ? [
+      {
+        ruta: [
+          String(historial.porAnio[0].anio),
+          historial.porAnio[0].porCategoria[0].categoria,
+        ],
+        figuras: historial.total,
+      },
+    ]
+  : [
+      { ruta: ["Total"], figuras: historial.total },
+      ...historial.porAnio.flatMap(year => [
+        ...(!unicoAnio && year.porCategoria.length > 1
+          ? [{ ruta: [String(year.anio), "Total"], figuras: year.total }]
+          : []),
+        ...year.porCategoria.map(record => ({
+          ruta: [String(year.anio), record.categoria],
+          figuras: record.figuras,
+        })),
+      ]),
+      ...(!unicoAnio && historial.porCategoria.length > 1
+        ? historial.porCategoria.map(record => ({
+            ruta: ["Todos los años", record.categoria],
+            figuras: record.figuras,
+          }))
+        : []),
+    ];
+---
+
+<Layout
+  title={player.nombreOficial}
+  description={`Estadísticas de ${player.nombreOficial} en los torneos finalizados.`}
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <p class="text-accent text-sm font-semibold tracking-[0.18em] uppercase">
+        Jugador
+      </p>
+      <h1 class="mt-2 text-3xl font-bold sm:text-4xl">
+        {player.nombreOficial}
+      </h1>
+      <p class="mt-3 text-base">
+        Resultados de los torneos finalizados. El torneo en curso no se cuenta.
+      </p>
+      <PeriodFilterPanel
+        basePath={`/jugadores/${player.id}`}
+        titulo={view.titulo}
+        filtros={view.filtros}
+      />
+
+      <section
+        class="border-border bg-background mt-6 rounded-2xl border p-4 sm:p-6"
+        aria-label="Resumen"
+      >
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
+          {
+            resumen.map(item => (
+              <div>
+                <dt class="text-foreground/70 text-sm font-semibold">
+                  {item.label}
+                </dt>
+                <dd class="mt-1 text-2xl font-bold tabular-nums">
+                  {item.value}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        {
+          official.cambios.length > 0 && (
+            <ul class="border-border mt-5 space-y-1 border-t pt-4 text-base">
+              {official.cambios.map(cambio => (
+                <li>
+                  Desde el {formatDate(cambio.desde)}: de {cambio.anterior} a{" "}
+                  {cambio.categoria} (por {ORIGEN_LABEL[cambio.origen]})
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <section
+        class="border-border bg-muted/25 mt-8 rounded-2xl border p-4 sm:p-6"
+        aria-labelledby="historial-titulo"
+      >
+        <h2 id="historial-titulo" class="text-2xl font-bold sm:text-3xl">
+          Historial completo
+        </h2>
+        {
+          historial.porAnio.length === 0 ? (
+            <p class="mt-3 text-lg">
+              Todavía no tiene partidos en torneos finalizados.
+            </p>
+          ) : (
+            <RecordFiguresTable
+              labelledby="historial-titulo"
+              columnas={columnas}
+            />
+          )
+        }
+      </section>
+    </section>
+  </main>
+  <Footer />
+</Layout>

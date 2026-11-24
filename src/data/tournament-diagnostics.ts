@@ -5,7 +5,17 @@ import {
   validateTournamentStatusRow,
   type TournamentSheetName,
 } from "./csv.js";
+import { matchResult } from "../domain/match-result.js";
 import { parseSets } from "../domain/parse-sets.js";
+import { createPlayerMatcher } from "../domain/player-names.js";
+import {
+  isoYear,
+  tournamentDate,
+  tournamentEndDate,
+  type ArchivedTournament,
+} from "../domain/archived-tournament.js";
+import type { Player } from "../domain/player.js";
+import { categoryOn, positionIn } from "../domain/player-official.js";
 
 export const DIAGNOSTIC_SHEETS = [
   "parejas",
@@ -34,6 +44,13 @@ export type TournamentDiagnostics = {
   checkedAt: string;
   scannedRanges: Record<SheetName, string>;
   issues: TournamentDiagnosticIssue[];
+  /** Non-blocking findings: they never make the sheet invalid. */
+  warnings: TournamentDiagnosticIssue[];
+};
+
+/** Registry data the live sheet is compared against; omitted checks are skipped. */
+export type TournamentDiagnosticsContext = {
+  players?: readonly Player[];
 };
 
 export type GoogleSheetsFetch = typeof fetch;
@@ -97,9 +114,11 @@ export async function fetchTournamentSheetGrids(
 
 export function diagnoseTournamentSheets(
   grids: readonly SheetGrid[],
-  checkedAt = new Date().toISOString()
+  checkedAt = new Date().toISOString(),
+  context: TournamentDiagnosticsContext = {}
 ): TournamentDiagnostics {
   const issues: TournamentDiagnosticIssue[] = [];
+  const warnings: TournamentDiagnosticIssue[] = [];
   const gridByName = new Map(grids.map(grid => [grid.name, grid]));
   const headersBySheet = new Map<SheetName, Headers>();
 
@@ -124,12 +143,53 @@ export function diagnoseTournamentSheets(
     issues
   );
 
+  if (context.players) {
+    warnUnknownPlayers(
+      gridByName.get("parejas"),
+      headersBySheet.get("parejas")!,
+      context.players,
+      warnings
+    );
+  }
+
   return {
     valid: issues.length === 0,
     checkedAt,
     scannedRanges: diagnosticRanges(),
     issues,
+    warnings,
   };
+}
+
+/**
+ * The live tournament keeps working with unregistered names; they are only
+ * surfaced so the organizer can fix them before the freeze step rejects them.
+ */
+function warnUnknownPlayers(
+  grid: SheetGrid | undefined,
+  headers: Headers,
+  players: readonly Player[],
+  warnings: TournamentDiagnosticIssue[]
+) {
+  if (!grid) return;
+  const match = createPlayerMatcher(players);
+
+  forEachPhysicalDataRow(grid, (row, values) => {
+    const parejaId = valueAt(values, headers, "id");
+    if (!parejaId) return;
+    for (const field of ["jugador_1", "jugador_2"]) {
+      const nombre = valueAt(values, headers, field);
+      if (!nombre || match(nombre)) continue;
+      addIssue(
+        warnings,
+        "parejas",
+        row,
+        columnFor("parejas", field, headers),
+        "unknown-player",
+        `"${nombre}" (pareja ${parejaId}) no está en el registro de jugadores.`
+      );
+    }
+  });
 }
 
 function readHeaders(
@@ -407,4 +467,147 @@ function columnToLetter(column: number): string {
     current = Math.floor((current - 1) / 26);
   }
   return result;
+}
+
+export type PlayerMissingOfficialData = {
+  id: string;
+  nombreOficial: string;
+  faltaCategoria: boolean;
+  faltaPosicion: boolean;
+};
+
+/**
+ * Players with no official category in effect on `fecha` (ISO date) or no
+ * position for its year, in registry order. Non-blocking: these players
+ * still have a profile.
+ */
+export function diagnosePlayerRegistry(
+  players: readonly Player[],
+  fecha: string
+): PlayerMissingOfficialData[] {
+  const anio = isoYear(fecha);
+  return players.flatMap(player => {
+    const faltaCategoria = !categoryOn(player, fecha);
+    const faltaPosicion = !positionIn(player, anio);
+    if (!faltaCategoria && !faltaPosicion) return [];
+    return [
+      {
+        id: player.id,
+        nombreOficial: player.nombreOficial,
+        faltaCategoria,
+        faltaPosicion,
+      },
+    ];
+  });
+}
+
+const TITLES_FOR_PROMOTION = 3;
+
+export type LikelyPromotion = {
+  id: string;
+  nombreOficial: string;
+  categoria: string;
+  /** The consecutive tournaments the player won, oldest first. */
+  torneos: { slug: string; nombre: string }[];
+};
+
+/**
+ * Players who won three consecutive archived tournaments of a category with
+ * no promotion (`origen: "ascenso"`) recorded on or after the last match date
+ * of the third of those tournaments (its final). Consecutive means consecutive among the archived tournaments
+ * that decided that category's final, ordered by their earliest match date
+ * (ties broken by slug). Results are in registry order, then category, then
+ * chronological order. Non-blocking: the organizer records the promotion by
+ * hand.
+ */
+export function diagnoseLikelyPromotions(
+  players: readonly Player[],
+  tournaments: readonly ArchivedTournament[]
+): LikelyPromotion[] {
+  const chronological = tournaments
+    .map(tournament => ({ tournament, date: tournamentDate(tournament) }))
+    .sort(
+      (a, b) =>
+        compareOptionalDates(a.date, b.date) ||
+        compareOptionalDates(a.tournament.slug, b.tournament.slug)
+    );
+
+  const finalsByCategory = new Map<string, CategoryFinal[]>();
+  for (const { tournament, date } of chronological) {
+    for (const final of decidedFinals(tournament)) {
+      const list = finalsByCategory.get(final.categoria) ?? [];
+      list.push({ ...final, tournament, date });
+      finalsByCategory.set(final.categoria, list);
+    }
+  }
+  const categories = [...finalsByCategory.keys()].sort((a, b) =>
+    a.localeCompare(b, "es")
+  );
+
+  return players.flatMap(player =>
+    categories.flatMap(categoria => {
+      const found: LikelyPromotion[] = [];
+      let streak: CategoryFinal[] = [];
+      for (const final of finalsByCategory.get(categoria) ?? []) {
+        if (!final.campeones.includes(player.id)) {
+          streak = [];
+          continue;
+        }
+        streak.push(final);
+        if (streak.length < TITLES_FOR_PROMOTION) continue;
+        if (!hasPromotionSince(player, tournamentEndDate(final.tournament))) {
+          found.push({
+            id: player.id,
+            nombreOficial: player.nombreOficial,
+            categoria,
+            torneos: streak.map(({ tournament }) => ({
+              slug: tournament.slug,
+              nombre: tournament.nombre,
+            })),
+          });
+        }
+        streak = [];
+      }
+      return found;
+    })
+  );
+}
+
+type CategoryFinal = {
+  categoria: string;
+  campeones: readonly string[];
+  tournament: ArchivedTournament;
+  date: string | undefined;
+};
+
+/** The champions of each category whose final was decided, one per category. */
+function decidedFinals(
+  tournament: ArchivedTournament
+): Pick<CategoryFinal, "categoria" | "campeones">[] {
+  const parejas = new Map(tournament.parejas.map(p => [p.id, p]));
+  const finals = new Map<string, readonly string[]>();
+  for (const partido of tournament.partidos) {
+    if (partido.fase !== "final" || finals.has(partido.categoria)) continue;
+    const winner = matchResult(partido)?.ganador;
+    if (!winner) continue;
+    finals.set(partido.categoria, parejas.get(winner.id)?.jugadores ?? []);
+  }
+  return [...finals].map(([categoria, campeones]) => ({
+    categoria,
+    campeones,
+  }));
+}
+
+function hasPromotionSince(player: Player, date: string | undefined) {
+  return (player.categorias ?? []).some(
+    entry => entry.origen === "ascenso" && (!date || entry.desde >= date)
+  );
+}
+
+/** Code-unit order (locale-independent); undefined sorts last. */
+function compareOptionalDates(a: string | undefined, b: string | undefined) {
+  if (a === b) return 0;
+  if (a === undefined) return 1;
+  if (b === undefined) return -1;
+  return a < b ? -1 : 1;
 }

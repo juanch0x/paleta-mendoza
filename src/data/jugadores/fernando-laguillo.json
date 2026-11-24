@@ -1,0 +1,10 @@
+{
+  "id": "fernando-laguillo",
+  "nombreOficial": "Fernando Laguillo",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Primera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
+}

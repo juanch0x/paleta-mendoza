@@ -131,6 +131,36 @@ const structuredData = {
 
     <ClientRouter />
 
+    <script>
+      // A link to `#id`, where `id` marks an element with `data-keep-position`,
+      // keeps that element at the same height on screen after the page changes.
+      // Without this, the router scrolls to the top and then smooth-scrolls
+      // down to the anchor. Without JavaScript, the anchor still applies.
+      let kept: { id: string; top: number } | undefined;
+
+      document.addEventListener("astro:before-swap", event => {
+        kept = undefined;
+        const id = decodeURIComponent(event.to.hash.slice(1));
+        if (!id) return;
+        const current = document.getElementById(id);
+        if (!current?.hasAttribute("data-keep-position")) return;
+        if (!event.newDocument.getElementById(id)) return;
+        kept = { id, top: current.getBoundingClientRect().top };
+        event.newDocument.documentElement.style.scrollBehavior = "auto";
+      });
+
+      document.addEventListener("astro:after-swap", () => {
+        if (!kept) return;
+        const target = document.getElementById(kept.id);
+        if (target) {
+          const offset = target.getBoundingClientRect().top - kept.top;
+          window.scrollBy({ top: offset, behavior: "instant" });
+        }
+        document.documentElement.style.removeProperty("scroll-behavior");
+        kept = undefined;
+      });
+    </script>
+
     <script is:inline src="/toggle-theme.js"></script>
   </head>
   <body>

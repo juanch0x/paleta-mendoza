@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  diagnoseLikelyPromotions,
+  diagnosePlayerRegistry,
   diagnoseTournamentSheets,
   diagnosticRanges,
   fetchTournamentSheetGrids,
@@ -11,6 +13,11 @@ import {
   parsePartidosCsv,
   parseTournamentStatusCsv,
 } from "./csv.js";
+import type {
+  ArchivedPareja,
+  ArchivedTournament,
+} from "../domain/archived-tournament.js";
+import type { CategoriaOficial, Player } from "../domain/player.js";
 
 const validGrids: SheetGrid[] = [
   {
@@ -101,6 +108,45 @@ describe("diagnoseTournamentSheets", () => {
           issue.rule === "orphan-data"
       )
     ).toHaveLength(1);
+  });
+
+  it("lists names missing from the player registry as non-blocking warnings", () => {
+    const players = [
+      { id: "ana-ficticia", nombreOficial: "Ana Ficticia" },
+      { id: "bea-ficticia", nombreOficial: "Bea Ficticia" },
+      { id: "carla-ficticia", nombreOficial: "Carla Ficticia" },
+    ];
+    const grids = structuredClone(validGrids);
+    grids[0].values[1] = [
+      "3A-1",
+      "Tercera",
+      "A",
+      "ana  FICTICIA",
+      "Beá Ficticia",
+    ];
+    grids[0].values[2] = [
+      "3A-2",
+      "Tercera",
+      "A",
+      "Carla Ficticia",
+      "Diana Ficticia",
+    ];
+
+    const diagnostics = diagnoseTournamentSheets(grids, undefined, {
+      players,
+    });
+
+    expect(diagnostics.valid).toBe(true);
+    expect(diagnostics.issues).toEqual([]);
+    expect(diagnostics.warnings).toEqual([
+      {
+        sheet: "parejas",
+        cell: "E3",
+        rule: "unknown-player",
+        message:
+          '"Diana Ficticia" (pareja 3A-2) no está en el registro de jugadores.',
+      },
+    ]);
   });
 
   it("accumulates runtime-contract errors instead of aborting at the first one", () => {
@@ -333,3 +379,292 @@ function toCsv(grid: SheetGrid) {
     .map(row => row.map(value => String(value ?? "")).join(","))
     .join("\n");
 }
+
+describe("diagnosePlayerRegistry", () => {
+  it("lists players missing an official category or a position for the date", () => {
+    const players = [
+      {
+        id: "ana-alfa",
+        nombreOficial: "Ana Alfa",
+        categorias: [
+          {
+            desde: "2026-01-01",
+            categoria: "Tercera",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2026,
+            posicion: "delantero" as const,
+            origen: "provisoria" as const,
+          },
+        ],
+      },
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        categorias: [
+          {
+            desde: "2026-12-01",
+            categoria: "Tercera",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2026,
+            posicion: "zaguero" as const,
+            origen: "federacion" as const,
+          },
+        ],
+      },
+      {
+        id: "caro-gama",
+        nombreOficial: "Caro Gama",
+        categorias: [
+          {
+            desde: "2025-01-01",
+            categoria: "Segunda",
+            origen: "federacion" as const,
+          },
+        ],
+        posiciones: [
+          {
+            anio: 2025,
+            posicion: "zaguero" as const,
+            origen: "federacion" as const,
+          },
+        ],
+      },
+      { id: "dani-delta", nombreOficial: "Dani Delta" },
+    ];
+
+    expect(diagnosePlayerRegistry(players, "2026-11-23")).toEqual([
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        faltaCategoria: true,
+        faltaPosicion: false,
+      },
+      {
+        id: "caro-gama",
+        nombreOficial: "Caro Gama",
+        faltaCategoria: false,
+        faltaPosicion: true,
+      },
+      {
+        id: "dani-delta",
+        nombreOficial: "Dani Delta",
+        faltaCategoria: true,
+        faltaPosicion: true,
+      },
+    ]);
+  });
+});
+
+describe("diagnoseLikelyPromotions", () => {
+  const ana: Player = { id: "ana-alfa", nombreOficial: "Ana Alfa" };
+  const beto: Player = { id: "beto-beta", nombreOficial: "Beto Beta" };
+  const caro: Player = { id: "caro-gama", nombreOficial: "Caro Gama" };
+  const dani: Player = { id: "dani-delta", nombreOficial: "Dani Delta" };
+
+  const pareja = (
+    id: string,
+    jugadores: readonly [string, string],
+    categoria = "Tercera"
+  ): ArchivedPareja => ({
+    id,
+    categoria,
+    nombre: jugadores.join(" / "),
+    jugadores,
+  });
+
+  /** A tournament whose only match is the `categoria` final, won by `winner`. */
+  const torneo = (
+    slug: string,
+    fecha: string,
+    winner: readonly [string, string],
+    loser: readonly [string, string],
+    categoria = "Tercera"
+  ): ArchivedTournament => {
+    const a = pareja(`${slug}-a`, winner, categoria);
+    const b = pareja(`${slug}-b`, loser, categoria);
+    return {
+      slug,
+      nombre: `Torneo ${slug}`,
+      fecha: "Mes 2026",
+      parejas: [a, b],
+      partidos: [
+        {
+          id: `${slug}-final`,
+          categoria,
+          fase: "final",
+          fecha,
+          a: { tipo: "pareja", pareja: a },
+          b: { tipo: "pareja", pareja: b },
+          sets: [
+            [12, 8],
+            [12, 9],
+          ],
+        },
+      ],
+    };
+  };
+
+  const ab = ["ana-alfa", "beto-beta"] as const;
+  const cd = ["caro-gama", "dani-delta"] as const;
+
+  it("warns on three consecutive titles in a category, naming the player, category and tournaments", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana, beto, caro, dani], tournaments)
+    ).toEqual([
+      {
+        id: "ana-alfa",
+        nombreOficial: "Ana Alfa",
+        categoria: "Tercera",
+        torneos: [
+          { slug: "uno", nombre: "Torneo uno" },
+          { slug: "dos", nombre: "Torneo dos" },
+          { slug: "tres", nombre: "Torneo tres" },
+        ],
+      },
+      {
+        id: "beto-beta",
+        nombreOficial: "Beto Beta",
+        categoria: "Tercera",
+        torneos: [
+          { slug: "uno", nombre: "Torneo uno" },
+          { slug: "dos", nombre: "Torneo dos" },
+          { slug: "tres", nombre: "Torneo tres" },
+        ],
+      },
+    ]);
+  });
+
+  const promotedOn = (desde: string): CategoriaOficial[] => [
+    { desde: "2026-01-01", categoria: "Tercera", origen: "federacion" },
+    { desde, categoria: "Segunda", origen: "ascenso" },
+  ];
+
+  it("does not warn when a promotion entry exists after the third title", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+    const promoted = [ana, beto].map(player => ({
+      ...player,
+      categorias: promotedOn("2026-07-20"),
+    }));
+
+    expect(diagnoseLikelyPromotions(promoted, tournaments)).toEqual([]);
+  });
+
+  it("still warns when the only promotion entry predates the third title", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      torneo("tres", "2026-07-10", ab, cd),
+    ];
+    const promotedEarly = { ...ana, categorias: promotedOn("2026-04-01") };
+
+    expect(
+      diagnoseLikelyPromotions([promotedEarly], tournaments).map(w => w.id)
+    ).toEqual(["ana-alfa"]);
+  });
+
+  it("still warns when the promotion is dated before the third tournament's final", () => {
+    const tres = torneo("tres", "2026-07-12", ab, cd);
+    const opening = {
+      ...tres.partidos[0],
+      id: "tres-grupo",
+      fase: "grupo",
+      fecha: "2026-07-10",
+    };
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+      { ...tres, partidos: [opening, ...tres.partidos] },
+    ];
+    const promotedMidTournament = {
+      ...ana,
+      categorias: promotedOn("2026-07-11"),
+    };
+    const promotedOnFinalDay = {
+      ...beto,
+      categorias: promotedOn("2026-07-12"),
+    };
+
+    expect(
+      diagnoseLikelyPromotions(
+        [promotedMidTournament, promotedOnFinalDay],
+        tournaments
+      ).map(w => w.id)
+    ).toEqual(["ana-alfa"]);
+  });
+
+  it("does not warn when another pair wins a tournament in between", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-05-10", cd, ab),
+      torneo("tres", "2026-07-10", ab, cd),
+      torneo("cuatro", "2026-09-10", ab, cd),
+    ];
+
+    expect(diagnoseLikelyPromotions([ana, caro], tournaments)).toEqual([]);
+  });
+
+  it("orders tournaments by match date, not by archive order or month label", () => {
+    // In archive order the "cuatro" loss would break the run; by match date
+    // it is played after the three titles.
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("cuatro", "2026-09-10", cd, ab),
+      torneo("tres", "2026-07-10", ab, cd),
+      torneo("dos", "2026-05-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w =>
+        w.torneos.map(t => t.slug)
+      )
+    ).toEqual([["uno", "dos", "tres"]]);
+  });
+
+  it("breaks ties between tournaments on the same date by slug", () => {
+    const tournaments = [
+      torneo("c", "2026-03-10", ab, cd),
+      torneo("a", "2026-03-10", ab, cd),
+      torneo("b", "2026-03-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w =>
+        w.torneos.map(t => t.slug)
+      )
+    ).toEqual([["a", "b", "c"]]);
+  });
+
+  it("counts each category separately", () => {
+    const tournaments = [
+      torneo("uno", "2026-03-10", ab, cd),
+      torneo("dos", "2026-04-10", ab, cd, "Segunda"),
+      torneo("tres", "2026-05-10", ab, cd),
+      torneo("cuatro", "2026-07-10", ab, cd),
+    ];
+
+    expect(
+      diagnoseLikelyPromotions([ana], tournaments).map(w => [
+        w.categoria,
+        w.torneos.map(t => t.slug),
+      ])
+    ).toEqual([["Tercera", ["uno", "tres", "cuatro"]]]);
+  });
+});

@@ -1,0 +1,10 @@
+{
+  "id": "santiago-rial",
+  "nombreOficial": "Santiago Rial",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "provisoria" }
+  ]
+}

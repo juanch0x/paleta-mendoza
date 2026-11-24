@@ -1,0 +1,45 @@
+---
+import type { PeriodFilter } from "@/domain/period-filters";
+
+type Props = {
+  /** Page path the filter routes hang from, e.g. "/estadisticas". */
+  basePath: string;
+  filtros: PeriodFilter[];
+  /** Element id the links land on, so the new page keeps the reader's place. */
+  anchor?: string;
+};
+
+const { basePath, filtros, anchor } = Astro.props;
+const href = (path: string) =>
+  `${path ? `${basePath}/${path}` : basePath}${anchor ? `#${anchor}` : ""}`;
+---
+
+{
+  filtros.length > 0 && (
+    <nav aria-label="Elegir período" class="mt-6 grid gap-4">
+      {filtros.map(filtro => (
+        <div>
+          <p class="text-lg font-semibold">{filtro.etiqueta}</p>
+          <ul class="mt-2 flex flex-wrap gap-2">
+            {filtro.opciones.map(opcion => (
+              <li>
+                <a
+                  href={href(opcion.path)}
+                  aria-current={opcion.actual ? "page" : undefined}
+                  class:list={[
+                    "inline-block min-h-11 rounded-xl border-2 px-4 py-2 text-base font-semibold",
+                    opcion.actual
+                      ? "border-accent bg-accent text-background"
+                      : "border-border underline underline-offset-4",
+                  ]}
+                >
+                  {opcion.etiqueta}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  )
+}

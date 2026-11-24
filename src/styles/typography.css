@@ -8,8 +8,8 @@
     @apply hover:!text-accent break-words;
   }
   .prose thead th:first-child,
-  tbody td:first-child,
-  tfoot td:first-child {
+  .prose tbody td:first-child,
+  .prose tfoot td:first-child {
     padding-inline-start: 0.5714286em !important;
   }
   .prose h2#table-of-contents {

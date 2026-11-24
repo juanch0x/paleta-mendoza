@@ -2,8 +2,11 @@ import {
   diagnoseTournamentSheets,
   fetchTournamentSheetGrids,
 } from "../../src/data/tournament-diagnostics";
+import type { Player } from "../../src/domain/player";
 
 type Env = {
+  /** Cloudflare Pages static assets binding. */
+  ASSETS?: { fetch: (input: URL) => Promise<Response> };
   GOOGLE_SHEETS_API_KEY?: string;
   GOOGLE_SHEETS_SPREADSHEET_ID?: string;
   TOURNAMENT_DIAGNOSTICS_TOKEN?: string;
@@ -12,6 +15,19 @@ type Env = {
 type Context = {
   env: Env;
   request: Request;
+};
+
+/**
+ * The registry is published at build time as a static asset. Name checks are
+ * non-blocking warnings, so a missing registry only skips them.
+ */
+const loadPlayerRegistry = async (env: Env, request: Request): Promise<Player[] | undefined> => {
+  try {
+    const response = await env.ASSETS?.fetch(new URL("/jugadores/registro.json", request.url));
+    return response?.ok ? ((await response.json()) as Player[]) : undefined;
+  } catch {
+    return undefined;
+  }
 };
 
 export const onRequestGet = async ({ env, request }: Context): Promise<Response> => {
@@ -37,8 +53,11 @@ export const onRequestGet = async ({ env, request }: Context): Promise<Response>
   }
 
   try {
-    const grids = await fetchTournamentSheetGrids(spreadsheetId, apiKey);
-    return Response.json(diagnoseTournamentSheets(grids), {
+    const [grids, players] = await Promise.all([
+      fetchTournamentSheetGrids(spreadsheetId, apiKey),
+      loadPlayerRegistry(env, request),
+    ]);
+    return Response.json(diagnoseTournamentSheets(grids, undefined, { players }), {
       headers: { "Cache-Control": "no-store" },
     });
   } catch {

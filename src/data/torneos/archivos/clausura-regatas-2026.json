@@ -12,187 +12,218 @@
       "id": "1A-1",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Hernán Fontana / Luis Darío"
+      "nombre": "Hernán Fontana / Luis Darío",
+      "jugadores": ["hernan-fontana", "luis-dario"]
     },
     {
       "id": "1A-2",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Alan Finelli / Fernando Laguillo"
+      "nombre": "Alan Finelli / Fernando Laguillo",
+      "jugadores": ["alan-finelli", "fernando-laguillo"]
     },
     {
       "id": "1A-3",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Bruno Romero / Andrés Frúgoli"
+      "nombre": "Bruno Romero / Andrés Frúgoli",
+      "jugadores": ["bruno-romero", "andres-frugoli"]
     },
     {
       "id": "1A-4",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Carlos Erreguerena / Valentino Palumbo"
+      "nombre": "Carlos Erreguerena / Valentino Palumbo",
+      "jugadores": ["carlos-erreguerena", "valentino-palumbo"]
     },
     {
       "id": "1A-5",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Tomás Molteno / Matías Poblete"
+      "nombre": "Tomás Molteno / Matías Poblete",
+      "jugadores": ["tomas-molteno", "matias-poblete"]
     },
     {
       "id": "2A-1",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Ariel Vives / Lucas Vives"
+      "nombre": "Ariel Vives / Luca Vives",
+      "jugadores": ["ariel-vives", "luca-vives"]
     },
     {
       "id": "2A-2",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Bautista Latuf / Fernando Losilla"
+      "nombre": "Bautista Latuf / Fernando Losilla",
+      "jugadores": ["bautista-latuf", "fernando-losilla"]
     },
     {
       "id": "2A-3",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Mariano López / Ariel Astesiano"
+      "nombre": "Mariano López / Ariel Astesiano",
+      "jugadores": ["mariano-lopez", "ariel-astesiano"]
     },
     {
       "id": "2A-4",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Rubén Poblete / Osvaldo Calderón"
+      "nombre": "Rubén Poblete / Osvaldo Calderón",
+      "jugadores": ["ruben-poblete", "osvaldo-calderon"]
     },
     {
       "id": "2A-5",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Fabián Tello / Gonzalo Zulueta"
+      "nombre": "Fabián Tello / Gonzalo Zulueta",
+      "jugadores": ["fabian-tello", "gonzalo-zulueta"]
     },
     {
       "id": "2B-1",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Sebastián Fleury / Danilo Morea"
+      "nombre": "Sebastián Fleury / Danilo Morea",
+      "jugadores": ["sebastian-fleury", "danilo-morea"]
     },
     {
       "id": "2B-2",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Goyo Tomasiello / Armando Masetto"
+      "nombre": "Goyo Tomasiello / Manolo Masetto",
+      "jugadores": ["goyo-tomasiello", "manolo-masetto"]
     },
     {
       "id": "2B-3",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Marcos Bustamante / Nicolás Quesada"
+      "nombre": "Marcos Bustamante / Nicolás Quesada",
+      "jugadores": ["marcos-bustamante", "nicolas-quesada"]
     },
     {
       "id": "2B-4",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Gonzalo Martínez / Matías Lombardi"
+      "nombre": "Gonzalo Martínez / Matías Lombardi",
+      "jugadores": ["gonzalo-martinez", "matias-lombardi"]
     },
     {
       "id": "2B-5",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Mauricio Olmedo / Andrés Cruzzocrea"
+      "nombre": "Mauricio Olmedo / Andrés Cruzzocrea",
+      "jugadores": ["mauricio-olmedo", "andres-cruzzocrea"]
     },
     {
       "id": "3A-1",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Fabián Tello / Diego Berna"
+      "nombre": "Fabián Tello / Diego Berna",
+      "jugadores": ["fabian-tello", "diego-berna"]
     },
     {
       "id": "3A-2",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Álvaro Zulueta / Sebastián Masetto"
+      "nombre": "Álvaro Zulueta / Sebastián Masetto",
+      "jugadores": ["alvaro-zulueta", "sebastian-masetto"]
     },
     {
       "id": "3A-3",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Erik Castro / Osvaldo Calderón"
+      "nombre": "Erik Castro / Osvaldo Calderón",
+      "jugadores": ["erik-castro", "osvaldo-calderon"]
     },
     {
       "id": "3A-4",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Mario Margutti / Mario Cuevas"
+      "nombre": "Mario Margutti / Pipino Cuevas",
+      "jugadores": ["mario-margutti", "pipino-cuevas"]
     },
     {
       "id": "3B-1",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Bautista Latuf / Ignacio Corso"
+      "nombre": "Bautista Latuf / Ignacio Corso",
+      "jugadores": ["bautista-latuf", "ignacio-corso"]
     },
     {
       "id": "3B-2",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Juan Portugal / Martín Guerra"
+      "nombre": "Juan Portugal / Martín Guerra",
+      "jugadores": ["juan-portugal", "martin-guerra"]
     },
     {
       "id": "3B-3",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Isaías Fernández / Benicio Zulueta"
+      "nombre": "Isaías Fernández / Benicio Zulueta",
+      "jugadores": ["isaias-fernandez", "benicio-zulueta"]
     },
     {
       "id": "3B-4",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Walter Palma / Santiago Rial"
+      "nombre": "Walter Palma / Santiago Rial",
+      "jugadores": ["walter-palma", "santiago-rial"]
     },
     {
       "id": "4A-1",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Juan Chondro / Carlos Castrillejo"
+      "nombre": "Juan Chondro / Carlos Castrillejo",
+      "jugadores": ["juan-chondro", "carlos-castrillejo"]
     },
     {
       "id": "4A-2",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Daniel Pereyra / Luis Lopez"
+      "nombre": "Daniel Pereyra / Luis Lopez",
+      "jugadores": ["daniel-pereyra", "luis-lopez"]
     },
     {
       "id": "4A-3",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Agustín Flores / Amparo Castrillejo"
+      "nombre": "Agustín Flores / Amparo Castrillejo",
+      "jugadores": ["agustin-flores", "amparo-castrillejo"]
     },
     {
       "id": "4A-4",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Nicolás Quiroga / Mariano Briffi"
+      "nombre": "Nicolás Quiroga / Mariano Briffi",
+      "jugadores": ["nicolas-quiroga", "mariano-briffi"]
     },
     {
       "id": "4B-1",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Javier Arraya / Gabriel Fernández"
+      "nombre": "Javier Arraya / Gabriel Fernández",
+      "jugadores": ["javier-arraya", "gabriel-fernandez"]
     },
     {
       "id": "4B-2",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Franco Spertino / Alma Astesiano"
+      "nombre": "Franco Spertino / Alma Astesiano",
+      "jugadores": ["franco-spertino", "alma-astesiano"]
     },
     {
       "id": "4B-3",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Benjamín Zamorano / Valentín Olguín"
+      "nombre": "Benjamín Zamorano / Valentín Olguín",
+      "jugadores": ["benjamin-zamorano", "valentin-olguin"]
     },
     {
       "id": "4B-4",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Manuel Luciarte / Gonzalo Marzal"
+      "nombre": "Manuel Luciarte / Gonzalo Marzal",
+      "jugadores": ["manuel-luciarte", "gonzalo-marzal"]
     }
   ],
   "partidos": [
@@ -239,7 +270,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -278,7 +309,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "sets": [
@@ -338,7 +369,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -603,7 +634,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "b": {
@@ -634,7 +665,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -891,8 +922,10 @@
           "nombre": "Manuel Luciarte / Gonzalo Marzal"
         }
       },
-      "sets": [],
-      "nota": "Marcador histórico incompleto; revisar fuente original."
+      "sets": [
+        [0, 12],
+        [0, 12]
+      ]
     },
     {
       "id": "24",
@@ -916,7 +949,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -999,7 +1032,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "b": {
@@ -1060,7 +1093,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "b": {
@@ -1161,7 +1194,7 @@
           "id": "3A-4",
           "categoria": "Tercera",
           "zona": "A",
-          "nombre": "Mario Margutti / Mario Cuevas"
+          "nombre": "Mario Margutti / Pipino Cuevas"
         }
       },
       "sets": [
@@ -1192,7 +1225,7 @@
           "id": "2B-2",
           "categoria": "Segunda",
           "zona": "B",
-          "nombre": "Goyo Tomasiello / Armando Masetto"
+          "nombre": "Goyo Tomasiello / Manolo Masetto"
         }
       },
       "sets": [
@@ -1767,7 +1800,7 @@
           "id": "2A-1",
           "categoria": "Segunda",
           "zona": "A",
-          "nombre": "Ariel Vives / Lucas Vives"
+          "nombre": "Ariel Vives / Luca Vives"
         }
       },
       "sets": [

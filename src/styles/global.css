@@ -35,7 +35,7 @@ html[data-theme="dark"] {
     scrollbar-color: var(--color-muted) transparent;
   }
   html {
-    @apply overflow-y-scroll scroll-smooth;
+    @apply overflow-y-scroll motion-safe:scroll-smooth;
   }
   body {
     @apply bg-background text-foreground selection:bg-accent/75 selection:text-background flex min-h-svh flex-col font-mono;

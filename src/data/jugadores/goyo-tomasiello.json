@@ -1,0 +1,10 @@
+{
+  "id": "goyo-tomasiello",
+  "nombreOficial": "Goyo Tomasiello",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Segunda", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }
+  ]
+}

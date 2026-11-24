@@ -1,0 +1,89 @@
+---
+import type { RecordFigures } from "@/domain/player-record";
+import { headerRows } from "@/domain/table-headers";
+import ScrollTable from "./ScrollTable.astro";
+
+type Props = {
+  /** Id of the heading that names the table. */
+  labelledby: string;
+  /**
+   * One column per slice of the record, named by its header labels from the
+   * outermost group in: ["Total"], ["2026", "Segunda"].
+   */
+  columnas: { ruta: string[]; figuras: RecordFigures }[];
+};
+
+const { labelledby, columnas } = Astro.props;
+const cabecera = headerRows(columnas.map(columna => columna.ruta));
+const niveles = cabecera.length;
+const filas: { label: string; value: (f: RecordFigures) => number }[] = [
+  { label: "Títulos", value: f => f.titulos },
+  { label: "Subcampeonatos", value: f => f.subcampeonatos },
+  { label: "Finales jugadas", value: f => f.finales },
+  { label: "Semifinales jugadas", value: f => f.semifinales },
+  { label: "Partidos ganados", value: f => f.partidosGanados },
+  { label: "Partidos perdidos", value: f => f.partidosPerdidos },
+  { label: "Sets ganados", value: f => f.setsGanados },
+  { label: "Sets perdidos", value: f => f.setsPerdidos },
+  {
+    label: "Compañeros distintos con los que ganó títulos",
+    value: f => f.companerosCampeones,
+  },
+];
+---
+
+<ScrollTable labelledby={labelledby}>
+  <table class="w-full text-base">
+    <colgroup>
+      <col />
+    </colgroup>
+    {cabecera[0]?.map(grupo => <colgroup span={grupo.colspan} />)}
+    <thead class="text-sm font-semibold">
+      {
+        cabecera.map((fila, nivel) => (
+          <tr class:list={[nivel > 0 && "border-border border-t"]}>
+            {nivel === 0 && (
+              <th scope="col" rowspan={niveles} class="col-fija py-3">
+                <span class="sr-only">Dato</span>
+              </th>
+            )}
+            {fila.map(celda => {
+              const hoja = nivel + celda.rowspan === niveles;
+              return (
+                <th
+                  scope={hoja ? "col" : "colgroup"}
+                  colspan={celda.colspan > 1 ? celda.colspan : undefined}
+                  rowspan={celda.rowspan > 1 ? celda.rowspan : undefined}
+                  class:list={[
+                    "px-4 py-2 align-middle sm:whitespace-nowrap",
+                    hoja
+                      ? "min-w-28 text-center"
+                      : "border-border text-accent border-l text-left",
+                  ]}
+                >
+                  {celda.label}
+                </th>
+              );
+            })}
+          </tr>
+        ))
+      }
+    </thead>
+    <tbody>
+      {
+        filas.map(fila => (
+          <tr class="border-border border-t">
+            <th scope="row" class="col-fija py-3 font-semibold">
+              {fila.label}
+            </th>
+            {columnas.map(columna => (
+              <td class="px-4 py-3 text-center whitespace-nowrap tabular-nums">
+                {fila.value(columna.figuras)}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</ScrollTable>
