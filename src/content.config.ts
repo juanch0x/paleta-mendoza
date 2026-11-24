@@ -3,6 +3,7 @@ import { glob } from "astro/loaders";
 import { SITE } from "@/config";
 
 export const BLOG_PATH = "src/data/blog";
+export const PLAYERS_PATH = "src/data/jugadores";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.md", base: `./${BLOG_PATH}` }),
@@ -22,4 +23,20 @@ const blog = defineCollection({
     }),
 });
 
-export const collections = { blog };
+/**
+ * Player registry: one JSON document per player, named `<id>.json`.
+ * An invalid record fails the build and the error names the file.
+ */
+const jugadores = defineCollection({
+  loader: glob({ pattern: "*.json", base: `./${PLAYERS_PATH}` }),
+  schema: z
+    .object({
+      id: z
+        .string()
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El id debe ser un slug."),
+      nombreOficial: z.string().trim().min(1),
+    })
+    .strict(),
+});
+
+export const collections = { blog, jugadores };

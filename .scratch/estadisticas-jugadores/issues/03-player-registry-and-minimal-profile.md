@@ -4,12 +4,16 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Player registry exists as one schema-validated record per player; an invalid record fails the build naming the record
-- [ ] Every player in the three archives has exactly one registry record; accent variants are unified
-- [ ] Archived tournaments store player ids for both members of every pair; existing tournament pages still render unchanged
-- [ ] Statistics are read through repository interfaces, not directly from files
-- [ ] Player statistics function returns titles and runner-ups per player; tested with synthetic fixtures (no real player data)
-- [ ] The player profile page is statically generated per player and shows titles and runner-ups
-- [ ] Only archived tournaments are counted, never the active one
+- [x] Player registry exists as one schema-validated record per player; an invalid record fails the build naming the record
+- [x] Every player in the three archives has exactly one registry record; accent variants are unified
+- [x] Archived tournaments store player ids for both members of every pair; existing tournament pages still render unchanged
+- [x] Statistics are read through repository interfaces, not directly from files
+- [x] Player statistics function returns titles and runner-ups per player; tested with synthetic fixtures (no real player data)
+- [x] The player profile page is statically generated per player and shows titles and runner-ups
+- [x] Only archived tournaments are counted, never the active one
+
+## Comments
+
+Resolved in eced0e5, 81674b0. Registry: `src/data/jugadores/<id>.json` (80 players), `jugadores` collection. Repositories: `src/data/repositories/`. Stats: `buildPlayerStats` in `src/domain/player-stats.ts`. Profile: `src/pages/jugadores/[id].astro`. Archives store `parejas[].jugadores`; freeze schema does not yet keep it (ticket 04).

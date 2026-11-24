@@ -4,30 +4,19 @@ import Header from "@/components/Header.astro";
 import ActiveTournament from "@/components/tournament/ActiveTournament";
 import TournamentIdentity from "@/components/tournament/TournamentIdentity";
 import Layout from "@/layouts/Layout.astro";
-import { loadRegisteredArchives } from "@/data/archives";
+import { jsonArchivedTournamentRepository } from "@/data/repositories/json";
+import type { ArchiveRecord } from "@/data/repositories/types";
 import type { ActiveTournament as TournamentData } from "@/data/active-tournament";
 
-type Archive = {
-  slug: string;
-  nombre: string;
-  edition: string;
-  hostClubName: string;
-  clubId: "gimnasia-y-esgrima" | "regatas" | "club-social-maipu";
-  clubLogo: string;
-  fecha: string;
-  alcance: string;
-  parejas: TournamentData["parejas"];
-  partidos: TournamentData["partidos"];
-};
-
-export function getStaticPaths() {
-  return loadRegisteredArchives().map(tournament => ({
+export async function getStaticPaths() {
+  const archives = await jsonArchivedTournamentRepository.list();
+  return archives.map(tournament => ({
     params: { slug: tournament.slug },
-    props: { tournament: tournament as unknown as Archive },
+    props: { tournament },
   }));
 }
 
-const { tournament } = Astro.props as { tournament: Archive };
+const { tournament } = Astro.props as { tournament: ArchiveRecord };
 const tournamentData = {
   parejas: tournament.parejas,
   partidos: tournament.partidos,

@@ -12,145 +12,169 @@
       "id": "1A-1",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Bruno Romero / Alan Finelli"
+      "nombre": "Bruno Romero / Alan Finelli",
+      "jugadores": ["bruno-romero", "alan-finelli"]
     },
     {
       "id": "1A-2",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Juan Cuevas / Fernando Laguillo"
+      "nombre": "Juan Cuevas / Fernando Laguillo",
+      "jugadores": ["juan-cuevas", "fernando-laguillo"]
     },
     {
       "id": "1A-3",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Guillermo Notti / Valentino Palumbo"
+      "nombre": "Guillermo Notti / Valentino Palumbo",
+      "jugadores": ["guillermo-notti", "valentino-palumbo"]
     },
     {
       "id": "1A-4",
       "categoria": "Primera",
       "zona": "A",
-      "nombre": "Bautista Latuf / Alexis Corso"
+      "nombre": "Bautista Latuf / Alexis Corso",
+      "jugadores": ["bautista-latuf", "alexis-corso"]
     },
     {
       "id": "1B-1",
       "categoria": "Primera",
       "zona": "B",
-      "nombre": "Carlos Erreguerena / Andrés Frugoli"
+      "nombre": "Carlos Erreguerena / Andrés Frugoli",
+      "jugadores": ["carlos-erreguerena", "andres-frugoli"]
     },
     {
       "id": "1B-2",
       "categoria": "Primera",
       "zona": "B",
-      "nombre": "Ignacio Corso / Tomas Molteno"
+      "nombre": "Ignacio Corso / Tomas Molteno",
+      "jugadores": ["ignacio-corso", "tomas-molteno"]
     },
     {
       "id": "1B-3",
       "categoria": "Primera",
       "zona": "B",
-      "nombre": "Hernan Fontana / Luis Darío"
+      "nombre": "Hernan Fontana / Luis Darío",
+      "jugadores": ["hernan-fontana", "luis-dario"]
     },
     {
       "id": "2A-1",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Gonzalo Martinez / Martin Armenault"
+      "nombre": "Gonzalo Martinez / Martin Armenault",
+      "jugadores": ["gonzalo-martinez", "martin-armenault"]
     },
     {
       "id": "2A-2",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Juan Portugal / Ariel Vives"
+      "nombre": "Juan Portugal / Ariel Vives",
+      "jugadores": ["juan-portugal", "ariel-vives"]
     },
     {
       "id": "2A-3",
       "categoria": "Segunda",
       "zona": "A",
-      "nombre": "Daniel Noe / Fernando Losilla"
+      "nombre": "Daniel Noe / Fernando Losilla",
+      "jugadores": ["daniel-noe", "fernando-losilla"]
     },
     {
       "id": "2B-1",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Bautista Latuf / Luca Vives"
+      "nombre": "Bautista Latuf / Luca Vives",
+      "jugadores": ["bautista-latuf", "luca-vives"]
     },
     {
       "id": "2B-2",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Gonzalo Zulueta / Alvaro Zulueta"
+      "nombre": "Gonzalo Zulueta / Alvaro Zulueta",
+      "jugadores": ["gonzalo-zulueta", "alvaro-zulueta"]
     },
     {
       "id": "2B-3",
       "categoria": "Segunda",
       "zona": "B",
-      "nombre": "Cristian Aranzabal / Cesar Mendoza"
+      "nombre": "Cristian Aranzabal / Cesar Mendoza",
+      "jugadores": ["cristian-aranzabal", "cesar-mendoza"]
     },
     {
       "id": "3A-1",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Juan Portugal / Martín Guerra"
+      "nombre": "Juan Portugal / Martín Guerra",
+      "jugadores": ["juan-portugal", "martin-guerra"]
     },
     {
       "id": "3A-2",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Mario Margutti / Pipino Cuevas"
+      "nombre": "Mario Margutti / Pipino Cuevas",
+      "jugadores": ["mario-margutti", "pipino-cuevas"]
     },
     {
       "id": "3A-3",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Isaías Fernández / Nicolás Quesada"
+      "nombre": "Isaías Fernández / Nicolás Quesada",
+      "jugadores": ["isaias-fernandez", "nicolas-quesada"]
     },
     {
       "id": "3A-4",
       "categoria": "Tercera",
       "zona": "A",
-      "nombre": "Tomas Aguinaga / Valentín Olguin"
+      "nombre": "Tomas Aguinaga / Valentín Olguin",
+      "jugadores": ["tomas-aguinaga", "valentin-olguin"]
     },
     {
       "id": "3B-1",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Mariano Lopez / Ignacio Corso"
+      "nombre": "Mariano Lopez / Ignacio Corso",
+      "jugadores": ["mariano-lopez", "ignacio-corso"]
     },
     {
       "id": "3B-2",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Sebastián Masetto / Benicio Zulueta"
+      "nombre": "Sebastián Masetto / Benicio Zulueta",
+      "jugadores": ["sebastian-masetto", "benicio-zulueta"]
     },
     {
       "id": "3B-3",
       "categoria": "Tercera",
       "zona": "B",
-      "nombre": "Álvaro Zulueta / Santiago Rial"
+      "nombre": "Álvaro Zulueta / Santiago Rial",
+      "jugadores": ["alvaro-zulueta", "santiago-rial"]
     },
     {
       "id": "4A-1",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Juan Chondro / Gonzalo Marzal"
+      "nombre": "Juan Chondro / Gonzalo Marzal",
+      "jugadores": ["juan-chondro", "gonzalo-marzal"]
     },
     {
       "id": "4A-2",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Isaías Fernández / Gabriel Fernández"
+      "nombre": "Isaías Fernández / Gabriel Fernández",
+      "jugadores": ["isaias-fernandez", "gabriel-fernandez"]
     },
     {
       "id": "4A-3",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Carlos Salis / Amparo Castrillejo"
+      "nombre": "Carlos Salis / Amparo Castrillejo",
+      "jugadores": ["carlos-salis", "amparo-castrillejo"]
     },
     {
       "id": "4A-4",
       "categoria": "Cuarta",
       "zona": "A",
-      "nombre": "Nicolás Quiroga / Mariano Briffi"
+      "nombre": "Nicolás Quiroga / Mariano Briffi",
+      "jugadores": ["nicolas-quiroga", "mariano-briffi"]
     }
   ],
   "partidos": [
