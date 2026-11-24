@@ -7,24 +7,25 @@ import {
   jsonArchivedTournamentRepository,
   jsonPlayerRepository,
 } from "@/data/repositories/json";
-import { buildAnnualTables, tournamentDate } from "@/domain/player-stats";
+import PeriodFilters from "@/components/players/PeriodFilters.astro";
+import type { ArchiveRecord } from "@/data/repositories/types";
+import { buildPeriodViews, type PeriodView } from "@/domain/period-filters";
+import { buildAnnualTables } from "@/domain/player-stats";
 
-// A rest route so the page is only built when STATISTICS_PAGE_PUBLISHED is on.
-export function getStaticPaths() {
-  return STATISTICS_PAGE_PUBLISHED ? [{ params: { slug: undefined } }] : [];
+// One pre-rendered route per period (latest year first, at /estadisticas);
+// nothing is built while STATISTICS_PAGE_PUBLISHED is off.
+export async function getStaticPaths() {
+  if (!STATISTICS_PAGE_PUBLISHED) return [];
+  const archives = await jsonArchivedTournamentRepository.list();
+  return buildPeriodViews(archives).map(view => ({
+    params: { slug: view.path || undefined },
+    props: { view },
+  }));
 }
 
-const [players, archives] = await Promise.all([
-  jsonPlayerRepository.list(),
-  jsonArchivedTournamentRepository.list(),
-]);
-
-// Most recent year with archived tournaments; filters come in ticket 10.
-const yearOfArchive = (archive: (typeof archives)[number]) =>
-  Number(tournamentDate(archive)?.slice(0, 4));
-const anio = Math.max(...archives.map(yearOfArchive).filter(Boolean));
-const tournaments = archives.filter(archive => yearOfArchive(archive) === anio);
-const tables = buildAnnualTables(players, tournaments);
+const { view } = Astro.props as { view: PeriodView<ArchiveRecord> };
+const players = await jsonPlayerRepository.list();
+const tables = buildAnnualTables(players, view.torneos);
 
 const POSICION_LABEL = {
   delantero: "Delanteros",
@@ -33,13 +34,17 @@ const POSICION_LABEL = {
 ---
 
 <Layout
-  title="Estadísticas"
+  title={`Estadísticas ${view.titulo}`}
   description="Tabla anual por categoría y posición de los torneos finalizados."
 >
   <Header />
   <main id="main-content">
     <section class="pt-12 pb-16 sm:pt-16">
-      <h1 class="text-3xl font-bold sm:text-4xl">Estadísticas {anio}</h1>
+      <h1 class="text-3xl font-bold sm:text-4xl">
+        Estadísticas
+        <span class="mt-2 block text-2xl sm:text-3xl">{view.titulo}</span>
+      </h1>
+      <PeriodFilters basePath="/estadisticas" filtros={view.filtros} />
       <p class="mt-3 text-base">
         Tabla anual por categoría y posición. Solo se cuentan los torneos
         finalizados que cada jugador jugó en su categoría oficial de ese
