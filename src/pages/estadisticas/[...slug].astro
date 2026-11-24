@@ -1,0 +1,141 @@
+---
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import Layout from "@/layouts/Layout.astro";
+import { STATISTICS_PAGE_PUBLISHED } from "@/config";
+import {
+  jsonArchivedTournamentRepository,
+  jsonPlayerRepository,
+} from "@/data/repositories/json";
+import { buildAnnualTables, tournamentDate } from "@/domain/player-stats";
+
+// A rest route so the page is only built when STATISTICS_PAGE_PUBLISHED is on.
+export function getStaticPaths() {
+  return STATISTICS_PAGE_PUBLISHED ? [{ params: { slug: undefined } }] : [];
+}
+
+const [players, archives] = await Promise.all([
+  jsonPlayerRepository.list(),
+  jsonArchivedTournamentRepository.list(),
+]);
+
+// Most recent year with archived tournaments; filters come in ticket 10.
+const yearOfArchive = (archive: (typeof archives)[number]) =>
+  Number(tournamentDate(archive)?.slice(0, 4));
+const anio = Math.max(...archives.map(yearOfArchive).filter(Boolean));
+const tournaments = archives.filter(archive => yearOfArchive(archive) === anio);
+const tables = buildAnnualTables(players, tournaments);
+
+const POSICION_LABEL = {
+  delantero: "Delanteros",
+  zaguero: "Zagueros",
+} as const;
+---
+
+<Layout
+  title="Estadísticas"
+  description="Tabla anual por categoría y posición de los torneos finalizados."
+>
+  <Header />
+  <main id="main-content">
+    <section class="pt-12 pb-16 sm:pt-16">
+      <h1 class="text-3xl font-bold sm:text-4xl">Estadísticas {anio}</h1>
+      <p class="mt-3 text-base">
+        Tabla anual por categoría y posición. Solo se cuentan los torneos
+        finalizados que cada jugador jugó en su categoría oficial de ese
+        momento. El torneo en curso no se cuenta.
+      </p>
+      <p class="mt-3 text-base">
+        Orden: más títulos primero; si empatan, más finales; si siguen
+        empatados, más partidos ganados.
+      </p>
+
+      {
+        tables.length === 0 ? (
+          <p class="mt-8 text-lg">
+            Todavía no hay jugadores con categoría y posición oficial cargadas.
+          </p>
+        ) : (
+          <div
+            class="border-border bg-muted/40 mt-6 rounded-xl border p-4 text-base"
+            role="note"
+          >
+            <strong>Filas en gris:</strong> jugadores de una categoría inferior
+            que jugaron en esta. Se muestran sus resultados, pero no tienen
+            puesto (aparece "–") y no afectan el orden de los demás.
+          </div>
+        )
+      }
+
+      {
+        tables.map(table => (
+          <section class="mt-10">
+            <h2 class="text-2xl font-bold">
+              {table.categoria} · {POSICION_LABEL[table.posicion]}
+            </h2>
+            {table.posicionesProvisorias && (
+              <p
+                class="border-accent mt-3 rounded-xl border-2 p-4 text-base"
+                role="note"
+              >
+                <strong>Posiciones provisorias.</strong> Algunas posiciones las
+                cargó la organización y todavía no son la lista oficial de la
+                federación.
+              </p>
+            )}
+            <table class="mt-4 w-full text-left text-base">
+              <thead>
+                <tr class="border-border border-b-2">
+                  <th scope="col" class="py-2 pr-2">
+                    Puesto
+                  </th>
+                  <th scope="col" class="py-2 pr-2">
+                    Jugador
+                  </th>
+                  <th scope="col" class="py-2 pr-2 text-right">
+                    Títulos
+                  </th>
+                  <th scope="col" class="py-2 pr-2 text-right">
+                    Finales
+                  </th>
+                  <th scope="col" class="py-2 text-right">
+                    Partidos ganados
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {table.filas.map(fila => (
+                  <tr
+                    class:list={[
+                      "border-border border-b",
+                      fila.categoriaInferior && "bg-muted/60 opacity-70",
+                    ]}
+                  >
+                    <td class="py-3 pr-2 font-semibold">
+                      {fila.puesto ?? "–"}
+                    </td>
+                    <td class="py-3 pr-2">
+                      <a
+                        href={`/jugadores/${fila.player.id}`}
+                        class="font-semibold underline underline-offset-4"
+                      >
+                        {fila.player.nombreOficial}
+                      </a>
+                      {fila.categoriaInferior && (
+                        <span class="block text-sm">(categoría inferior)</span>
+                      )}
+                    </td>
+                    <td class="py-3 pr-2 text-right">{fila.titulos}</td>
+                    <td class="py-3 pr-2 text-right">{fila.finales}</td>
+                    <td class="py-3 text-right">{fila.partidosGanados}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        ))
+      }
+    </section>
+  </main>
+  <Footer />
+</Layout>

@@ -4,15 +4,19 @@
 
 **Blocked by:** 05 (Full player profile statistics), 07 (Official category and position). Can be built in parallel with 08, but must not be published before 08 is done.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Table per category and position counts only tournaments in the player's official category on that date
-- [ ] Mid-year promotion splits results at the promotion date
-- [ ] Lower-category players are greyed, unranked ("–"), labeled "(categoría inferior)", with a legend; ranks skip them
-- [ ] Players without official category are excluded
-- [ ] Ordering criterion is defined in one place
-- [ ] Provisional positions show the notice
-- [ ] Archive validation fails when a player played below their official category
-- [ ] Each row links to the player's profile
-- [ ] The statistics page and its navigation entry are not published until ticket 08 is done
-- [ ] Covered by player statistics tests with synthetic fixtures and by freeze tests for the new validation rule
+- [x] Table per category and position counts only tournaments in the player's official category on that date
+- [x] Mid-year promotion splits results at the promotion date
+- [x] Lower-category players are greyed, unranked ("–"), labeled "(categoría inferior)", with a legend; ranks skip them
+- [x] Players without official category are excluded
+- [x] Ordering criterion is defined in one place
+- [x] Provisional positions show the notice
+- [x] Archive validation fails when a player played below their official category
+- [x] Each row links to the player's profile
+- [x] The statistics page and its navigation entry are not published until ticket 08 is done
+- [x] Covered by player statistics tests with synthetic fixtures and by freeze tests for the new validation rule
+
+## Comments
+
+Resolved in 7b8518c, 61c49e3, ca5d411, f39df9a. `buildAnnualTables(players, tournaments)` and `compareTableFigures` in `src/domain/player-stats.ts`; rule `playersNotBelowOfficialCategory` in `archiveRules`. Page `src/pages/estadisticas/[...slug].astro` and nav entry are gated by `STATISTICS_PAGE_PUBLISHED` in `src/config.ts` (false until ticket 08 is done). Ties share a rank; players without a position for the year are excluded.
