@@ -16,7 +16,11 @@ const { basePath, titulo, filtros } = Astro.props;
 
 {
   filtros.length > 0 ? (
-    <details id="periodo" class="filtro-periodo mt-6 scroll-mt-4">
+    <details
+      id="periodo"
+      data-keep-position
+      class="filtro-periodo mt-6 scroll-mt-4"
+    >
       <summary class="border-accent bg-background hover:bg-accent/5 inline-flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-full border-2 px-5 py-2 text-lg font-semibold transition">
         <IconAdjustmentsHorizontal
           aria-hidden="true"

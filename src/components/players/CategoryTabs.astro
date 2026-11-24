@@ -13,7 +13,12 @@ type Props = {
 const { categorias, actual, href } = Astro.props;
 ---
 
-<nav id="categorias" aria-label="Elegir categoría" class="mt-6 scroll-mt-4">
+<nav
+  id="categorias"
+  data-keep-position
+  aria-label="Elegir categoría"
+  class="mt-6 scroll-mt-4"
+>
   <p class="text-lg font-semibold">Categoría</p>
   <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
     {
