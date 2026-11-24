@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildPlayerStats,
-  type ArchivedPareja,
-  type ArchivedTournament,
-  type Player,
-} from "./player-stats.js";
+import type {
+  ArchivedPareja,
+  ArchivedTournament,
+} from "./archived-tournament.js";
+import type { Player } from "./player.js";
+import { buildPlayerStats } from "./player-record.js";
 import type { PartidoResuelto, SetScore } from "./types.js";
 
 const player = (id: string, nombreOficial: string): Player => ({
@@ -317,22 +317,27 @@ describe("buildPlayerStats", () => {
         [12, 5],
         [12, 6],
       ] as SetScore[];
+      const final = (
+        winner: ArchivedPareja,
+        loser: ArchivedPareja,
+        fecha: string
+      ) => ({ ...partido("1", "final", winner, loser, win), fecha });
       const tercera2025 = tournament(
         "apertura-2025",
         [ab, cd],
-        [partido("1", "final", ab, cd, win)],
+        [final(ab, cd, "2025-04-12")],
         "Abril 2025"
       );
       const tercera2026 = tournament(
         "apertura-2026",
         [ab, cd],
-        [partido("1", "final", cd, ab, win)],
+        [final(cd, ab, "2026-05-09")],
         "Mayo 2026"
       );
       const primera2026 = tournament(
         "clausura-2026",
         [primeraAc, primeraEf],
-        [partido("1", "final", primeraAc, primeraEf, win)],
+        [final(primeraAc, primeraEf, "2026-10-17")],
         "Octubre 2026"
       );
 
@@ -377,6 +382,35 @@ describe("buildPlayerStats", () => {
         },
         { anio: 2025, titulos: 1, categorias: [["Tercera", 1, 0]] },
       ]);
+    });
+
+    it("reads the year from the match dates, not the archive display date", () => {
+      const dated = (fecha: string) => ({
+        ...partido("1", "final", ab, cd, [
+          [12, 5],
+          [12, 6],
+        ]),
+        fecha,
+      });
+      const torneo = tournament(
+        "clausura-2025",
+        [ab, cd],
+        [dated("2025-12-20")],
+        "Enero 2026"
+      );
+      const undated = tournament(
+        "sin-fecha",
+        [ab, cd],
+        [partido("1", "grupo", ab, cd, [[12, 5]])],
+        "Marzo 2026"
+      );
+
+      const historial = historialOf("ana-alfa", [torneo, undated]);
+
+      expect(
+        historial?.porAnio.map(y => [y.anio, y.total.partidosGanados])
+      ).toEqual([[2025, 1]]);
+      expect(historial?.total.partidosGanados).toBe(2);
     });
 
     it("leaves the breakdowns empty for a player with no archived matches", () => {

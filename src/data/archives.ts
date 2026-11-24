@@ -1,7 +1,7 @@
 import { validateArchive } from "./archive-validation.js";
 import type { FrozenTournament } from "./freeze.js";
 import registry from "./torneos/registro.json";
-import type { Player } from "../domain/player-stats.js";
+import type { Player } from "../domain/player.js";
 
 const archiveFiles = import.meta.glob<FrozenTournament>(
   ["./torneos/archivos/*.json", "./torneos/archivos/*/torneo.json"],

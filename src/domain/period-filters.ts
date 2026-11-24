@@ -1,4 +1,5 @@
-import { tournamentDate } from "./player-stats.js";
+import { isoYear, tournamentDate } from "./archived-tournament.js";
+import { normalizePlayerName } from "./player-names.js";
 
 /** What period filtering needs from an archived tournament. */
 export type PeriodSource = {
@@ -209,11 +210,7 @@ function sortEditions(editions: readonly string[]): string[] {
 
 /** URL segment for an edition: "Apertura" becomes "apertura". */
 function slugifyEdition(edition: string): string {
-  return edition
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim()
+  return normalizePlayerName(edition)
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }
@@ -225,7 +222,7 @@ function datedTournaments<T extends PeriodSource>(
   return tournaments
     .flatMap(torneo => {
       const fecha = tournamentDate(torneo);
-      return fecha ? [{ torneo, fecha, anio: Number(fecha.slice(0, 4)) }] : [];
+      return fecha ? [{ torneo, fecha, anio: isoYear(fecha) }] : [];
     })
     .sort((a, b) => b.fecha.localeCompare(a.fecha));
 }

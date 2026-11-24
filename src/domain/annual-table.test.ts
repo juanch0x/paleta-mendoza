@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildAnnualTables,
-  type ArchivedPareja,
-  type ArchivedTournament,
-  type Player,
-} from "./player-stats.js";
+import { buildAnnualTables } from "./annual-table.js";
+import type {
+  ArchivedPareja,
+  ArchivedTournament,
+} from "./archived-tournament.js";
+import type { Player } from "./player.js";
 import type { PartidoResuelto } from "./types.js";
 
 const enTercera = [

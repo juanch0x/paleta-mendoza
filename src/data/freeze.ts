@@ -4,7 +4,8 @@ import { validateArchive } from "./archive-validation.js";
 import type { ClubId } from "./clubs.js";
 import { construirPartidos } from "../domain/resolver.js";
 import { createPlayerMatcher } from "../domain/player-names.js";
-import type { ArchivedPareja, Player } from "../domain/player-stats.js";
+import type { ArchivedPareja } from "../domain/archived-tournament.js";
+import type { Player } from "../domain/player.js";
 import type { Pareja, PartidoResuelto } from "../domain/types.js";
 import {
   parseParejaMembersCsv,

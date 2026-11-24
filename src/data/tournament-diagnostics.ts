@@ -5,15 +5,17 @@ import {
   validateTournamentStatusRow,
   type TournamentSheetName,
 } from "./csv.js";
+import { matchResult } from "../domain/match-result.js";
 import { parseSets } from "../domain/parse-sets.js";
 import { createPlayerMatcher } from "../domain/player-names.js";
 import {
-  categoryOn,
-  positionIn,
+  isoYear,
   tournamentDate,
+  tournamentEndDate,
   type ArchivedTournament,
-  type Player,
-} from "../domain/player-stats.js";
+} from "../domain/archived-tournament.js";
+import type { Player } from "../domain/player.js";
+import { categoryOn, positionIn } from "../domain/player-official.js";
 
 export const DIAGNOSTIC_SHEETS = [
   "parejas",
@@ -467,10 +469,6 @@ function columnToLetter(column: number): string {
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// Player registry: pending official data (ticket 07)
-// ---------------------------------------------------------------------------
-
 export type PlayerMissingOfficialData = {
   id: string;
   nombreOficial: string;
@@ -487,7 +485,7 @@ export function diagnosePlayerRegistry(
   players: readonly Player[],
   fecha: string
 ): PlayerMissingOfficialData[] {
-  const anio = Number(fecha.slice(0, 4));
+  const anio = isoYear(fecha);
   return players.flatMap(player => {
     const faltaCategoria = !categoryOn(player, fecha);
     const faltaPosicion = !positionIn(player, anio);
@@ -503,10 +501,6 @@ export function diagnosePlayerRegistry(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Likely unrecorded promotions (ticket 11)
-// ---------------------------------------------------------------------------
-
 const TITLES_FOR_PROMOTION = 3;
 
 export type LikelyPromotion = {
@@ -519,8 +513,8 @@ export type LikelyPromotion = {
 
 /**
  * Players who won three consecutive archived tournaments of a category with
- * no promotion (`origen: "ascenso"`) recorded on or after the last of those
- * tournaments. Consecutive means consecutive among the archived tournaments
+ * no promotion (`origen: "ascenso"`) recorded on or after the last match date
+ * of the third of those tournaments (its final). Consecutive means consecutive among the archived tournaments
  * that decided that category's final, ordered by their earliest match date
  * (ties broken by slug). Results are in registry order, then category, then
  * chronological order. Non-blocking: the organizer records the promotion by
@@ -561,7 +555,7 @@ export function diagnoseLikelyPromotions(
         }
         streak.push(final);
         if (streak.length < TITLES_FOR_PROMOTION) continue;
-        if (!hasPromotionSince(player, final.date)) {
+        if (!hasPromotionSince(player, tournamentEndDate(final.tournament))) {
           found.push({
             id: player.id,
             nombreOficial: player.nombreOficial,
@@ -594,11 +588,8 @@ function decidedFinals(
   const finals = new Map<string, readonly string[]>();
   for (const partido of tournament.partidos) {
     if (partido.fase !== "final" || finals.has(partido.categoria)) continue;
-    if (partido.a.tipo !== "pareja" || partido.b.tipo !== "pareja") continue;
-    const setsA = partido.sets.filter(([a, b]) => a > b).length;
-    const setsB = partido.sets.length - setsA;
-    if (setsA === setsB) continue;
-    const winner = setsA > setsB ? partido.a.pareja : partido.b.pareja;
+    const winner = matchResult(partido)?.ganador;
+    if (!winner) continue;
     finals.set(partido.categoria, parejas.get(winner.id)?.jugadores ?? []);
   }
   return [...finals].map(([categoria, campeones]) => ({
