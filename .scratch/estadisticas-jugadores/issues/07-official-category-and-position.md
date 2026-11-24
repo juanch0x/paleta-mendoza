@@ -4,12 +4,16 @@
 
 **Blocked by:** 03 (Player registry and minimal player profile)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Registry schema supports dated category entries and per-year positions, both with origin
-- [ ] The category in effect on a date is the latest entry starting on or before that date
-- [ ] Profile shows official category, position, mid-year category changes and titles by position
-- [ ] Provisional positions show a notice that they are not yet official
-- [ ] Players without category or position still have a working profile
-- [ ] Diagnostics lists players missing category or position
-- [ ] Covered by player statistics tests and diagnostics tests
+- [x] Registry schema supports dated category entries and per-year positions, both with origin
+- [x] The category in effect on a date is the latest entry starting on or before that date
+- [x] Profile shows official category, position, mid-year category changes and titles by position
+- [x] Provisional positions show a notice that they are not yet official
+- [x] Players without category or position still have a working profile
+- [x] Diagnostics lists players missing category or position
+- [x] Covered by player statistics tests and diagnostics tests
+
+## Comments
+
+Resolved in 94de41f, e6afd41 (merge d91714d). Exports in `src/domain/player-stats.ts`: `categoryOn`, `positionIn`, `tournamentDate` (earliest match date), `buildOfficialProfile`; `diagnosePlayerRegistry` in `src/data/tournament-diagnostics.ts`. Record format: `categorias: [{desde, categoria, origen: federacion|ascenso}]`, `posiciones: [{anio, posicion, origen: provisoria|federacion}]`.
