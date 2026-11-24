@@ -32,15 +32,12 @@ export type AnnualTableRow = TableFigures & {
    * official category at the end of the period is higher than the table's.
    */
   ascendio: boolean;
-  posicionProvisoria: boolean;
 };
 
 export type AnnualTable = {
   categoria: string;
   posicion: Posicion;
   filas: AnnualTableRow[];
-  /** True when any row uses a provisional position. */
-  posicionesProvisorias: boolean;
 };
 
 /**
@@ -92,7 +89,6 @@ export function buildAnnualTables(
     player: Player;
     categoria: string;
     posicion: Posicion;
-    provisoria: boolean;
     oficial: TableFigures | undefined;
     inferior: TableFigures;
   };
@@ -118,12 +114,10 @@ export function buildAnnualTables(
           player,
           categoria: pareja.categoria,
           posicion: posicion.posicion,
-          provisoria: false,
           oficial: undefined,
           inferior: emptyTableFigures(),
         };
         entries.set(key, entry);
-        if (posicion.origen === "provisoria") entry.provisoria = true;
         if (counts) entry.oficial ??= emptyTableFigures();
         addTableFigures(entry.oficial ?? entry.inferior, figures);
       }
@@ -137,7 +131,6 @@ export function buildAnnualTables(
       categoria: entry.categoria,
       posicion: entry.posicion,
       filas: [],
-      posicionesProvisorias: false,
     };
     tables.set(key, table);
     const finalCategory =
@@ -151,9 +144,7 @@ export function buildAnnualTables(
         !!entry.oficial &&
         !!finalCategory &&
         isLowerCategory(entry.categoria, finalCategory),
-      posicionProvisoria: entry.provisoria,
     });
-    if (entry.provisoria) table.posicionesProvisorias = true;
   }
 
   for (const table of tables.values()) rankRows(table.filas);
