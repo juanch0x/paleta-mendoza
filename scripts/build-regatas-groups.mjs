@@ -38,7 +38,7 @@ const roster = [
   ["4A-2", "Cuarta", "A", "Daniel Pereyra", "Luis Lopez"],
   ["4A-3", "Cuarta", "A", "Agustín Flores", "Amparo Castrillejo"],
   ["4A-4", "Cuarta", "A", "Nicolás Quiroga", "Mariano Briffi"],
-  ["4B-1", "Cuarta", "B", "Javier Arraya", "Gabriel Fernández"],
+  ["4B-1", "Cuarta", "B", "Javier Ayarra", "Gabriel Fernández"],
   ["4B-2", "Cuarta", "B", "Franco Spertino", "Alma Astesiano"],
   ["4B-3", "Cuarta", "B", "Benjamín Zamorano", "Valentín Olguín"],
   ["4B-4", "Cuarta", "B", "Manuel Luciarte", "Gonzalo Marzal"],

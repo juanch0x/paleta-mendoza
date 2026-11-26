@@ -1,0 +1,10 @@
+{
+  "id": "juan-quiroga",
+  "nombreOficial": "Juan Quiroga",
+  "categorias": [
+    { "desde": "2026-01-01", "categoria": "Tercera", "origen": "federacion" }
+  ],
+  "posiciones": [
+    { "anio": 2026, "posicion": "zaguero", "origen": "federacion" }
+  ]
+}

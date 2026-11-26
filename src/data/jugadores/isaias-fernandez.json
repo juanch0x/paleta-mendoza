@@ -2,7 +2,8 @@
   "id": "isaias-fernandez",
   "nombreOficial": "Isaías Fernández",
   "categorias": [
-    { "desde": "2026-01-01", "categoria": "Cuarta", "origen": "federacion" }
+    { "desde": "2026-01-01", "categoria": "Cuarta", "origen": "federacion" },
+    { "desde": "2026-11-25", "categoria": "Tercera", "origen": "ascenso" }
   ],
   "posiciones": [
     { "anio": 2026, "posicion": "delantero", "origen": "provisoria" }

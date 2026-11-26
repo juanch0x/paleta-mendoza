@@ -201,8 +201,8 @@
       "id": "4B-1",
       "categoria": "Cuarta",
       "zona": "B",
-      "nombre": "Javier Arraya / Gabriel Fernández",
-      "jugadores": ["javier-arraya", "gabriel-fernandez"]
+      "nombre": "Javier Ayarra / Gabriel Fernández",
+      "jugadores": ["javier-ayarra", "gabriel-fernandez"]
     },
     {
       "id": "4B-2",
@@ -249,7 +249,7 @@
           "id": "4B-1",
           "categoria": "Cuarta",
           "zona": "B",
-          "nombre": "Javier Arraya / Gabriel Fernández"
+          "nombre": "Javier Ayarra / Gabriel Fernández"
         }
       },
       "sets": [
@@ -1124,7 +1124,7 @@
           "id": "4B-1",
           "categoria": "Cuarta",
           "zona": "B",
-          "nombre": "Javier Arraya / Gabriel Fernández"
+          "nombre": "Javier Ayarra / Gabriel Fernández"
         }
       },
       "b": {
@@ -1316,7 +1316,7 @@
           "id": "4B-1",
           "categoria": "Cuarta",
           "zona": "B",
-          "nombre": "Javier Arraya / Gabriel Fernández"
+          "nombre": "Javier Ayarra / Gabriel Fernández"
         }
       },
       "sets": [
@@ -1908,7 +1908,7 @@
           "id": "4B-1",
           "categoria": "Cuarta",
           "zona": "B",
-          "nombre": "Javier Arraya / Gabriel Fernández"
+          "nombre": "Javier Ayarra / Gabriel Fernández"
         }
       },
       "b": {
@@ -1975,7 +1975,7 @@
           "id": "4B-1",
           "categoria": "Cuarta",
           "zona": "B",
-          "nombre": "Javier Arraya / Gabriel Fernández"
+          "nombre": "Javier Ayarra / Gabriel Fernández"
         }
       },
       "sets": [
