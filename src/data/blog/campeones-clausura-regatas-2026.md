@@ -33,8 +33,8 @@ _En la foto: las dos parejas finalistas de Segunda._
 
 ## Cuarta
 
-![Javier Arraya y Gabriel Fernández, campeones de Cuarta.](/images/news/clausura-regatas-2026/cuarta-campeones.jpeg)
+![Javier Ayarra y Gabriel Fernández, campeones de Cuarta.](/images/news/clausura-regatas-2026/cuarta-campeones.jpeg)
 
-**Javier Arraya / Gabriel Fernández** se quedaron con Cuarta luego de superar a Manuel Luciarte / Gonzalo Marzal por **12-5, 8-12 y 7-3**.
+**Javier Ayarra / Gabriel Fernández** se quedaron con Cuarta luego de superar a Manuel Luciarte / Gonzalo Marzal por **12-5, 8-12 y 7-3**.
 
 [Ver el torneo completo, con fixture, zonas y playoffs.](/torneos/clausura-regatas-2026/)
