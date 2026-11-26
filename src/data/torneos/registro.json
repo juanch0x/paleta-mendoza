@@ -1,5 +1,12 @@
 [
   {
+    "slug": "clausura-villa-emilia-2026",
+    "nombre": "Clausura · Villa Emilia",
+    "fecha": "Noviembre 2026",
+    "clubLogo": "/images/clubs/villa-emilia.png",
+    "alcance": "Fase de grupos y playoffs"
+  },
+  {
     "slug": "clausura-club-social-maipu-2026",
     "nombre": "Clausura · Club Social Maipú",
     "fecha": "Octubre 2026",

@@ -239,6 +239,7 @@ describe("freezeTournament", () => {
       "clausura-club-social-maipu-2026",
       "clausura-gimnasia-y-esgrima-2026",
       "clausura-regatas-2026",
+      "clausura-villa-emilia-2026",
     ]);
   });
 });
