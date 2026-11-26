@@ -2,6 +2,7 @@ import fs from "node:fs/promises"
 import path from "node:path"
 
 import { fetchCsv } from "../src/data/fetch-csv.js"
+import { formatJson } from "../src/data/format-json.js"
 import { freezeTournament, type TournamentMetadata } from "../src/data/freeze.js"
 import type { Player } from "../src/domain/player.js"
 
@@ -71,9 +72,9 @@ const entry: RegistryEntry = {
 }
 const nextRegistry = [entry, ...registry.filter((item) => item.slug !== metadata.slug)]
 
-await fs.writeFile(archivePath, `${JSON.stringify(tournament, null, 2)}\n`)
+await fs.writeFile(archivePath, await formatJson(tournament, archivePath))
 await fs.writeFile(path.join(tournamentDirectory, "parejas.csv"), parejasCsv)
 await fs.writeFile(path.join(tournamentDirectory, "partidos.csv"), partidosCsv)
-await fs.writeFile(registryPath, `${JSON.stringify(nextRegistry, null, 2)}\n`)
+await fs.writeFile(registryPath, await formatJson(nextRegistry, registryPath))
 
 process.stdout.write(`Congelado ${tournament.nombre}: ${tournament.parejas.length} parejas y ${tournament.partidos.length} partidos.\n`)

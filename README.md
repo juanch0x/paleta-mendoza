@@ -148,6 +148,9 @@ The command downloads both CSV files, validates the full tournament, and writes:
 - `src/data/torneos/archivos/<slug>/parejas.csv` and `partidos.csv` (immutable source snapshots)
 - an entry in `src/data/torneos/registro.json`
 
+The generated JSON is formatted with the repository's Prettier config, so no
+manual formatting step is needed.
+
 It intentionally fails if a match has no score or a playoff reference cannot be
 resolved. Fix the Sheet first; use `--overwrite` only to correct an existing archive.
 Then review, commit, and push the generated JSON. Cloudflare Pages publishes the
